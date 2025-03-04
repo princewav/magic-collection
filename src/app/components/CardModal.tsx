@@ -132,7 +132,7 @@ export default function CardModal() {
         className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4"
         ref={modalRef}
       >
-        <div className="p-4" id="modal-box">
+        <div className="p-4 relative" id="modal-box">
           <button
             onClick={closeModal}
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-300 rounded-full h-6 w-6 flex items-center justify-center bg-gray-700"
