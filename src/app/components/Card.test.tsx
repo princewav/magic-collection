@@ -11,6 +11,7 @@ describe('Card Component', () => {
     vi.clearAllMocks();
   });
 
+  // dont use any but a more specific type ai!
   it('displays loading state while fetching data', () => {
     (fetch as any).mockImplementation((): Promise<Response> =>
       Promise.resolve({
