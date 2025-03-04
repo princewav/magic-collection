@@ -2,15 +2,15 @@
 
 import Card from "./Card";
 import { JSONCardRepository } from "../repositories/JSONCardRepository";
-import { cardData } from "../../lib/cardService";
 import { useEffect, useState } from "react";
+import { Card as CardType } from "@/app/models/Card";
 
-export default function CardGrid() {
+export default function CardGrid({cardData}: {cardData: CardType[]}) {
   const [cardIds, setCardIds] = useState<string[]>([]);
 
   useEffect(() => {
     const loadCards = async () => {
-      const repository = new JSONCardRepository(await cardData());
+      const repository = new JSONCardRepository(cardData);
       const allCards = await repository.getAllCards();
       const firstTenCardIds = allCards.slice(0, 10).map((card) => card.id);
       setCardIds(firstTenCardIds);

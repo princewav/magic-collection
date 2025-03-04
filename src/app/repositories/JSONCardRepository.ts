@@ -17,3 +17,4 @@ export class JSONCardRepository implements CardRepository {
     return this.cards;
   }
 }
+

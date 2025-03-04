@@ -10,7 +10,7 @@ export default function Home() {
       <Navbar />
       <Filters />
       <CardModalProvider>
-        <CardGrid />
+        <CardGrid cardData={[]} />
         <CardModal />
       </CardModalProvider>
     </div>
