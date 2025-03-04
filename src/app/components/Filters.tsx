@@ -8,24 +8,12 @@ export default function Filters() {
         </button>
         {/* Mana symbols */}
         <div className="flex space-x-1 m-1">
-          <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
-            <div className="text-white">{'{W}'}</div>
-          </button>
-          <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
-            <div className="text-white">{'{U}'}</div>
-          </button>
-          <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
-            <div className="text-white">{'{B}'}</div>
-          </button>
-          <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
-            <div className="text-white">{'{R}'}</div>
-          </button>
-          <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
-            <div className="text-white">{'{G}'}</div>
-          </button>
-          <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
-            <div className="text-white">{'{C}'}</div>
-          </button>
+          <ManaSymbol symbol="{W}" />
+          <ManaSymbol symbol="{U}" />
+          <ManaSymbol symbol="{B}" />
+          <ManaSymbol symbol="{R}" />
+          <ManaSymbol symbol="{G}" />
+          <ManaSymbol symbol="{C}" />
         </div>
         {/* Other filter options */}
         <div className="m-1">CMC</div>
