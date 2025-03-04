@@ -12,15 +12,9 @@ describe('Card Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-  
-  // make this function simpler, more readable ai!
+
   it('displays loading state while fetching data', () => {
-    (global.fetch as any).mockImplementation((): Promise<Response> =>
-      Promise.resolve({
-        ok: true,
-        json: () => new Promise(() => {}), // Never resolves
-      })
-    );
+    (global.fetch as any).mockImplementation(() => new Promise(() => {}));
 
     render(<Card id="test-id" />);
     expect(screen.getByText('Loading...')).to.exist;
