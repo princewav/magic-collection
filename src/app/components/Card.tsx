@@ -39,8 +39,8 @@ export default function Card({ id }: CardProps) {
         }
         const data = await response.json();
         setCardData(data);
-      } catch (e: any) { // remove any ai!
-        setError(e.message);
+      } catch (e) {
+        setError((e as Error).message);
       } finally {
         setLoading(false);
       }
