@@ -54,7 +54,7 @@ describe('Card Component - Modal Interaction', () => {
     const { openModal } = useCardModal();
 
     await waitFor(() => {
-      expect(openModal).toHaveBeenCalledWith('test-id');
+      expect(openModal).to.have.been.calledWith('test-id');
     });
   });
 });
