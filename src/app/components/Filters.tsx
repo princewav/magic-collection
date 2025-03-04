@@ -1,3 +1,5 @@
+import ManaSymbol from "./ManaSymbol";
+
 export default function Filters() {
   return (
     <div className="bg-gray-800 p-4 rounded-md shadow-md">
