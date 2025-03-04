@@ -2,12 +2,29 @@
 
 import { useEffect, useState } from "react";
 
+interface CardData {
+  name: string;
+  mana_cost: string;
+  type_line: string;
+  oracle_text: string;
+  power?: string;
+  toughness?: string;
+  image_uris?: {
+    small: string;
+    normal: string;
+    large: string;
+    png: string;
+    art_crop: string;
+    border_crop: string;
+  };
+}
+
 interface CardProps {
   id: string;
 }
 
 export default function Card({ id }: CardProps) {
-  const [cardData, setCardData] = useState<any>(null);
+  const [cardData, setCardData] = useState<CardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
