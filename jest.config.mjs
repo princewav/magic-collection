@@ -1,6 +1,8 @@
 /** @type {import('jest').Config} */
+import { jest } from '@jest/globals';
+
 const config = {
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-environment-jsdom',
   transform: {
     "^.+\\.tsx?$": "babel-jest"
   },
