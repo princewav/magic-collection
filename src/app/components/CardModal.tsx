@@ -139,9 +139,9 @@ export default function CardModal() {
         <div className="p-4 relative" id="modal-box">
           <button
             onClick={closeModal}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-300 rounded-full h-6 w-6 flex items-center justify-center bg-gray-700"
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-300 rounded-full h-8 w-8 flex items-center justify-center bg-gray-700"
           >
-            <X size={16} />
+            <X size={20} />
           </button>
           <div className="flex h-full">
             <div className="w-1/2 pr-4">
