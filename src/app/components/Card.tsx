@@ -17,6 +17,7 @@ export default function Card({ id }: CardProps) {
   };
 
   const imageSrc = `https://cards.scryfall.io/normal/front/${id.substring(0, 1)}/${id.substring(0, 2)}/${id}.jpg?1562623085`;
+  console.log(imageSrc);
 
   return (
     <div className="bg-gray-700 rounded-md shadow-md cursor-pointer" onClick={() => openModal(id)}>
