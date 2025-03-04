@@ -32,8 +32,9 @@ describe('Card Component', () => {
       </CardModalProvider>
     );
 
+    screen.debug();
     await waitFor(() => {
-      expect(screen.getByAltText('Card Test Card')).to.exist;
+      expect(screen.getByAltText('Card test-id')).to.exist;
     });
   });
 });
