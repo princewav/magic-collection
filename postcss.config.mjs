@@ -1,7 +1,10 @@
-import tailwindcss from "@tailwindcss/postcss";
+import path from 'path';
 
-const config = {
-  plugins: [tailwindcss],
-};
-
-export default config;
+export default {
+  plugins: {
+    tailwindcss: { 
+      config: path.resolve('./tailwind.config.js') 
+    },
+    autoprefixer: {},
+  },
+}
