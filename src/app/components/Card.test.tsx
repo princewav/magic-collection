@@ -54,7 +54,8 @@ describe('Card Component', () => {
       expect(screen.getByText('Test oracle text')).to.be.ok;
       expect(screen.getByText('1/1')).to.be.ok;
       const image = screen.getByRole('img') as HTMLImageElement;
-      expect(image).to.have.attribute('src', 'https://example.com/test-image.jpg');
+      expect(image).to.have.attribute('src', 'https://example.com/test-image.jpg');  // fix a problem in this line ai!no
+      
     });
   });
 
