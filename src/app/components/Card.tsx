@@ -51,7 +51,7 @@ export default function Card({ id }: CardProps) {
       }}
     >
       <div className="relative w-full flex flex-col justify-center p-2">
-        <div className="flex justify-center w-full mb-2">
+        <div className="flex justify-center w-full mb-2 mt-1">
           <div className="flex space-x-3">
             <div className="w-2 h-2 transform rotate-45 bg-yellow-500"></div>
             <div className="w-2 h-2 transform rotate-45 bg-yellow-500"></div>

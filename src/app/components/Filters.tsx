@@ -9,7 +9,7 @@ export default function Filters() {
           <input
             type="text"
             placeholder="Search by name"
-            className="bg-gray-700 text-white rounded-md p-1"
+            className="bg-gray-700 text-white rounded-md px-2 py-1"
           />
         </div>
         {/* Mana symbols */}

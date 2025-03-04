@@ -47,13 +47,13 @@ describe('Card Component - Modal Interaction', () => {
         <Card id="test-id" />
       </CardModalProvider>
     );
-
+    
     const cardElement = await screen.findByRole('button');
     fireEvent.click(cardElement);
-
+    
     const { openModal } = useCardModal();
-
     await waitFor(() => {
+      screen.debug();
       expect(openModal).to.have.been.calledWith('test-id');
     });
   });
