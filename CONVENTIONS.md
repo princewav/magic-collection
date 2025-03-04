@@ -21,3 +21,10 @@ When writing code, you MUST follow these principles:
 - never use "any" as a type
 - use vitest and not jest as test framework
 - use chai sintax for expectations in tests
+
+The SEARCH section must exactly match an existing block of lines including
+all white space, comments, indentation, docstrings, etc
+
+# The other 1 SEARCH/REPLACE block were applied successfully.
+Don't re-send them.
+Just reply with fixed versions of the block above that failed to match

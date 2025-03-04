@@ -13,12 +13,12 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     plugins: {
-      vitest: require('eslint-plugin-vitest').configs.recommended
+      vitest: require("eslint-plugin-vitest").configs.recommended,
     },
     rules: {
-      ...require('eslint-plugin-vitest').configs.recommended.rules,
+      ...require("eslint-plugin-vitest").configs.recommended.rules,
     },
-  }
+  },
 ];
 
 export default eslintConfig;

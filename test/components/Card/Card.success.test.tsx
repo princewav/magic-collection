@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import Card from '../../../../src/app/components/Card';
+import Card from '../../../src/app/components/Card';
 
 vi.mock('node-fetch');
 
@@ -11,6 +11,7 @@ describe('Card Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
+
   it('renders card data correctly when the API call is successful', async () => {
     const mockCardData = {
       name: 'Test Card',
@@ -39,7 +40,7 @@ describe('Card Component', () => {
       expect(screen.getByText('Creature — Human Soldier')).to.be.ok;
       expect(screen.getByText('Test oracle text')).to.be.ok;
       expect(screen.getByText('1/1')).to.be.ok;
-      const image = screen.getByRole('img') as HTMLImageElement;
+	  const image = screen.getByRole('img') as HTMLImageElement;
       expect(image.src).to.equal('https://example.com/test-image.jpg');
     });
   });
