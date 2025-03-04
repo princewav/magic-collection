@@ -1,6 +1,4 @@
 /** @type {import('jest').Config} */
-import { jest } from '@jest/globals';
-
 const config = {
   testEnvironment: 'jest-environment-jsdom',
   transform: {
