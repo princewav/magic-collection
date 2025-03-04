@@ -1,3 +1,5 @@
+"use client";
+
 import Card from "./Card";
 import { JSONCardRepository } from "../repositories/JSONCardRepository";
 import { cardData } from "../../lib/cardService";
