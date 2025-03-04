@@ -29,14 +29,18 @@ describe('JSONCardRepository', () => {
   });
 
   it('should return null if a card with the given ID does not exist', async () => {
-    const mockCards = [{ id: '1', name: 'Card 1', oracle_text: 'Some text', colors: ['W'], type_line: 'Creature' }];
-    (cardService.loadCardsData as any).mockResolvedValue(mockCards);
+    (cardService.loadCardsData as any).mockResolvedValue([{ id: '1', name: 'Card 1', oracle_text: 'Some text', colors: ['W'], type_line: 'Creature' }]);
     const card = await repository.getCardById('3');
     expect(card).toBeNull();
     expect(cardService.loadCardsData).toHaveBeenCalled();
   });
 
   it('should return all cards', async () => {
+    const mockCards = [
+      { id: '1', name: 'Card 1', oracle_text: 'Some text', colors: ['W'], type_line: 'Creature' },
+      { id: '2', name: 'Card 2', oracle_text: 'Some other text', colors: ['B'], type_line: 'Instant' },
+    ];
+    (cardService.loadCardsData as any).mockResolvedValue(mockCards);
     const allCards = await repository.getAllCards();
     expect(allCards).toEqual([
       { id: '1', name: 'Card 1', oracle_text: 'Some text', colors: ['W'], type_line: 'Creature' },
