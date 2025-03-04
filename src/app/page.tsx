@@ -1,12 +1,13 @@
+import Filters from "./components/Filters";
+import CardGrid from "./components/CardGrid";
 import Navbar from "./components/Navbar";
 
 export default function Home() {
   return (
-    <div className="text-white min-h-screen">
+    <div className="text-white min-h-screen p-4">
       <Navbar />
-      <div className="flex items-center justify-center h-screen">
-        <h1>Content</h1>
-      </div>
+      <Filters />
+      <CardGrid />
     </div>
   );
 }
