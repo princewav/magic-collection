@@ -59,7 +59,7 @@ export default function Card({ id }: CardProps) {
   }
 
   if (!cardData) {
-    return <div className="bg-gray-700 rounded-md shadow-md p-4">No card data found.</div>;
+    return <div className="bg-gray-700 rounded-md shadow-md p-4">Card not found.</div>;
   }
 
   return (
