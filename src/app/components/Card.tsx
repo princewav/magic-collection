@@ -24,6 +24,7 @@ export default function Card({ id }: CardProps) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log(`Card ${id} fetch accepted`);
         setCardData(data);
       } catch (error: any) {
         console.error("Failed to fetch card ", error);
