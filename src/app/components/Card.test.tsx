@@ -2,10 +2,9 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from './Card';
+import fetch from 'node-fetch';
 
-vi.mock('node-fetch', () => ({
-  default: vi.fn(),
-}));
+vi.mock('node-fetch');
 
 describe('Card Component', () => {
   beforeEach(() => {
@@ -13,7 +12,7 @@ describe('Card Component', () => {
   });
 
   it('displays loading state while fetching data', () => {
-    (global.fetch as any).mockImplementation(() => new Promise(() => {}));
+    (fetch as any).mockImplementation(() => new Promise(() => {}));
     render(<Card id="test-id" />);
     expect(screen.getByText('Loading...')).to.exist;
   });
@@ -31,7 +30,7 @@ describe('Card Component', () => {
       },
     };
 
-    (global.fetch as any).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockCardData),
@@ -52,7 +51,7 @@ describe('Card Component', () => {
   });
 
   it('displays an error message when the API call fails', async () => {
-    (global.fetch as any).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.reject(new Error('API Error'))
     );
 
@@ -64,7 +63,7 @@ describe('Card Component', () => {
   });
 
   it('displays "Card not found" message when the API returns a 404 error', async () => {
-    (global.fetch as any).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.resolve({
         ok: false,
         status: 404,
