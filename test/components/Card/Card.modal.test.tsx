@@ -47,7 +47,10 @@ describe('Card Component - Modal Interaction', () => {
       </CardModalProvider>
     );
     
+    screen.debug();
+    // wait for isLoading to be false ai!
     const cardElement = await screen.findByRole('button');
+    screen.debug();
     fireEvent.click(cardElement);
     
     const { openModal } = useCardModal();
