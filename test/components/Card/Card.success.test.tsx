@@ -39,7 +39,10 @@ describe('Card Component', () => {
       expect(screen.getByText('1/1')).to.exist;
       const image = screen.getByRole('img') as HTMLImageElement;
       const src = image.getAttribute('src');
-      expect(src.startsWith('/_next/image?url=https%3A%2F%2Fexample.com%2Ftest-image.jpg')).to.be.true;
+      expect(src).to.not.be.null;
+      if (src) {
+        expect(src.startsWith('/_next/image?url=https%3A%2F%2Fexample.com%2Ftest-image.jpg')).to.be.true;
+      }
     });
   });
 });
