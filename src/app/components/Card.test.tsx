@@ -20,7 +20,7 @@ describe('Card Component', () => {
     );
 
     render(<Card id="test-id" />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).to.exist;
   });
 
   it('renders card data correctly when the API call is successful', async () => {
