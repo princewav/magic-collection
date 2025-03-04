@@ -48,10 +48,10 @@ describe('Card Component - Modal Interaction', () => {
     );
     
     await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    });
+      expect(screen.queryByText('Loading...')).not.to.exist;
+    })
 
-    const cardElement = await screen.findByRole('button');
+    const cardElement = screen.getByAltText('Card Test Card');
     fireEvent.click(cardElement);
     
     const { openModal } = useCardModal();
