@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCardModal } from "./contexts/CardModalContext";
+import { useCardModal } from "../contexts/CardModalContext";
 import { useState } from "react";
 
 interface CardProps {
@@ -17,11 +17,14 @@ export default function Card({ id }: CardProps) {
   };
 
   const imageSrc = `https://api.scryfall.com/cards/${id}/?format=image`;
-  
+
   return (
-    <div className="bg-gray-700 rounded-md shadow-md cursor-pointer flex items-center justify-center p-2" onClick={() => openModal(id)}>
+    <div
+      className="bg-gray-700 rounded-md shadow-md cursor-pointer flex items-center justify-center p-2"
+      onClick={() => openModal(id)}
+    >
       {imageError ? (
-        <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
+        <div className="aspect-[223/310] w-52 flex items-center justify-center rounded-t-md">
           <span className="text-white text-sm">Image failed to load</span>
         </div>
       ) : (
