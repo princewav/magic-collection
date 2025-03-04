@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCardModal } from "../contexts/CardModalContext";
+import { useCardModal } from "./contexts/CardModalContext";
 import { useState } from "react";
 
 interface CardProps {
@@ -24,7 +24,7 @@ export default function Card({ id }: CardProps) {
             </div>
         ) : (
             <Image
-                src={`https://cards.scryfall.io/normal/front/${id.substring(0, 1)}/${id.substring(0, 2)}/${id}.jpg?1562623085`} // fix this link creation ai!no
+                src={`https://cards.scryfall.io/normal/front/${id.substring(0, 1)}/${id.substring(0, 2)}/${id}.jpg?1562623085`}
                 alt={`Card ${id}`}
                 className="rounded-t-md"
                 width={223}
