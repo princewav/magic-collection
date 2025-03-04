@@ -2,11 +2,10 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from './Card';
-import * as nodeFetch from 'node-fetch';
 
 vi.mock('node-fetch');
 
-const mockedFetch = vi.mocked(nodeFetch.default);
+const mockedFetch = vi.mocked(vi.fn());
 
 describe('Card Component', () => {
   beforeEach(() => {
