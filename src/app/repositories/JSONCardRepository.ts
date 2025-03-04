@@ -4,6 +4,8 @@ import { CARD_DATA_PATH } from "@/constants";
 import * as fs from 'fs/promises';
 import path from 'path';
 
+
+
 export class JSONCardRepository implements CardRepository {
   private cards: Card[];
   private isLoaded: boolean = false;
