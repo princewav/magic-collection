@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, beforeEach, vi } from 'vitest';
 import Card from './Card';
-// use chai assertions ai!
+import { expect } from 'chai';
 // Mock the global fetch function
 global.fetch = vi.fn();
 
@@ -46,13 +46,13 @@ describe('Card Component', () => {
     render(<Card id="test-id" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Test Card')).toBeInTheDocument();
-      expect(screen.getByText('{1}{W}')).toBeInTheDocument();
-      expect(screen.getByText('Creature — Human Soldier')).toBeInTheDocument();
-      expect(screen.getByText('Test oracle text')).toBeInTheDocument();
-      expect(screen.getByText('1/1')).toBeInTheDocument();
+      expect(screen.getByText('Test Card')).to.be.ok;
+      expect(screen.getByText('{1}{W}')).to.be.ok;
+      expect(screen.getByText('Creature — Human Soldier')).to.be.ok;
+      expect(screen.getByText('Test oracle text')).to.be.ok;
+      expect(screen.getByText('1/1')).to.be.ok;
       const image = screen.getByRole('img') as HTMLImageElement;
-      expect(image).toHaveAttribute('src', 'https://example.com/test-image.jpg');
+      expect(image).to.have.attribute('src', 'https://example.com/test-image.jpg');
     });
   });
 
@@ -64,7 +64,7 @@ describe('Card Component', () => {
     render(<Card id="test-id" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Error: API Error')).toBeInTheDocument();
+      expect(screen.getByText('Error: API Error')).to.be.ok;
     });
   });
 
@@ -79,7 +79,7 @@ describe('Card Component', () => {
     render(<Card id="test-id" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Card not found.')).toBeInTheDocument();
+      expect(screen.getByText('Card not found.')).to.be.ok;
     });
   });
 });
