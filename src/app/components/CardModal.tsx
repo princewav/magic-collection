@@ -95,7 +95,9 @@ export default function CardModal() {
     console.log("CardModal is loading");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-        <div className="bg-gray-700 rounded-md shadow-md p-4 text-lg">Loading...</div>
+        <div className="bg-gray-700 rounded-md shadow-md p-4 text-lg">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -126,14 +128,15 @@ export default function CardModal() {
     setImageError(true);
   };
 
-  const powerToughness = cardData.power && cardData.toughness
-    ? `${cardData.power}/${cardData.toughness}`
-    : null;
+  const powerToughness =
+    cardData.power && cardData.toughness
+      ? `${cardData.power}/${cardData.toughness}`
+      : null;
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
       <div
-        className="bg-gray-800 rounded-md shadow-md max-w-4xl w-full h-full max-h-[90vh]"
+        className="bg-gray-800 rounded-md shadow-md max-w-4xl w-full  max-h-[90vh]"
         ref={modalRef}
       >
         <div className="p-4 relative" id="modal-box">
@@ -147,7 +150,9 @@ export default function CardModal() {
             <div className="w-1/2 pr-4">
               {imageError ? (
                 <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
-                  <span className="text-white text-lg">Image failed to load</span>
+                  <span className="text-white text-lg">
+                    Image failed to load
+                  </span>
                 </div>
               ) : (
                 <Image
@@ -163,16 +168,18 @@ export default function CardModal() {
                 />
               )}
             </div>
-            <div className="w-1/2 flex flex-col">
-              <h2 className="text-2xl font-bold text-white">{cardData.name}</h2>
-              <p className="text-gray-400 text-lg">{cardData.mana_cost}</p>
-              <p className="text-gray-300 text-lg">{cardData.type_line}</p>
-              <p className="text-gray-300 text-lg">{cardData.oracle_text}</p>
+            <div className="w-1/2 flex flex-col justify-between">
+              <div className="flex flex-col space-y-4">
+                <h2 className="text-3xl font-bold text-white">
+                  {cardData.name}
+                </h2>
+                <p className="text-gray-400 text-xl">{cardData.mana_cost}</p>
+                <p className="text-gray-300 text-xl">{cardData.type_line}</p>
+                <p className="text-gray-300 text-xl">{cardData.oracle_text}</p>
+              </div>
               {powerToughness && (
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-white text-lg">
-                    {powerToughness}
-                  </p>
+                <div className="flex items-center mt-2 justify-end">
+                  <p className="text-white text-3xl ">{powerToughness}</p>
                 </div>
               )}
             </div>
