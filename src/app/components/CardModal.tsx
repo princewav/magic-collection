@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useCardModal } from "../contexts/CardModalContext";
 
 interface CardData {
   name: string;
@@ -20,13 +21,8 @@ interface CardData {
   };
 }
 
-interface CardModalProps {
-  cardId: string;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export default function CardModal({ cardId, isOpen, onClose }: CardModalProps) {
+export default function CardModal() {
+  const { isOpen, cardId, closeModal } = useCardModal();
   const [cardData, setCardData] = useState<CardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +91,7 @@ export default function CardModal({ cardId, isOpen, onClose }: CardModalProps) {
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
       <div className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-300">
+        <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-300">
           X
         </button>
         {imageError ? (
