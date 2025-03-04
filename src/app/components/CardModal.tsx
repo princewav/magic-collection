@@ -139,33 +139,39 @@ export default function CardModal() {
           >
             <X size={16} />
           </button>
-          <h2 className="text-xl font-bold text-white">{cardData.name}</h2>
-          <p className="text-gray-400">{cardData.mana_cost}</p>
-          <p className="text-gray-300">{cardData.type_line}</p>
-          <p className="text-gray-300">{cardData.oracle_text}</p>
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-white">
-              {cardData.power}/{cardData.toughness}
-            </p>
+          <div className="flex">
+            <div className="w-1/2 pr-4">
+              {imageError ? (
+                <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
+                  <span className="text-white text-sm">Image failed to load</span>
+                </div>
+              ) : (
+                <Image
+                  src={
+                    cardData.image_uris?.normal ||
+                    "https://via.placeholder.com/223x310"
+                  }
+                  alt={cardData.name}
+                  className="rounded-t-md"
+                  width={223}
+                  height={310}
+                  onError={handleImageError}
+                />
+              )}
+            </div>
+            <div className="w-1/2">
+              <h2 className="text-xl font-bold text-white">{cardData.name}</h2>
+              <p className="text-gray-400">{cardData.mana_cost}</p>
+              <p className="text-gray-300">{cardData.type_line}</p>
+              <p className="text-gray-300">{cardData.oracle_text}</p>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-white">
+                  {cardData.power}/{cardData.toughness}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-        {imageError ? (
-          <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
-            <span className="text-white text-sm">Image failed to load</span>
-          </div>
-        ) : (
-          <Image
-            src={
-              cardData.image_uris?.normal ||
-              "https://via.placeholder.com/223x310"
-            }
-            alt={cardData.name}
-            className="rounded-t-md"
-            width={223}
-            height={310}
-            onError={handleImageError}
-          />
-        )}
       </div>
     </div>
   );
