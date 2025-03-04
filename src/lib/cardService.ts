@@ -1,13 +1,18 @@
-import { Card } from "../app/models/Card";
-import { CardRepository } from "../app/repositories/CardRepository";
-import { JSONCardRepository } from "../app/repositories/JSONCardRepository";
+'use server'
 
-const cardRepository: CardRepository = new JSONCardRepository();
+import { Card } from "@/app/models/Card";
+import { CARD_DATA_PATH } from "@/constants";
+import { promises as fs } from 'fs';
+import path from 'path';
 
-export const getCardById = async (id: string): Promise<Card | null> => {
-  return cardRepository.getCardById(id);
-};
-
-export const getAllCards = async (): Promise<Card[]> => {
-  return cardRepository.getAllCards();
-};
+export async function loadCardsData(): Promise<Card[]> {
+  try {
+    const filePath = path.join(process.cwd(), CARD_DATA_PATH);
+    const data = await fs.readFile(filePath, 'utf-8');
+    const cards: Card[] = JSON.parse(data);
+    return cards;
+  } catch (error) {
+    console.error("Error loading cards:", error);
+    return [];
+  }
+}

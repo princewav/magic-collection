@@ -1,5 +1,6 @@
 import { Card } from "@/app/models/Card";
 import { CardRepository } from "@/app/repositories/CardRepository";
+import { loadCardsData } from "@/lib/cardService";
 
 export class JSONCardRepository implements CardRepository {
   private cards: Card[] = [];
@@ -21,11 +22,7 @@ export class JSONCardRepository implements CardRepository {
     }
 
     try {
-      const response = await fetch('/api/cards');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch cards: ${response.status}`);
-      }
-      this.cards = await response.json();
+      this.cards = await loadCardsData();
     } catch (error) {
       console.error("Error loading cards:", error);
       this.cards = [];
