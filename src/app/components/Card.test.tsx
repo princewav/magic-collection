@@ -12,7 +12,8 @@ describe('Card Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
+  
+  // make this function simpler, more readable ai!
   it('displays loading state while fetching data', () => {
     (global.fetch as any).mockImplementation((): Promise<Response> =>
       Promise.resolve({
