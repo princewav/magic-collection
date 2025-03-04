@@ -5,14 +5,28 @@ import Card from '../../../src/app/components/Card';
 import { expect } from 'chai';
 import { CardModalProvider, useCardModal } from '../../../src/app/contexts/CardModalContext';
 
+vi.mock('../../../src/app/contexts/CardModalContext', () => {
+  const mockOpenModal = vi.fn();
+  return {
+    useCardModal: () => ({
+      isOpen: false,
+      cardId: null,
+      openModal: mockOpenModal,
+      closeModal: () => {},
+    }),
+    CardModalProvider: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
+  };
+});
+
 describe('Card Component - Modal Interaction', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.unstubAllGlobals();
   });
 
   it('opens the modal when the card is clicked', async () => {
-    const openModalMock = vi.fn();
-
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
       ok: true,
       json: () => Promise.resolve({
@@ -28,28 +42,19 @@ describe('Card Component - Modal Interaction', () => {
       }),
     })));
 
-    const { container } = render(
+    render(
       <CardModalProvider>
         <Card id="test-id" />
       </CardModalProvider>
     );
 
-    // Mock the openModal function from the CardModalContext
-    const cardComponent = container.querySelector('.bg-gray-700');
+    const cardElement = await screen.findByRole('button');
+    fireEvent.click(cardElement);
 
-    // Ensure the cardComponent is found before proceeding
-    expect(cardComponent).to.not.be.null;
-
-    // Attach the mock function to the Card component's openModal function
     const { openModal } = useCardModal();
-    vi.spyOn(useCardModal(), 'openModal').mockImplementation(openModalMock);
 
-    // Simulate a click on the card
-    fireEvent.click(cardComponent as Element);
-
-    // Wait for the modal to open
     await waitFor(() => {
-      expect(openModalMock).toHaveBeenCalledWith('test-id');
+      expect(openModal).toHaveBeenCalledWith('test-id');
     });
   });
 });
