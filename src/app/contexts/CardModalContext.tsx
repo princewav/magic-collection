@@ -20,11 +20,13 @@ export function CardModalProvider({ children }: CardModalProviderProps) {
   const [cardId, setCardId] = useState<string | null>(null);
 
   const openModal = (cardId: string) => {
+    console.log(`Opening modal for card ${cardId}`);
     setCardId(cardId);
     setIsOpen(true);
   };
 
   const closeModal = () => {
+    console.log("Closing modal");
     setCardId(null);
     setIsOpen(false);
   };

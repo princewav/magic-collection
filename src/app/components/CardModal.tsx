@@ -28,8 +28,11 @@ export default function CardModal() {
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<boolean>(false);
 
+  console.log(`CardModal rendered, isOpen: ${isOpen}, cardId: ${cardId}`);
+
   useEffect(() => {
     if (!cardId || !isOpen) {
+      console.log("CardModal useEffect - cardId or isOpen is false, returning");
       return;
     }
 
@@ -37,6 +40,7 @@ export default function CardModal() {
       setLoading(true);
       setError(null);
       try {
+        console.log(`Fetching card data for ${cardId}`);
         const response = await fetch(`https://api.scryfall.com/cards/${cardId}`);
         if (!response.ok) {
           if (response.status === 404) {
@@ -46,8 +50,10 @@ export default function CardModal() {
         }
         const data = await response.json();
         setCardData(data);
+        console.log(`Card data fetched successfully for ${cardId}`);
       } catch (e) {
         setError((e as Error).message);
+        console.error(`Error fetching card data for ${cardId}:`, e);
       } finally {
         setLoading(false);
       }
@@ -57,10 +63,12 @@ export default function CardModal() {
   }, [cardId, isOpen]);
 
   if (!isOpen) {
+    console.log("CardModal is not open, returning null");
     return null;
   }
 
   if (loading) {
+    console.log("CardModal is loading");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
         <div className="bg-gray-700 rounded-md shadow-md p-4">Loading...</div>
@@ -69,6 +77,7 @@ export default function CardModal() {
   }
 
   if (error) {
+    console.log("CardModal has an error");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
         <div className="bg-gray-700 rounded-md shadow-md p-4">Error: {error}</div>
@@ -77,6 +86,7 @@ export default function CardModal() {
   }
 
   if (!cardData) {
+    console.log("CardModal - card data not found");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
         <div className="bg-gray-700 rounded-md shadow-md p-4">Card not found.</div>

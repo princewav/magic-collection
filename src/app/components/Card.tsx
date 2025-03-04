@@ -18,10 +18,15 @@ export default function Card({ id }: CardProps) {
 
   const imageSrc = `https://api.scryfall.com/cards/${id}/?format=image`;
 
+  console.log(`Card ${id} rendered`);
+
   return (
     <div
       className="bg-gray-700 rounded-md shadow-md cursor-pointer flex items-center justify-center p-2"
-      onClick={() => openModal(id)}
+      onClick={() => {
+        console.log(`Card ${id} clicked`);
+        openModal(id);
+      }}
     >
       {imageError ? (
         <div className="aspect-[223/310] w-52 flex items-center justify-center rounded-t-md">
