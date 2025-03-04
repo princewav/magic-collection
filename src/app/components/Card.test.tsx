@@ -1,17 +1,18 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from './Card';
 
 // Mock the global fetch function
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Card Component', () => {
   beforeEach(() => {
-    (fetch as jest.Mock).mockClear();
+    vi.clearAllMocks();
   });
 
   it('displays loading state while fetching data', () => {
-    (fetch as jest.Mock).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.resolve({
         ok: true,
         json: () => new Promise(() => {}), // Never resolves
@@ -35,7 +36,7 @@ describe('Card Component', () => {
       },
     };
 
-    (fetch as jest.Mock).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockCardData),
@@ -56,7 +57,7 @@ describe('Card Component', () => {
   });
 
   it('displays an error message when the API call fails', async () => {
-    (fetch as jest.Mock).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.reject(new Error('API Error'))
     );
 
@@ -68,7 +69,7 @@ describe('Card Component', () => {
   });
 
   it('displays "Card not found" message when the API returns a 404 error', async () => {
-    (fetch as jest.Mock).mockImplementation(() =>
+    (fetch as any).mockImplementation(() =>
       Promise.resolve({
         ok: false,
         status: 404,
