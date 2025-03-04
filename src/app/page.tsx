@@ -3,7 +3,6 @@ import CardGrid from "./components/CardGrid";
 import Navbar from "./components/Navbar";
 import { CardModalProvider } from "./contexts/CardModalContext";
 import CardModal from "./components/CardModal";
-import { getAllCards } from "@/lib/cardService";
 
 export default async function Home() {
   return (
