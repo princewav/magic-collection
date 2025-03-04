@@ -18,4 +18,19 @@ describe('Card Component', () => {
       expect(screen.getByText('Error: API Error')).to.exist;
     });
   });
+
+  it('displays a message when the image fails to load', async () => {
+    render(<Card id="test-id" />);
+
+    // Mock the Image component's onError event
+    const img = screen.getByRole('img');
+    img.onerror = () => {
+      console.log("Image error triggered");
+    };
+
+    // Wait for the error message to appear
+    await waitFor(() => {
+      expect(screen.getByText('Image failed to load')).to.exist;
+    });
+  });
 });

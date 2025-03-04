@@ -28,6 +28,7 @@ export default function Card({ id }: CardProps) {
   const [cardData, setCardData] = useState<CardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCardData = async () => {
@@ -65,15 +66,26 @@ export default function Card({ id }: CardProps) {
     return <div className="bg-gray-700 rounded-md shadow-md p-4">Card not found.</div>;
   }
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <div className="bg-gray-700 rounded-md shadow-md">
-      <Image
-        src={cardData.image_uris?.normal || "https://via.placeholder.com/223x310"}
-        alt={cardData.name}
-        className="rounded-t-md"
-        width={223}
-        height={310}
-      />
+      {imageError ? (
+        <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
+          <span className="text-white text-sm">Image failed to load</span>
+        </div>
+      ) : (
+        <Image
+          src={cardData.image_uris?.normal || "https://via.placeholder.com/223x310"}
+          alt={cardData.name}
+          className="rounded-t-md"
+          width={223}
+          height={310}
+          onError={handleImageError}
+        />
+      )}
       <div className="p-4">
         <h2 className="text-xl font-bold text-white">{cardData.name}</h2>
         <p className="text-gray-400">{cardData.mana_cost}</p>
