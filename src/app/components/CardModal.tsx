@@ -126,6 +126,10 @@ export default function CardModal() {
     setImageError(true);
   };
 
+  const powerToughness = cardData.power && cardData.toughness
+    ? `${cardData.power}/${cardData.toughness}`
+    : null;
+
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
       <div
@@ -164,11 +168,13 @@ export default function CardModal() {
               <p className="text-gray-400">{cardData.mana_cost}</p>
               <p className="text-gray-300">{cardData.type_line}</p>
               <p className="text-gray-300">{cardData.oracle_text}</p>
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-white">
-                  {cardData.power}/{cardData.toughness}
-                </p>
-              </div>
+              {powerToughness && (
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-white">
+                    {powerToughness}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
