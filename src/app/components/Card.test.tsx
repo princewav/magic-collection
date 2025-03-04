@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from './Card';
-import fetch from 'node-fetch';
 
 vi.mock('node-fetch');
 
