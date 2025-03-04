@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useCardModal } from "../contexts/CardModalContext";
 
@@ -27,6 +27,7 @@ export default function CardModal() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<boolean>(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   console.log(`CardModal rendered, isOpen: ${isOpen}, cardId: ${cardId}`);
 
@@ -61,6 +62,23 @@ export default function CardModal() {
 
     fetchCardData();
   }, [cardId, isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        console.log("Clicked outside the modal, closing it");
+        closeModal();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, closeModal]);
 
   if (!isOpen) {
     console.log("CardModal is not open, returning null");
@@ -100,7 +118,7 @@ export default function CardModal() {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-      <div className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4">
+      <div className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4" ref={modalRef}>
         <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-300">
           X
         </button>

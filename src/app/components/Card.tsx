@@ -18,7 +18,7 @@ export default function Card({ id }: CardProps) {
 
   const imageSrc = `https://api.scryfall.com/cards/${id}/?format=image`;
 
-  console.log(`Card ${id} rendered`);
+  // console.log(`Card ${id} rendered`);
 
   return (
     <div
