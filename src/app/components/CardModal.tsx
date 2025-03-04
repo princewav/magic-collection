@@ -131,9 +131,9 @@ export default function CardModal() {
     : null;
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
       <div
-        className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4"
+        className="bg-gray-800 rounded-md shadow-md max-w-4xl w-full h-full max-h-[90vh]"
         ref={modalRef}
       >
         <div className="p-4 relative" id="modal-box">
@@ -143,7 +143,7 @@ export default function CardModal() {
           >
             <X size={16} />
           </button>
-          <div className="flex">
+          <div className="flex h-full">
             <div className="w-1/2 pr-4">
               {imageError ? (
                 <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
@@ -156,14 +156,14 @@ export default function CardModal() {
                     "https://via.placeholder.com/223x310"
                   }
                   alt={cardData.name}
-                  className="rounded-t-md"
+                  className="rounded-t-md object-contain h-full w-full"
                   width={223}
                   height={310}
                   onError={handleImageError}
                 />
               )}
             </div>
-            <div className="w-1/2">
+            <div className="w-1/2 flex flex-col">
               <h2 className="text-xl font-bold text-white">{cardData.name}</h2>
               <p className="text-gray-400">{cardData.mana_cost}</p>
               <p className="text-gray-300">{cardData.type_line}</p>
