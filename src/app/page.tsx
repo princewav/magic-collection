@@ -2,6 +2,7 @@ import Filters from "./components/Filters";
 import CardGrid from "./components/CardGrid";
 import Navbar from "./components/Navbar";
 import { CardModalProvider } from "./contexts/CardModalContext";
+import CardModal from "./components/CardModal";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Filters />
       <CardModalProvider>
         <CardGrid />
+        <CardModal />
       </CardModalProvider>
     </div>
   );
