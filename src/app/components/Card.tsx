@@ -43,7 +43,7 @@ export default function Card({ id }: CardProps) {
           <Image
             src={imageSrc}
             alt={`Card ${id}`}
-            className="rounded-t-md"
+            className="rounded-t-md rounded-xl"
             width={223}
             height={310}
             onError={handleImageError}
