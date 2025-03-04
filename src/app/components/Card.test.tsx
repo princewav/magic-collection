@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from './Card';
-
+// use chai assertions ai!
 // Mock the global fetch function
 global.fetch = vi.fn();
 
