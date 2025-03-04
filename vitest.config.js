@@ -10,7 +10,9 @@ export default defineConfig({
     globals: true,  // Add this line
     typecheck: {
       enabled: true
-    }
+    },
+    silent: true,
+    reporters: ['verbose'],
   },
   resolve: {
     alias: {
