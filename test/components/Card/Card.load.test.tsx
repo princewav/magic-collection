@@ -1,21 +1,26 @@
-import React from "react";
-import { expect, beforeEach, vi, describe, it } from "vitest";
-import Card from "../../../src/app/components/Card";
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, beforeEach, vi } from 'vitest';
+import Card from '../../../src/app/components/Card';
+import { CardModalProvider } from '../../../src/app/contexts/CardModalContext';
+import { expect } from 'chai';
 
-
-vi.mock("node-fetch");
-
-const mockedFetch = vi.mocked(vi.fn());
-
-describe("Card Component", () => {
+describe('Card Component', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.unstubAllGlobals();
   });
 
-  it("displays loading state while fetching data", () => {
-    mockedFetch.mockImplementation(() => new Promise(() => {}));
-    render(<Card id="test-id" />);
-    expect(screen.getByText("Loading...")).to.exist;
+  it('displays loading state while fetching data', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})));
+
+    render(
+      <CardModalProvider>
+        <Card id="test-id" />
+      </CardModalProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Loading...')).to.exist;
+    });
   });
 });
