@@ -21,3 +21,4 @@ When writing code, you MUST follow these principles:
   2. Immutability
   3. Function Composition
   4. Declarative Code
+- never use any
