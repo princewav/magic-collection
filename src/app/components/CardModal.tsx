@@ -120,7 +120,7 @@ export default function CardModal() {
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
       <div className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4" ref={modalRef}>
-        <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-300 rounded-full h-6 w-6 flex items-center justify-center">
+        <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-300 rounded-full h-6 w-6 flex items-center justify-center bg-gray-700">
           <X size={16} />
         </button>
         {imageError ? (
