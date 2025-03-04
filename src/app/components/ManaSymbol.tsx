@@ -29,8 +29,13 @@ export default function ManaSymbol({ symbol }: ManaSymbolProps) {
     default:
       imageSrc = "/images/mana/unknown.svg"; // Provide a default image
   }
-  // add multicolor ai!
 
+  if (symbol.startsWith("{") && symbol.endsWith("}")) {
+    const colors = symbol.slice(1, -1).split("");
+    if (colors.length > 1) {
+      imageSrc = `/images/mana/${colors.sort().join("").toLowerCase()}.svg`; // Assuming you have combined images like "wb.svg"
+    }
+  }
 
   return (
     <button className="bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center hover:scale-110 transition-transform">
