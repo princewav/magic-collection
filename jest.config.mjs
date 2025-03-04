@@ -16,6 +16,7 @@ const config = {
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  moduleType: 'module',
 };
 
 export default config;
