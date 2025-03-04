@@ -36,6 +36,9 @@ export default function Card({ id }: CardProps) {
       try {
         const response = await fetch(`https://api.scryfall.com/cards/${id}`);
         if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Card not found.');
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();

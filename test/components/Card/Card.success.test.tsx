@@ -3,13 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from '../../../src/app/components/Card';
 
-vi.mock('node-fetch');
-
-const mockedFetch = vi.mocked(vi.fn());
-
 describe('Card Component', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('renders card data correctly when the API call is successful', async () => {
@@ -25,12 +21,12 @@ describe('Card Component', () => {
       },
     };
 
-    mockedFetch.mockImplementation(() =>
+    vi.stubGlobal('fetch', vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockCardData),
       })
-    );
+    ));
 
     render(<Card id="test-id" />);
 
@@ -40,7 +36,7 @@ describe('Card Component', () => {
       expect(screen.getByText('Creature — Human Soldier')).to.be.ok;
       expect(screen.getByText('Test oracle text')).to.be.ok;
       expect(screen.getByText('1/1')).to.be.ok;
-	  const image = screen.getByRole('img') as HTMLImageElement;
+      const image = screen.getByRole('img') as HTMLImageElement;
       expect(image.src).to.equal('https://example.com/test-image.jpg');
     });
   });

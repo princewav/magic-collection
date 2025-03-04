@@ -3,19 +3,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from '../../../src/app/components/Card';
 
-vi.mock('node-fetch');
-
-const mockedFetch = vi.mocked(vi.fn());
-
 describe('Card Component', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('displays an error message when the API call fails', async () => {
-    mockedFetch.mockImplementation(() =>
-      Promise.reject(new Error('API Error'))
-    );
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('API Error'))));
 
     render(<Card id="test-id" />);
 
