@@ -22,7 +22,7 @@ describe('Card Component', () => {
         <Card id="test-id" />
       </CardModalProvider>
     );
-
+screen.debug();
     await waitFor(() => {
       expect(screen.getByText('Card not found.')).to.exist;
     });
