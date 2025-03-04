@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, beforeEach, vi } from 'vitest';
 import Card from '../../../src/app/components/Card';
-import { CardModalProvider } from '../../../src/app/contexts/CardModalContext';
 import { expect } from 'chai';
+import { CardModalProvider } from '../../../src/app/contexts/CardModalContext';
 
 describe('Card Component', () => {
   beforeEach(() => {
