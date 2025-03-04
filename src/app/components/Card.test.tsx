@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Card from './Card';
-import { expect } from 'chai';
 
 vi.mock('node-fetch', () => ({
   default: vi.fn(),
@@ -15,7 +14,6 @@ describe('Card Component', () => {
 
   it('displays loading state while fetching data', () => {
     (global.fetch as any).mockImplementation(() => new Promise(() => {}));
-
     render(<Card id="test-id" />);
     expect(screen.getByText('Loading...')).to.exist;
   });
