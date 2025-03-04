@@ -17,10 +17,10 @@ export default function Card({ id }: CardProps) {
   };
 
   const imageSrc = `https://api.scryfall.com/cards/${id}/?format=image`;
-// lil zoom on hover ai!
+
   return (
     <div
-      className="bg-gray-700 rounded-md shadow-md cursor-pointer flex flex-col items-center"
+      className="bg-gray-700 rounded-md shadow-md cursor-pointer flex flex-col items-center transition-transform transform hover:scale-105"
       onClick={() => {
         console.log(`Card ${id} clicked`);
         openModal(id);
