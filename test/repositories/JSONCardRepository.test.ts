@@ -9,19 +9,19 @@ describe('JSONCardRepository', () => {
   ];
 
   it('should return a card by ID if it exists', async () => {
-    const repository = new JSONCardRepository(mockCards);
+    const repository = new JSONCardRepository();
     const card = await repository.getCardById('1');
     expect(card).toEqual(mockCards[0]);
   });
 
   it('should return null if a card with the given ID does not exist', async () => {
-    const repository = new JSONCardRepository(mockCards);
+    const repository = new JSONCardRepository();
     const card = await repository.getCardById('3');
     expect(card).toBeNull();
   });
 
   it('should return all cards', async () => {
-    const repository = new JSONCardRepository(mockCards);
+    const repository = new JSONCardRepository();
     const allCards = await repository.getAllCards();
     expect(allCards).toEqual(mockCards);
   });
