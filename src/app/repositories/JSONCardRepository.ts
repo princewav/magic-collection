@@ -13,24 +13,29 @@ export class JSONCardRepository implements CardRepository {
   }
 
   async getCardById(id: string): Promise<Card | null> {
-    if (!this.isLoaded) {
-      await this.loadCards();
-    }
+    await this.loadCards();
     const card = this.cards.find((card) => card.id === id);
     return card || null;
   }
 
   async getAllCards(): Promise<Card[]> {
-    if (!this.isLoaded) {
-      await this.loadCards();
-    }
+    await this.loadCards();
     return this.cards;
   }
 
   private async loadCards() {
-    const filePath = path.join(process.cwd(), CARD_DATA_PATH);
-    const data = await fs.readFile(filePath, 'utf-8');
-    this.cards = JSON.parse(data);
-    this.isLoaded = true;
+    if (this.isLoaded) {
+      return;
+    }
+    try {
+      const filePath = path.join(process.cwd(), CARD_DATA_PATH);
+      const data = await fs.readFile(filePath, 'utf-8');
+      this.cards = JSON.parse(data);
+      this.isLoaded = true;
+    } catch (error) {
+      console.error("Error loading cards:", error);
+      this.cards = [];
+      this.isLoaded = true;
+    }
   }
 }
