@@ -9,12 +9,18 @@ describe('Card Component', () => {
   });
 
   it('displays "Card not found" message when the API returns a 404 error', async () => {
-    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: false, status: 404 })));
+    vi.stubGlobal('fetch', vi.fn(() =>
+      Promise.resolve({
+        ok: false,
+        status: 404,
+        text: () => Promise.resolve('Card not found.'), // Simulate the response body
+      })
+    ));
 
     render(<Card id="test-id" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Card not found.')).to.be.ok;
+      expect(screen.getByText('Error: Card not found.')).to.be.ok;
     });
   });
 });
