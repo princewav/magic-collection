@@ -16,6 +16,7 @@ export default function Filters() {
           <ManaSymbol symbol="R" />
           <ManaSymbol symbol="G" />
           <ManaSymbol symbol="C" />
+          <ManaSymbol symbol="M" />
         </div>
         {/* Other filter options */}
         <div className="m-1">CMC</div>
