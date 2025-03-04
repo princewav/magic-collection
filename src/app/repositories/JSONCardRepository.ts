@@ -1,18 +1,8 @@
 import { Card } from "@/app/models/Card";
 import { CardRepository } from "@/app/repositories/CardRepository";
-import { CARD_DATA_PATH } from "@/constants";
-import * as fs from 'fs/promises';
-import path from 'path';
-
-
 
 export class JSONCardRepository implements CardRepository {
-  private cards: Card[];
-  private isLoaded: boolean = false;
-
-  constructor() {
-    this.cards = [];
-  }
+  private cards: Card[] = [];
 
   async getCardById(id: string): Promise<Card | null> {
     await this.loadCards();
@@ -26,18 +16,19 @@ export class JSONCardRepository implements CardRepository {
   }
 
   private async loadCards() {
-    if (this.isLoaded) {
+    if (this.cards.length > 0) {
       return;
     }
+
     try {
-      const filePath = path.join(process.cwd(), CARD_DATA_PATH);
-      const data = await fs.readFile(filePath, 'utf-8');
-      this.cards = JSON.parse(data);
-      this.isLoaded = true;
+      const response = await fetch('/api/cards');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch cards: ${response.status}`);
+      }
+      this.cards = await response.json();
     } catch (error) {
       console.error("Error loading cards:", error);
       this.cards = [];
-      this.isLoaded = true;
     }
   }
 }
