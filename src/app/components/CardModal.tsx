@@ -132,23 +132,6 @@ export default function CardModal() {
         className="bg-gray-800 rounded-md shadow-md max-w-md w-full p-4"
         ref={modalRef}
       >
-        {imageError ? (
-          <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
-            <span className="text-white text-sm">Image failed to load</span>
-          </div>
-        ) : (
-          <Image
-            src={
-              cardData.image_uris?.normal ||
-              "https://via.placeholder.com/223x310"
-            }
-            alt={cardData.name}
-            className="rounded-t-md"
-            width={223}
-            height={310}
-            onError={handleImageError}
-          />
-        )}
         <div className="p-4" id="modal-box">
           <button
             onClick={closeModal}
@@ -166,6 +149,23 @@ export default function CardModal() {
             </p>
           </div>
         </div>
+        {imageError ? (
+          <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
+            <span className="text-white text-sm">Image failed to load</span>
+          </div>
+        ) : (
+          <Image
+            src={
+              cardData.image_uris?.normal ||
+              "https://via.placeholder.com/223x310"
+            }
+            alt={cardData.name}
+            className="rounded-t-md"
+            width={223}
+            height={310}
+            onError={handleImageError}
+          />
+        )}
       </div>
     </div>
   );
