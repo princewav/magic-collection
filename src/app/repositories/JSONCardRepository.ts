@@ -4,8 +4,8 @@ import { CardRepository } from "./CardRepository";
 export class JSONCardRepository implements CardRepository {
   private cards: Card[];
 
-  constructor(cardData: Card[]) {
-    this.cards = cardData;
+  constructor(cards: Card[]) {
+    this.cards = cards;
   }
 
   async getCardById(id: string): Promise<Card | null> {
