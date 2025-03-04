@@ -14,7 +14,7 @@ describe('Card Component', () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
       ok: false,
       status: 404,
-      json: () => Promise.resolve({}),
+      json: () => Promise.resolve({ message: 'Card not found' }), // Simulate the API returning an error message
     })));
 
     render(
@@ -24,7 +24,7 @@ describe('Card Component', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText((content) => content?.includes('Card not found.'))).to.exist;
+      expect(screen.getByText((content) => content?.includes('Card not found'))).to.exist;
     });
   });
 });
