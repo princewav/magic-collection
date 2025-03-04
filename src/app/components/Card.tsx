@@ -17,7 +17,7 @@ export default function Card({ id }: CardProps) {
   };
 
   const imageSrc = `https://api.scryfall.com/cards/${id}/?format=image`;
-
+// lil zoom on hover ai!
   return (
     <div
       className="bg-gray-700 rounded-md shadow-md cursor-pointer flex flex-col items-center"
@@ -26,12 +26,12 @@ export default function Card({ id }: CardProps) {
         openModal(id);
       }}
     >
-      <div className="relative w-full flex justify-center">
-        <div className="absolute top-0 flex justify-center w-full">
+      <div className="relative w-full flex flex-col justify-center p-2">
+        <div className="flex justify-center w-full mb-1">
           <div className="flex">
-            <div className="w-2 h-2 rounded-full bg-red-500 m-1"></div>
-            <div className="w-2 h-2 rounded-full bg-green-500 m-1"></div>
-            <div className="w-2 h-2 rounded-full bg-blue-500 m-1"></div>
+            <div className="w-2 h-2 rounded-full bg-yellow-500 m-1"></div>
+            <div className="w-2 h-2 rounded-full bg-yellow-500 m-1"></div>
+            <div className="w-2 h-2 rounded-full bg-yellow-500 m-1"></div>
             <div className="w-2 h-2 rounded-full bg-yellow-500 m-1"></div>
           </div>
         </div>
