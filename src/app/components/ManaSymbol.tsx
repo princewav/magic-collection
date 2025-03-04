@@ -8,36 +8,34 @@ export default function ManaSymbol({ symbol }: ManaSymbolProps) {
   let imageSrc = "";
 
   switch (symbol) {
-    case "{W}":
+    case "W":
       imageSrc = "/images/mana/white.svg";
       break;
-    case "{U}":
+    case "U":
       imageSrc = "/images/mana/blue.svg";
       break;
-    case "{B}":
+    case "B":
       imageSrc = "/images/mana/black.svg";
       break;
-    case "{R}":
+    case "R":
       imageSrc = "/images/mana/red.svg";
       break;
-    case "{G}":
+    case "G":
       imageSrc = "/images/mana/green.svg";
       break;
-    case "{C}":
+    case "C":
       imageSrc = "/images/mana/colorless.svg";
       break;
-    case "{M}":
+    case "M":
       imageSrc = "/images/mana/multicolor.svg";
       break;
     default:
       imageSrc = "/images/mana/unknown.svg"; // Provide a default image
   }
 
-  if (symbol.startsWith("{") && symbol.endsWith("}")) {
-    const colors = symbol.slice(1, -1).split("");
-    if (colors.length > 1) {
-      imageSrc = `/images/mana/${colors.sort().join("").toLowerCase()}.svg`; // Assuming you have combined images like "wb.svg"
-    }
+  if (symbol.length > 1) {
+    const colors = symbol.split("");
+    imageSrc = `/images/mana/${colors.sort().join("").toLowerCase()}.svg`; // Assuming you have combined images like "wb.svg"
   }
 
   return (

@@ -10,12 +10,12 @@ export default function Filters() {
         </button>
         {/* Mana symbols */}
         <div className="flex space-x-1 m-1">
-          <ManaSymbol symbol="{W}" />
-          <ManaSymbol symbol="{U}" />
-          <ManaSymbol symbol="{B}" />
-          <ManaSymbol symbol="{R}" />
-          <ManaSymbol symbol="{G}" />
-          <ManaSymbol symbol="{C}" />
+          <ManaSymbol symbol="W" />
+          <ManaSymbol symbol="U" />
+          <ManaSymbol symbol="B" />
+          <ManaSymbol symbol="R" />
+          <ManaSymbol symbol="G" />
+          <ManaSymbol symbol="C" />
         </div>
         {/* Other filter options */}
         <div className="m-1">CMC</div>
