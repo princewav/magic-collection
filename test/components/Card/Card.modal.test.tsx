@@ -47,6 +47,7 @@ describe('Card Component - Modal Interaction', () => {
       </CardModalProvider>
     );
     
+    // wait for the page to load ai!
     const cardElement = await screen.findByRole('button');
     fireEvent.click(cardElement);
     
