@@ -1,5 +1,5 @@
-import { Card } from "../models/Card";
-import { CardRepository } from "./CardRepository";
+import { Card } from "@/app/models/Card";
+import { CardRepository } from "@/app/repositories/CardRepository";
 
 export class JSONCardRepository implements CardRepository {
   private cards: Card[];
@@ -17,4 +17,3 @@ export class JSONCardRepository implements CardRepository {
     return this.cards;
   }
 }
-

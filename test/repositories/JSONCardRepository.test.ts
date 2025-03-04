@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { JSONCardRepository } from '../../src/app/repositories/JSONCardRepository';
-import { Card } from '../../src/app/models/Card';
+import { JSONCardRepository } from '@/app/repositories/JSONCardRepository';
+import { Card } from '@/app/models/Card';
 
 describe('JSONCardRepository', () => {
   const mockCards: Card[] = [
