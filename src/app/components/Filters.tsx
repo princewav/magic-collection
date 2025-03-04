@@ -1,3 +1,4 @@
+import Image from "next/image";
 import ManaSymbol from "./ManaSymbol";
 
 export default function Filters() {
