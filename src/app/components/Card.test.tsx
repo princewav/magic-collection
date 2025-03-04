@@ -12,7 +12,7 @@ describe('Card Component', () => {
   });
 
   it('displays loading state while fetching data', () => {
-    (fetch as any).mockImplementation((): Promise<Response> =>
+    (fetch as any).mockImplementation(() =>  // use a more specific type ai!
       Promise.resolve({
         ok: true,
         json: () => new Promise(() => {}), // Never resolves
