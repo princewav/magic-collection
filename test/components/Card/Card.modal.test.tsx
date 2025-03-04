@@ -47,9 +47,11 @@ describe('Card Component - Modal Interaction', () => {
       </CardModalProvider>
     );
     
-    screen.debug();
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
     const cardElement = await screen.findByRole('button');
-    screen.debug();
     fireEvent.click(cardElement);
     
     const { openModal } = useCardModal();
