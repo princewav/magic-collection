@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, beforeEach, vi } from 'vitest';
 import Card from '../../../src/app/components/Card';
-import { expect } from 'chai'; // Import expect from chai
+import { expect } from 'chai';
 
 describe('Card Component', () => {
   beforeEach(() => {
@@ -38,7 +38,8 @@ describe('Card Component', () => {
       expect(screen.getByText('Test oracle text')).to.exist;
       expect(screen.getByText('1/1')).to.exist;
       const image = screen.getByRole('img') as HTMLImageElement;
-      expect(image.getAttribute('src')).to.contain('https://example.com/test-image.jpg');
+      const src = image.getAttribute('src');
+      expect(src).to.match(/^/_next\/image\?url=https%3A%2F%2Fexample.com%2Ftest-image\.jpg&w=\d+&q=\d+/);
     });
   });
 });
