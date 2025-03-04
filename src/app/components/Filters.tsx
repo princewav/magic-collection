@@ -18,6 +18,14 @@ export default function Filters() {
           <ManaSymbol symbol="C" />
           <ManaSymbol symbol="M" />
         </div>
+        {/* Search by name input */}
+        <div className="m-1">
+          <input
+            type="text"
+            placeholder="Search by name"
+            className="bg-gray-700 text-white rounded-md p-1"
+          />
+        </div>
         {/* Other filter options */}
         <div className="m-1">CMC</div>
         <div className="m-1">Type</div>
