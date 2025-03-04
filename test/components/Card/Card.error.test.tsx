@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, beforeEach, vi } from 'vitest';
 import Card from '../../../src/app/components/Card';
+import { expect } from 'chai'; // Import expect from chai
 
 describe('Card Component', () => {
   beforeEach(() => {
@@ -14,7 +15,7 @@ describe('Card Component', () => {
     render(<Card id="test-id" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Error: API Error')).to.be.ok;
+      expect(screen.getByText('Error: API Error')).to.exist;
     });
   });
 });
