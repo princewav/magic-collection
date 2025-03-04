@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCardModal } from "../contexts/CardModalContext";
+import { useCardModal } from "./contexts/CardModalContext";
 import { useState } from "react";
 
 interface CardProps {
@@ -16,7 +16,7 @@ export default function Card({ id }: CardProps) {
     setImageError(true);
   };
 
-  const imageSrc = `https://cards.scryfall.io/normal/front/${id.substring(0, 1)}/${id.substring(0, 2)}/${id}.jpg?1562623085`; // use this format instead https://api.scryfall.com/cards/c6399a22-cebf-4c1d-a23e-4c68f784ac1b ai!
+  const imageSrc = `https://api.scryfall.com/cards/${id}/?format=image`;
   
 
   return (
