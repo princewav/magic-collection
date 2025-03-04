@@ -6,7 +6,7 @@ interface ManaSymbolProps {
 
 export default function ManaSymbol({ symbol }: ManaSymbolProps) {
   let imageSrc = "";
-// add multicolor ai!
+
   switch (symbol) {
     case "{W}":
       imageSrc = "/images/mana/white.svg";
