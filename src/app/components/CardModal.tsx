@@ -95,7 +95,7 @@ export default function CardModal() {
     console.log("CardModal is loading");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-        <div className="bg-gray-700 rounded-md shadow-md p-4">Loading...</div>
+        <div className="bg-gray-700 rounded-md shadow-md p-4 text-lg">Loading...</div>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function CardModal() {
     console.log("CardModal has an error");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-        <div className="bg-gray-700 rounded-md shadow-md p-4">
+        <div className="bg-gray-700 rounded-md shadow-md p-4 text-lg">
           Error: {error}
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function CardModal() {
     console.log("CardModal - card data not found");
     return (
       <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-        <div className="bg-gray-700 rounded-md shadow-md p-4">
+        <div className="bg-gray-700 rounded-md shadow-md p-4 text-lg">
           Card not found.
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function CardModal() {
             <div className="w-1/2 pr-4">
               {imageError ? (
                 <div className="aspect-[223/310] bg-gray-800 flex items-center justify-center rounded-t-md">
-                  <span className="text-white text-sm">Image failed to load</span>
+                  <span className="text-white text-lg">Image failed to load</span>
                 </div>
               ) : (
                 <Image
@@ -164,13 +164,13 @@ export default function CardModal() {
               )}
             </div>
             <div className="w-1/2 flex flex-col">
-              <h2 className="text-xl font-bold text-white">{cardData.name}</h2>
-              <p className="text-gray-400">{cardData.mana_cost}</p>
-              <p className="text-gray-300">{cardData.type_line}</p>
-              <p className="text-gray-300">{cardData.oracle_text}</p>
+              <h2 className="text-2xl font-bold text-white">{cardData.name}</h2>
+              <p className="text-gray-400 text-lg">{cardData.mana_cost}</p>
+              <p className="text-gray-300 text-lg">{cardData.type_line}</p>
+              <p className="text-gray-300 text-lg">{cardData.oracle_text}</p>
               {powerToughness && (
                 <div className="flex justify-between items-center mt-2">
-                  <p className="text-white">
+                  <p className="text-white text-lg">
                     {powerToughness}
                   </p>
                 </div>
