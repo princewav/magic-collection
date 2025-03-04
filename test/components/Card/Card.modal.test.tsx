@@ -1,11 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, beforeEach, vi } from 'vitest';
-import Card from '../../../src/app/components/Card';
-import { expect } from 'chai';
-import { CardModalProvider, useCardModal } from '../../../src/app/contexts/CardModalContext';
+import { describe, it, beforeEach, vi, expect } from 'vitest';
+import Card from '@/app/components/Card';
+import { CardModalProvider, useCardModal } from '@/app/contexts/CardModalContext';
 
-vi.mock('../../../src/app/contexts/CardModalContext', () => {
+vi.mock('@/app/contexts/CardModalContext', () => {
   const mockOpenModal = vi.fn();
   return {
     useCardModal: () => ({
@@ -53,8 +52,7 @@ describe('Card Component - Modal Interaction', () => {
     
     const { openModal } = useCardModal();
     await waitFor(() => {
-      screen.debug();
-      expect(openModal).to.have.been.calledWith('test-id');
+      expect(vi.mocked(openModal)).toHaveBeenCalledWith('test-id')
     });
   });
 });
