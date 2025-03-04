@@ -1,6 +1,5 @@
 import { Card } from "../models/Card";
 import { CardRepository } from "./CardRepository";
-import cardData from '../../../data/card.example';
 
 export class JSONCardRepository implements CardRepository {
   private cards: Card[];
@@ -18,9 +17,3 @@ export class JSONCardRepository implements CardRepository {
     return this.cards;
   }
 }
-
-// Pre-load the card data from the JSON file
-const cards: Card[] = cardData;
-
-// Export a singleton instance of the repository with the pre-loaded data
-export const cardRepository = new JSONCardRepository(cards);
