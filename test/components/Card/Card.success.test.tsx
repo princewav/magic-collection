@@ -39,7 +39,7 @@ describe('Card Component', () => {
       expect(screen.getByText('1/1')).to.exist;
       const image = screen.getByRole('img') as HTMLImageElement;
       const src = image.getAttribute('src');
-      expect(src).to.match(/^/_next\/image\?url=https%3A%2F%2Fexample.com%2Ftest-image\.jpg&w=\d+&q=\d+/);
+      expect(src).to.match(/^/_next\/image\?url=https%3A%2F%2Fexample.com%2Ftest-image\.jpg&w=\d+&q=\d+/.toString());
     });
   });
 });
