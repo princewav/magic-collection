@@ -212,3 +212,14 @@ export async function loadCardsData(filePath: string): Promise<Card[]> {
     return [];
   }
 }
+
+export async function loadCardsDataJSON(filePath: string): Promise<Card[]> {
+  try {
+    const data = await fs.readFile(filePath, 'utf-8');
+    const cards: Card[] = JSON.parse(data);
+    return cards;
+  } catch (error) {
+    console.error("Error loading cards from JSON:", error);
+    return [];
+  }
+}
