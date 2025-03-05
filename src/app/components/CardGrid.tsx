@@ -1,26 +1,23 @@
-"use client";
-
 import Card from "./Card";
-import { useEffect, useState } from "react";
 import { loadInitialCardIds } from "@/app/actions/load-card-ids";
+import { populateDatabase } from "@/app/actions/populate-db";
 
-export default function CardGrid() {
-  const [cardIds, setCardIds] = useState<string[]>([]);
+export default async function CardGrid() {
+  const cardIds = await loadInitialCardIds();
 
-  useEffect(() => {
-    const loadCards = async () => {
-      const initialCardIds = await loadInitialCardIds();
-      setCardIds(initialCardIds);
-    };
-
-    loadCards();
-  }, []);
+  const handlePopulateDatabase = async () => {
+    "use server"; // Mark this function as a server action
+    await populateDatabase();
+  };
 
   return (
-    <div className="flex flex-wrap gap-4">
-      {cardIds.map((id) => (
-        <Card key={id} id={id} />
-      ))}
+    <div>
+      <button onClick={handlePopulateDatabase}>Populate Database</button>
+      <div className="flex flex-wrap gap-4">
+        {cardIds.map((id) => (
+          <Card key={id} id={id} />
+        ))}
+      </div>
     </div>
   );
 }
