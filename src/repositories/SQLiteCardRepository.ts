@@ -1,5 +1,5 @@
-import { Card } from "@/app/models/Card";
-import { CardRepository } from "@/app/repositories/CardRepository";
+import { Card } from "@/models/Card";
+import { CardRepository } from "@/repositories/CardRepository";
 import Database from 'better-sqlite3';
 import path from 'path';
 

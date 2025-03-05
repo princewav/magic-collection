@@ -1,6 +1,6 @@
 "use client";
 
-import { generatePagination } from "@/app/lib/utils";
+import { generatePagination } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 

@@ -1,5 +1,5 @@
 import CardGrid from "@/components/CardGrid";
-import { getPageNumber } from "./lib/utils";
+import { getPageNumber } from "@/lib/utils";
 import { Metadata } from "next";
 import Filters from "@/components/Filters";
 import CardModal from "@/components/CardModal";

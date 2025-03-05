@@ -1,7 +1,7 @@
 "use server";
 
-import { JSONCardRepository } from "@/app/repositories/JSONCardRepository";
-import { SQLiteCardRepository } from "@/app/repositories/SQLiteCardRepository";
+import { JSONCardRepository } from "@/repositories/JSONCardRepository";
+import { SQLiteCardRepository } from "@/repositories/SQLiteCardRepository";
 import { CARD_DATA_PATH } from "@/constants";
 
 export async function populateDatabase() {

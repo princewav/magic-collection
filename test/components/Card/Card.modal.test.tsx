@@ -4,7 +4,7 @@ import { describe, it, beforeEach, vi, expect } from "vitest";
 import Card from "@/components/Card";
 import { CardModalProvider, useCardModal } from "@/contexts/CardModalContext";
 
-vi.mock("@/app/contexts/CardModalContext", () => {
+vi.mock("@/contexts/CardModalContext", () => {
   const mockOpenModal = vi.fn();
   return {
     useCardModal: () => ({

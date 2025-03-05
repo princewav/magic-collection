@@ -1,5 +1,5 @@
-import { Card } from "@/app/models/Card";
-import { CardRepository } from "@/app/repositories/CardRepository";
+import { Card } from "@/models/Card";
+import { CardRepository } from "@/repositories/CardRepository";
 import { loadCardsDataJSON } from "@/lib/cardService";
 import { CARD_DATA_PATH } from "@/constants";
 

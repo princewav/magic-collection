@@ -1,6 +1,6 @@
 "use server";
-import { SQLiteCardRepository } from "@/app/repositories/SQLiteCardRepository";
-import { Card as CardType } from "@/app/models/Card";
+import { SQLiteCardRepository } from "@/repositories/SQLiteCardRepository";
+import { Card as CardType } from "@/models/Card";
 import { ITEMS_PER_PAGE } from "@/constants";
 
 export async function loadCardIds(page: number = 1): Promise<string[]> {

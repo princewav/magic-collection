@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { JSONCardRepository } from '@/app/repositories/JSONCardRepository';
-import { Card } from '@/app/models/Card';
+import { JSONCardRepository } from '@/repositories/JSONCardRepository';
 import * as cardService from '@/lib/cardService';
 
 vi.mock('@/lib/cardService', () => {

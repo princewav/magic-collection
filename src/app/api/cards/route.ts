@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { CARD_DATA_PATH } from '@/constants';
-import { Card } from '@/app/models/Card';
+import { Card } from '@/models/Card';
 
 export async function GET() {
   try {
