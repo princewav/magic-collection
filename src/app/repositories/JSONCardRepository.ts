@@ -1,6 +1,7 @@
 import { Card } from "@/app/models/Card";
 import { CardRepository } from "@/app/repositories/CardRepository";
 import { loadCardsData } from "@/lib/cardService";
+import { CARD_DATA_PATH } from "@/constants";
 
 export class JSONCardRepository implements CardRepository {
   private cards: Card[] = [];
@@ -20,9 +21,8 @@ export class JSONCardRepository implements CardRepository {
     if (this.cards.length > 0) {
       return;
     }
-// add path ftom constants ai!
     try {
-      this.cards = await loadCardsData();
+      this.cards = await loadCardsData(CARD_DATA_PATH);
     } catch (error) {
       console.error("Error loading cards:", error);
       this.cards = [];
