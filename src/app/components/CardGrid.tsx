@@ -1,11 +1,21 @@
 import Card from "./Card";
-import { loadInitialCardIds } from "@/app/actions/load-card-ids";
+import { loadCardIds } from "@/app/actions/load-card-ids";
 
-export default async function CardGrid() {
-  const cardIds = await loadInitialCardIds();
+import { ITEMS_PER_PAGE } from "@/constants";
+import Pagination from "./Pagination";
+
+interface Props {
+  currentPage: number;
+}
+export default async function CardGrid({ currentPage }: Props) {
+  const cardIds = await loadCardIds(currentPage);
+  const totalCardCount = await loadCardIds(); // Assuming loadCardIds() with no argument returns all IDs
+
+  const totalPages = Math.ceil(totalCardCount.length / ITEMS_PER_PAGE);
 
   return (
     <div>
+      <Pagination totalPages={totalPages} currentPage={currentPage} />
       <div className="flex flex-wrap gap-4">
         {cardIds.map((id) => (
           <Card key={id} id={id} />
