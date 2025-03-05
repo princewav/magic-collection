@@ -9,8 +9,13 @@ export async function loadCardsData(): Promise<Card[]> {
   try {
     const filePath = path.join(process.cwd(), CARD_DATA_PATH);
     const data = await fs.readFile(filePath, 'utf-8');
-    const cards: Card[] = JSON.parse(data);
-    return cards;
+    try {
+      const cards: Card[] = JSON.parse(data);
+      return cards;
+    } catch (parseError) {
+      console.error("Error parsing JSON:", parseError);
+      throw new Error("Invalid JSON format in card data file.");
+    }
   } catch (error) {
     console.error("Error loading cards:", error);
     return [];

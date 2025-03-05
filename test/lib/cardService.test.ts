@@ -1,24 +1,26 @@
 import { describe, it, expect, vi } from 'vitest';
 import { loadCardsData } from '@/lib/cardService';
 import * as fs from 'fs/promises';
-
+// instead of use mock, let's change this code and the cardService code to accept a path from outside. for the test create a json file inside test folder with '[{"id": "1", "name": "Test Card"}]' content ai!
 vi.mock('fs/promises', () => ({
-  readFile: vi.fn(),
+  readFile: vi.fn().mockResolvedValue('[{"id": "1", "name": "Test Card"}]'),
 }));
 
 vi.mock('path', () => ({
-  join: vi.fn().mockReturnValue('mocked/path/to/card.example'),
+  default:{
+    join: vi.fn().mockReturnValue('mocked/path/to/card.example'),
+  }
 }));
 
 describe('cardService', () => {
   it('should load cards data successfully', async () => {
-    const mockCardData = '[{"id": "1", "name": "Test Card"}]';    
-    await (fs.readFile as any).mockResolvedValue(mockCardData);
+    // const mockCardData = '[{"id": "1", "name": "Test Card"}]';
+    // await (fs.readFile as any).mockResolvedValue(mockCardData);
 
     const cards = await loadCardsData();
     expect(cards).toEqual([{ id: '1', name: 'Test Card' }]);
     expect(fs.readFile).toHaveBeenCalledWith('mocked/path/to/card.example', 'utf-8');
-  });
+  }, 3000);
 
   // it('should handle invalid JSON data', async () => {
   //   (fs.readFile as any).mockResolvedValue('Invalid JSON');
