@@ -17,6 +17,7 @@ export class SQLiteCardRepository implements CardRepository {
       const stmt = this.db.prepare('SELECT * FROM cards WHERE id = ?');
       const row = stmt.get(id) as any;
       if (!row) {
+        console.log(`Card with id ${id} not found in database.`);
         return null;
       }
       return this.mapRowToCard(row);
@@ -30,6 +31,10 @@ export class SQLiteCardRepository implements CardRepository {
     try {
       const stmt = this.db.prepare('SELECT * FROM cards');
       const rows = stmt.all() as any[];
+      if (rows.length === 0) {
+        console.log("No cards found in database.");
+        return [];
+      }
       return rows.map(this.mapRowToCard);
     } catch (error) {
       console.error("Error getting all cards from database:", error);
@@ -43,12 +48,12 @@ export class SQLiteCardRepository implements CardRepository {
         INSERT INTO cards (
           id, oracle_id, name, lang, released_at, uri, scryfall_uri, layout, highres_image, image_status,
           mana_cost, cmc, type_line, oracle_text, power, toughness, colors, color_identity, keywords, legalities,
-          games, reserved, game_changer, foil, nonfoil, finishes, oversized, promo, reprint, variation, set_id, set, set_name,
+          games, reserved, game_changer, foil, nonfoil, finishes, oversized, promo, reprint, variation, set_id, set_code, set_name,
           set_type, collector_number, digital, rarity, watermark, flavor_text, card_back_id, artist, artist_ids, illustration_id, border_color, frame, frame_effects, security_stamp, full_art, textless, booster, story_spotlight, edhrec_rank, preview, prices, related_uris, purchase_uris
         ) VALUES (
           @id, @oracle_id, @name, @lang, @released_at, @uri, @scryfall_uri, @layout, @highres_image, @image_status,
           @mana_cost, @cmc, @type_line, @oracle_text, @power, @toughness, @colors, @color_identity, @keywords, @legalities,
-          @games, @reserved, @game_changer, @foil, @nonfoil, @finishes, @oversized, @promo, @reprint, @variation, @set_id, @set, @set_name,
+          @games, @reserved, @game_changer, @foil, @nonfoil, @finishes, @oversized, @promo, @reprint, @variation, @set_id, @set_code, @set_name,
           @set_type, @collector_number, @digital, @rarity, @watermark, @flavor_text, @card_back_id, @artist, @artist_ids, @illustration_id, @border_color, @frame, @frame_effects, @security_stamp, @full_art, @textless, @booster, @story_spotlight, @edhrec_rank, @preview, @prices, @related_uris, @purchase_uris
         )
       `);
@@ -85,7 +90,7 @@ export class SQLiteCardRepository implements CardRepository {
         reprint: card.reprint ? 1 : 0,
         variation: card.variation ? 1 : 0,
         set_id: card.set_id,
-        set: card.set,
+        set_code: card.set,
         set_name: card.set_name,
         set_type: card.set_type,
         collector_number: card.collector_number,
