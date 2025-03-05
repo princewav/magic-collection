@@ -1,10 +1,9 @@
-import CardGrid from "./components/CardGrid";
+import CardGrid from "@/components/CardGrid";
 import { getPageNumber } from "./lib/utils";
 import { Metadata } from "next";
-import Navbar from "@/app/components/Navbar";
-import Filters from "@/app/components/Filters";
-import CardModal from "@/app/components/CardModal";
-import { CardModalProvider } from "@/app/contexts/CardModalContext";
+import Filters from "@/components/Filters";
+import CardModal from "@/components/CardModal";
+import { CardModalProvider } from "@/contexts/CardModalContext";
 
 export const metadata: Metadata = {
   title: "My Awesome Cards",
@@ -28,6 +27,5 @@ const Page = (props: {
     </div>
   );
 };
-
 
 export default Page;

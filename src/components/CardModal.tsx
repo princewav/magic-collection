@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { useCardModal } from "../contexts/CardModalContext";
+import { useCardModal } from "@/contexts/CardModalContext";
 import { X } from "lucide-react";
 
 interface CardData {

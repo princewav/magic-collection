@@ -1,7 +1,7 @@
 "use client";
 
+import { useCardModal } from "@/contexts/CardModalContext";
 import Image from "next/image";
-import { useCardModal } from "../contexts/CardModalContext";
 import { useState, useEffect } from "react";
 
 interface CardProps {
