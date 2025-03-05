@@ -3,7 +3,6 @@ import Filters from "@/app/components/Filters";
 import CardGrid from "@/app/components/CardGrid";
 import CardModal from "@/app/components/CardModal";
 import { CardModalProvider } from "@/app/contexts/CardModalContext";
-import { SQLiteCardRepository } from "@/app/repositories/SQLiteCardRepository";
 
 export default async function Home() {
   return (

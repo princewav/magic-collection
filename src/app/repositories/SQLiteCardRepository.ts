@@ -122,11 +122,23 @@ export class SQLiteCardRepository implements CardRepository {
   }
 
   private mapRowToCard(row: any): Card {
+    const parseJSON = (jsonString: string | undefined): any => {
+      if (jsonString === undefined || jsonString === null) {
+        return null; // Or return a default value like [] or {}, depending on the expected type
+      }
+      try {
+        return JSON.parse(jsonString);
+      } catch (error) {
+        console.error("Error parsing JSON:", jsonString, error);
+        return null; // Or return a default value.  Crucially, *do not* re-throw.
+      }
+    };
+
     return {
       object: row.object,
       id: row.id,
       oracle_id: row.oracle_id,
-      multiverse_ids: JSON.parse(row.multiverse_ids),
+      multiverse_ids: parseJSON(row.multiverse_ids),
       mtgo_id: row.mtgo_id,
       tcgplayer_id: row.tcgplayer_id,
       cardmarket_id: row.cardmarket_id,
@@ -138,24 +150,24 @@ export class SQLiteCardRepository implements CardRepository {
       layout: row.layout,
       highres_image: !!row.highres_image,
       image_status: row.image_status,
-      image_uris: JSON.parse(row.image_uris),
+      image_uris: parseJSON(row.image_uris),
       mana_cost: row.mana_cost,
       cmc: row.cmc,
       type_line: row.type_line,
       oracle_text: row.oracle_text,
       power: row.power,
       toughness: row.toughness,
-      colors: JSON.parse(row.colors),
-      color_identity: JSON.parse(row.color_identity),
-      keywords: JSON.parse(row.keywords),
-      all_parts: JSON.parse(row.all_parts),
-      legalities: JSON.parse(row.legalities),
-      games: JSON.parse(row.games),
+      colors: parseJSON(row.colors),
+      color_identity: parseJSON(row.color_identity),
+      keywords: parseJSON(row.keywords),
+      all_parts: parseJSON(row.all_parts),
+      legalities: parseJSON(row.legalities),
+      games: parseJSON(row.games),
       reserved: !!row.reserved,
       game_changer: !!row.game_changer,
       foil: !!row.foil,
       nonfoil: !!row.nonfoil,
-      finishes: JSON.parse(row.finishes),
+      finishes: parseJSON(row.finishes),
       oversized: !!row.oversized,
       promo: !!row.promo,
       reprint: !!row.reprint,
@@ -176,21 +188,21 @@ export class SQLiteCardRepository implements CardRepository {
       flavor_text: row.flavor_text,
       card_back_id: row.card_back_id,
       artist: row.artist,
-      artist_ids: JSON.parse(row.artist_ids),
+      artist_ids: parseJSON(row.artist_ids),
       illustration_id: row.illustration_id,
       border_color: row.border_color,
       frame: row.frame,
-      frame_effects: JSON.parse(row.frame_effects),
+      frame_effects: parseJSON(row.frame_effects),
       security_stamp: row.security_stamp,
       full_art: !!row.full_art,
       textless: !!row.textless,
       booster: !!row.booster,
       story_spotlight: !!row.story_spotlight,
       edhrec_rank: row.edhrec_rank,
-      preview: JSON.parse(row.preview),
-      prices: JSON.parse(row.prices),
-      related_uris: JSON.parse(row.related_uris),
-      purchase_uris: JSON.parse(row.purchase_uris),
+      preview: parseJSON(row.preview),
+      prices: parseJSON(row.prices),
+      related_uris: parseJSON(row.related_uris),
+      purchase_uris: parseJSON(row.purchase_uris),
     };
   }
 }
