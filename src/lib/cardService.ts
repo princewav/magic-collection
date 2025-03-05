@@ -4,6 +4,7 @@ import { Card } from "@/app/models/Card";
 import { promises as fs } from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
+import { CARD_DATA_PATH } from '@/constants';
 
 const dbPath = path.join(process.cwd(), 'data', 'card.db');
 
@@ -78,8 +79,7 @@ async function initializeDatabase(filePath: string) {
     `).run();
 
     // Load data from JSON and insert into the database
-    const data = await fs.readFile(filePath, 'utf-8');
-    const cards: Card[] = JSON.parse(data);
+    const cards = await loadCardsData(CARD_DATA_PATH);
 
     const insert = db.prepare(`
       INSERT INTO cards (
@@ -167,8 +167,6 @@ async function initializeDatabase(filePath: string) {
   db.close();
 }
 
-// add a func to load cards from a json in CARD_DATA_PATH ai!
-
 export async function loadCardsData(filePath: string): Promise<Card[]> {
   try {
     await initializeDatabase(filePath);
@@ -209,17 +207,6 @@ export async function loadCardsData(filePath: string): Promise<Card[]> {
     return cards;
   } catch (error) {
     console.error("Error loading cards from database:", error);
-    return [];
-  }
-}
-
-export async function loadCardsDataJSON(filePath: string): Promise<Card[]> {
-  try {
-    const data = await fs.readFile(filePath, 'utf-8');
-    const cards: Card[] = JSON.parse(data);
-    return cards;
-  } catch (error) {
-    console.error("Error loading cards from JSON:", error);
     return [];
   }
 }
