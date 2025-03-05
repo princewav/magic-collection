@@ -49,7 +49,7 @@ async function initializeDatabase(filePath: string) {
         reprint INTEGER,
         variation INTEGER,
         set_id TEXT,
-        set TEXT,
+        set_code TEXT,
         set_name TEXT,
         set_type TEXT,
         collector_number TEXT,
@@ -85,15 +85,13 @@ async function initializeDatabase(filePath: string) {
       INSERT INTO cards (
         id, oracle_id, name, lang, released_at, uri, scryfall_uri, layout, highres_image, image_status,
         mana_cost, cmc, type_line, oracle_text, power, toughness, colors, color_identity, keywords, legalities,
-        games, reserved, game_changer, foil, nonfoil, finishes, oversized, promo, reprint, variation, set_id, set, set_name,
-        set_type, collector_number, digital, rarity, watermark, flavor_text, card_back_id, artist, border_color, frame,
-        full_art, textless, booster, story_spotlight, edhrec_rank, preview, prices, related_uris, purchase_uris
+        games, reserved, game_changer, foil, nonfoil, finishes, oversized, promo, reprint, variation, set_id, set_code, set_name,
+        set_type, collector_number, digital, rarity, watermark, flavor_text, card_back_id, artist, artist_ids, illustration_id, border_color, frame, frame_effects, security_stamp, full_art, textless, booster, story_spotlight, edhrec_rank, preview, prices, related_uris, purchase_uris
       ) VALUES (
         @id, @oracle_id, @name, @lang, @released_at, @uri, @scryfall_uri, @layout, @highres_image, @image_status,
         @mana_cost, @cmc, @type_line, @oracle_text, @power, @toughness, @colors, @color_identity, @keywords, @legalities,
-        @games, @reserved, @game_changer, @foil, @nonfoil, @finishes, @oversized, @promo, @reprint, @variation, @set_id, @set, @set_name,
-        @set_type, @collector_number, @digital, @rarity, @watermark, @flavor_text, @card_back_id, @artist, @border_color, @frame,
-        @full_art, @textless, @booster, @story_spotlight, @edhrec_rank, @preview, @prices, @related_uris, @purchase_uris
+        @games, @reserved, @game_changer, @foil, @nonfoil, @finishes, @oversized, @promo, @reprint, @variation, @set_id, @set_code, @set_name,
+        @set_type, @collector_number, @digital, @rarity, @watermark, @flavor_text, @card_back_id, @artist, @artist_ids, @illustration_id, @border_color, @frame, frame_effects, @security_stamp, @full_art, @textless, @booster, @story_spotlight, @edhrec_rank, @preview, @prices, @related_uris, @purchase_uris
       )
     `);
 
@@ -131,7 +129,7 @@ async function initializeDatabase(filePath: string) {
           reprint: card.reprint ? 1 : 0,
           variation: card.variation ? 1 : 0,
           set_id: card.set_id,
-          set: card.set,
+          set_code: card.set,
           set_name: card.set_name,
           set_type: card.set_type,
           collector_number: card.collector_number,
