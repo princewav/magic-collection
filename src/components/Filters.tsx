@@ -1,4 +1,4 @@
-import ManaSymbol from "./ManaSymbol";
+import { ManaSymbol } from "./ManaSymbol";
 
 export default function Filters() {
   return (
