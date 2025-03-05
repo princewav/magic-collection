@@ -46,7 +46,7 @@ export default function Card({ id }: CardProps) {
 
   return (
     <div
-      className="bg-gray-700 rounded-md shadow-md cursor-pointer flex flex-col items-center transition-transform transform hover:scale-105"
+      className="bg-foreground/10 rounded-md shadow-md cursor-pointer flex flex-col items-center transition-transform transform hover:scale-105"
       onClick={() => {
         console.log(`Card ${id} clicked`);
         openModal(id);

@@ -5,10 +5,11 @@ import { ITEMS_PER_PAGE } from "@/constants";
 import Pagination from "./Pagination";
 
 interface Props {
-  currentPage: number;
+  currentPage?: number;
+  cardIds?: string[];
 }
-export default async function CardGrid({ currentPage }: Props) {
-  const cardIds = await loadCardIds(currentPage);
+export default async function CardGrid({ currentPage = 1, cardIds }: Props) {
+  const fetchedCardIds = cardIds ?? await loadCardIds(currentPage);
   // const cardIds: string[] = []
 
   const totalCardCount = await loadCardIds();
@@ -19,7 +20,7 @@ export default async function CardGrid({ currentPage }: Props) {
     <div>
       <Pagination totalPages={totalPages} currentPage={currentPage} />
       <div className="flex flex-wrap gap-4">
-        {cardIds.map((id) => (
+        {fetchedCardIds.map((id) => (
           <Card key={id} id={id} />
         ))}
       </div>
