@@ -20,7 +20,7 @@ export class JSONCardRepository implements CardRepository {
     if (this.cards.length > 0) {
       return;
     }
-
+// add path ftom constants ai!
     try {
       this.cards = await loadCardsData();
     } catch (error) {
