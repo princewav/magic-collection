@@ -11,8 +11,6 @@ export default defineConfig({
     typecheck: {
       enabled: true
     },
-    silent: true,
-    reporters: ['verbose'],
   },
   resolve: {
     alias: {
