@@ -167,6 +167,8 @@ async function initializeDatabase(filePath: string) {
   db.close();
 }
 
+// add a func to load cards from a json in CARD_DATA_PATH ai!
+
 export async function loadCardsData(filePath: string): Promise<Card[]> {
   try {
     await initializeDatabase(filePath);
