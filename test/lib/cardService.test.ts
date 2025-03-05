@@ -12,7 +12,7 @@ vi.mock('path', () => ({
 
 describe('cardService', () => {
   it('should load cards data successfully', async () => {
-    const mockCardData = '[{"id": "1", "name": "Test Card"}]';
+    const mockCardData = '[{"id": "1", "name": "Test Card"}]';    
     (fs.readFile as any).mockResolvedValue(mockCardData);
 
     const cards = await loadCardsData();
