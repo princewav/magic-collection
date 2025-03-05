@@ -61,7 +61,7 @@ export default function Pagination({ totalPages, currentPage }: Props) {
 
       <Button
         variant="outline"
-        disabled={currentPage === totalPages}
+        // disabled={currentPage === totalPages}
         onClick={() => {
           router.push(pathname + "?" + createQueryString("page", String(currentPage + 1)));
         }}

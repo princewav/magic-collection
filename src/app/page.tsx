@@ -17,8 +17,7 @@ const Page = (props: {
   const currentPage = getPageNumber(searchParams);
 
   return (
-    <div className="text-white min-h-screen p-4">
-      <Navbar />
+    <div className="min-h-screen px-4 py-2">
       <Filters />
       <CardModalProvider>
         <main className="antialiased">

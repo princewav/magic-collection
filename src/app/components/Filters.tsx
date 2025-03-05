@@ -2,14 +2,14 @@ import ManaSymbol from "./ManaSymbol";
 
 export default function Filters() {
   return (
-    <div className="bg-gray-800 p-4 rounded-md shadow-md mb-3">
+    <div className="bg-foreground/20 p-4 rounded-md shadow-md mb-3">
       <div className="flex items-center space-x-2 flex-wrap">
         {/* Search by name input */}
         <div className="m-1">
           <input
             type="text"
             placeholder="Search by name"
-            className="bg-gray-700 text-white rounded-md px-2 py-1"
+            className="rounded-md px-2 py-1 border border-foreground/30 outline-foreground/50"
           />
         </div>
         {/* Mana symbols */}

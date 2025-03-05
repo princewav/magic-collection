@@ -9,7 +9,9 @@ interface Props {
 }
 export default async function CardGrid({ currentPage }: Props) {
   const cardIds = await loadCardIds(currentPage);
-  const totalCardCount = await loadCardIds(); // Assuming loadCardIds() with no argument returns all IDs
+  // const cardIds: string[] = []
+
+  const totalCardCount = await loadCardIds();
 
   const totalPages = Math.ceil(totalCardCount.length / ITEMS_PER_PAGE);
 
