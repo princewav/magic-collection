@@ -15,8 +15,16 @@ export async function populateDatabase() {
       // Check if card already exists before inserting
       const existingCard = await sqliteRepo.getCardById(card.id);
       if (!existingCard) {
-        await sqliteRepo.insertCard(card); // Assuming you have an insertCard method
-        console.log(`Inserted card: ${card.name}`);
+        try {
+          await sqliteRepo.insertCard(card); // Assuming you have an insertCard method
+          console.log(`Inserted card: ${card.name}`);
+        } catch (error: any) {
+          if (error.message.includes("UNIQUE constraint failed")) {
+            console.warn(`Skipped card ${card.name} due to unique constraint violation.`);
+          } else {
+            console.error(`Error inserting card ${card.name}:`, error);
+          }
+        }
       } else {
         console.log(`Card already exists: ${card.name}`);
       }
