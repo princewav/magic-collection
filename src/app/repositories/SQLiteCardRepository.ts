@@ -37,6 +37,85 @@ export class SQLiteCardRepository implements CardRepository {
     }
   }
 
+  async insertCard(card: Card): Promise<void> {
+    try {
+      const insert = this.db.prepare(`
+        INSERT INTO cards (
+          id, oracle_id, name, lang, released_at, uri, scryfall_uri, layout, highres_image, image_status,
+          mana_cost, cmc, type_line, oracle_text, power, toughness, colors, color_identity, keywords, legalities,
+          games, reserved, game_changer, foil, nonfoil, finishes, oversized, promo, reprint, variation, set_id, set, set_name,
+          set_type, collector_number, digital, rarity, watermark, flavor_text, card_back_id, artist, artist_ids, illustration_id, border_color, frame, frame_effects, security_stamp, full_art, textless, booster, story_spotlight, edhrec_rank, preview, prices, related_uris, purchase_uris
+        ) VALUES (
+          @id, @oracle_id, @name, @lang, @released_at, @uri, @scryfall_uri, @layout, @highres_image, @image_status,
+          @mana_cost, @cmc, @type_line, @oracle_text, @power, @toughness, @colors, @color_identity, @keywords, @legalities,
+          @games, @reserved, @game_changer, @foil, @nonfoil, @finishes, @oversized, @promo, @reprint, @variation, @set_id, @set, @set_name,
+          @set_type, @collector_number, @digital, @rarity, @watermark, @flavor_text, @card_back_id, @artist, @artist_ids, @illustration_id, @border_color, @frame, @frame_effects, @security_stamp, @full_art, @textless, @booster, @story_spotlight, @edhrec_rank, @preview, @prices, @related_uris, @purchase_uris
+        )
+      `);
+
+      insert.run({
+        id: card.id,
+        oracle_id: card.oracle_id,
+        name: card.name,
+        lang: card.lang,
+        released_at: card.released_at,
+        uri: card.uri,
+        scryfall_uri: card.scryfall_uri,
+        layout: card.layout,
+        highres_image: card.highres_image ? 1 : 0,
+        image_status: card.image_status,
+        mana_cost: card.mana_cost,
+        cmc: card.cmc,
+        type_line: card.type_line,
+        oracle_text: card.oracle_text,
+        power: card.power,
+        toughness: card.toughness,
+        colors: JSON.stringify(card.colors),
+        color_identity: JSON.stringify(card.color_identity),
+        keywords: JSON.stringify(card.keywords),
+        legalities: JSON.stringify(card.legalities),
+        games: JSON.stringify(card.games),
+        reserved: card.reserved ? 1 : 0,
+        game_changer: card.game_changer ? 1 : 0,
+        foil: card.foil ? 1 : 0,
+        nonfoil: card.nonfoil ? 1 : 0,
+        finishes: JSON.stringify(card.finishes),
+        oversized: card.oversized ? 1 : 0,
+        promo: card.promo ? 1 : 0,
+        reprint: card.reprint ? 1 : 0,
+        variation: card.variation ? 1 : 0,
+        set_id: card.set_id,
+        set: card.set,
+        set_name: card.set_name,
+        set_type: card.set_type,
+        collector_number: card.collector_number,
+        digital: card.digital ? 1 : 0,
+        rarity: card.rarity,
+        watermark: card.watermark,
+        flavor_text: card.flavor_text,
+        card_back_id: card.card_back_id,
+        artist: card.artist,
+        artist_ids: JSON.stringify(card.artist_ids),
+        illustration_id: card.illustration_id,
+        border_color: card.border_color,
+        frame: card.frame,
+        frame_effects: JSON.stringify(card.frame_effects),
+        security_stamp: card.security_stamp,
+        full_art: card.full_art ? 1 : 0,
+        textless: card.textless ? 1 : 0,
+        booster: card.booster ? 1 : 0,
+        story_spotlight: card.story_spotlight ? 1 : 0,
+        edhrec_rank: card.edhrec_rank,
+        preview: JSON.stringify(card.preview),
+        prices: JSON.stringify(card.prices),
+        related_uris: JSON.stringify(card.related_uris),
+        purchase_uris: JSON.stringify(card.purchase_uris),
+      });
+    } catch (error) {
+      console.error("Error inserting card into database:", error);
+    }
+  }
+
   private mapRowToCard(row: any): Card {
     return {
       object: row.object,
