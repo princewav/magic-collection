@@ -17,6 +17,7 @@
 - Use **React Context** for state management.
 - Use **PascalCase** for filenames (e.g., `UserCard.tsx`, not `user-card.tsx`).
 - Use **named exports** for components.
+- Write functional components instead of class-based ones.
 - If a **function exceeds 10 lines**, split it into **smaller functions**.
 - If a **component exceeds 30 lines**, split it into **smaller components**.
 

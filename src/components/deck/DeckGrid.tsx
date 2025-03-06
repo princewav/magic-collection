@@ -18,14 +18,14 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     y: number;
     deckId: string;
   } | null>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
   const [checkedDecks, setCheckedDecks] = useState<string[]>([]);
 
   const handleContextMenu = (
     e: React.MouseEvent<Element, MouseEvent>,
     deckId: string,
   ) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent the default context menu
     setContextMenu({ x: e.clientX, y: e.clientY, deckId });
   };
 
@@ -35,30 +35,34 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
 
   const handleCheck = (deckId: string) => {
     setCheckedDecks((prev) =>
-      prev.includes(deckId) ? prev.filter((id) => id !== deckId) : [...prev, deckId],
+      prev.includes(deckId)
+        ? prev.filter((id) => id !== deckId)
+        : [...prev, deckId],
     );
   };
 
   const isDeckChecked = (deckId: string) => checkedDecks.includes(deckId);
 
+  // Use useEffect to handle clicks outside the context menu
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-    if (contextMenu && gridRef.current && !gridRef.current.contains(e.target as Node)) {
-      closeContextMenu();
-    }
-  };
+      if (
+        contextMenu &&
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(e.target as Node)
+      ) {
+        closeContextMenu();
+      }
+    };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-};
+    };
   }, [contextMenu]);
 
   return (
-    <div
-      className="flex flex-wrap gap-6"
-      ref={gridRef}
-    >
+    <div className="flex flex-wrap gap-6">
       {decks.map((deck) => (
         <Deck
           key={deck.id}
@@ -74,8 +78,10 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
           y={contextMenu.y}
           deckId={contextMenu.deckId}
           onClose={closeContextMenu}
+          ref={contextMenuRef}
         />
       )}
     </div>
   );
 };
+export default DeckGrid; // Exporting as default instead of named
