@@ -1,8 +1,8 @@
-import Card from "./Card";
-import { loadCardIds } from "@/app/actions/load-card-ids";
+import Card from './Card';
+import { loadCardIds } from '@/actions/load-card-ids';
 
-import { ITEMS_PER_PAGE } from "@/lib/constants";
-import Pagination from "./Pagination";
+import { ITEMS_PER_PAGE } from '@/lib/constants';
+import Pagination from './Pagination';
 
 interface Props {
   currentPage?: number;

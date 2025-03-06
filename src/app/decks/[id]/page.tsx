@@ -1,9 +1,9 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-import { Filters } from "@/components/Filters";
-import { CardGrid } from "@/components/CardGrid";
-import { DeckInfo } from "@/components/DeckInfo";
-import { getDeckById } from "@/app/actions/load-decks";
+import { Filters } from '@/components/Filters';
+import { CardGrid } from '@/components/CardGrid';
+import { DeckInfo } from '@/components/DeckInfo';
+import { getDeckById } from '@/actions/load-decks';
 
 interface Props {
   params: {

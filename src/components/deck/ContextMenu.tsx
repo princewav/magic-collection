@@ -1,6 +1,8 @@
 import React from 'react';
 import { CSSProperties } from 'react';
 import { Edit, Copy, Trash } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { deleteDeck } from '@/actions/delete-deck';
 
 interface ContextMenuProps {
   x: number;
@@ -15,6 +17,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   deckId,
   onClose,
 }) => {
+  const router = useRouter();
+
   const style: CSSProperties = {
     // Specify CSSProperties type
     position: 'fixed',
@@ -28,11 +32,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     onClose();
   };
 
-  const handleDelete = () => {
-    alert(`Delete deck ${deckId}`);
+  const handleDelete = async () => {
+    await deleteDeck(deckId);
+    router.refresh();
     onClose();
   };
-
+  
   const handleDuplicate = () => {
     alert(`Duplicate deck ${deckId}`);
     onClose();
