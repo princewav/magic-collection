@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ContextMenu } from './ContextMenu';
 import { Deck } from '@/components/deck/Deck';
 
@@ -25,6 +25,7 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     e: React.MouseEvent<Element, MouseEvent>,
     deckId: string,
   ) => {
+    e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, deckId });
   };
 
@@ -40,17 +41,23 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
 
   const isDeckChecked = (deckId: string) => checkedDecks.includes(deckId);
 
-  const handleGridClick = (e: React.MouseEvent) => {
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
     if (contextMenu && gridRef.current && !gridRef.current.contains(e.target as Node)) {
       closeContextMenu();
     }
   };
 
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+};
+  }, [contextMenu]);
+
   return (
     <div
       className="flex flex-wrap gap-6"
       ref={gridRef}
-      onClick={handleGridClick}
     >
       {decks.map((deck) => (
         <Deck
