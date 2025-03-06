@@ -38,3 +38,8 @@
 - **Do not include project setup instructions**.
 - **Do not generate over-engineered solutions** without prior discussion.
 
+## Code of conduct
+- Thoroughly analyze the existing code before making any changes.
+- Explicitly state which parts of the code I intend to modify and why.
+- Double-check the changes to ensure no unintended deletions occur.
+- Ask for confirmation before implementing any changes that might affect existing functionality.
