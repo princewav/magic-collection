@@ -17,3 +17,5 @@ Whenever you are writing React code, make sure to
 
 Whenever you are specifically asked to generate a commit message, make sure to use lowercase for generating commit messages, don't write description;
 use shadcn@... instead of shadcn-ui@... when generating commands to install shadcn components.
+
+when generating code, put a comment at the top with the intended relative path of the file.
