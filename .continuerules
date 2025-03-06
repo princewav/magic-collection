@@ -15,4 +15,5 @@ Whenever you are writing React code, make sure to
 - Use named exports when creating new react components.
 - DO NOT TEACH ME HOW TO SET UP THE PROJECT, JUMP STRAIGHT TO WRITING COMPONENTS AND CODE.
 
-Whenever you are specifically asked to generate a commit message, make sure to use lowercase for generating commit messages, don't write description
+Whenever you are specifically asked to generate a commit message, make sure to use lowercase for generating commit messages, don't write description;
+use shadcn@... instead of shadcn-ui@... when generating commands to install shadcn components.
