@@ -14,12 +14,12 @@ type DeckGridProps = {
 
 export const DeckGrid = ({ decks }: DeckGridProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="flex flex-wrap gap-6">
       {decks.map((deck) => (
         <Link
           href={`/decks/${deck.id}`}
           key={deck.id}
-          className="bg-card hover:bg-card/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg border border-muted w-70"
+          className="bg-card hover:bg-card/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg border border-muted w-70 hover:scale-105"
         >
           <div className="h-48 relative">
             {deck.imageUrl ? (
