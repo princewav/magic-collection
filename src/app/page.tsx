@@ -1,12 +1,12 @@
-import { CardGrid } from "@/components/CardGrid";
-import { getPageNumber } from "@/lib/utils";
-import { Metadata } from "next";
-import { Filters } from "@/components/Filters";
-import CardModal from "@/components/CardModal";
-import { CardModalProvider } from "@/contexts/CardModalContext";
+import { CardGrid } from '@/components/CardGrid';
+import { getPageNumber } from '@/lib/utils';
+import { Metadata } from 'next';
+import { Filters } from '@/components/Filters';
+import CardModal from '@/components/CardModal';
+import { CardModalProvider } from '@/context/CardModalContext';
 
 export const metadata: Metadata = {
-  title: "My Awesome Cards",
+  title: 'My Awesome Cards',
 };
 
 const Page = (props: {

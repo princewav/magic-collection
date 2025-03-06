@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCardModal } from "@/contexts/CardModalContext";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useCardModal } from '@/context/CardModalContext';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 interface CardProps {
   id: string;
@@ -28,7 +28,7 @@ export default function Card({ id }: CardProps) {
         console.log(data);
         setCardData(data);
       } catch (error: any) {
-        console.error("Failed to fetch card ", error);
+        console.error('Failed to fetch card ', error);
         setCardData(null); // Set cardData to null on error
       } finally {
         setIsLoading(false);
@@ -42,42 +42,42 @@ export default function Card({ id }: CardProps) {
     setImageError(true);
   };
 
-  let imageSrc = cardData?.image_uris?.normal || "";
+  let imageSrc = cardData?.image_uris?.normal || '';
 
   return (
     <div
-      className="bg-foreground/10 rounded-md shadow-md cursor-pointer flex flex-col items-center transition-transform transform hover:scale-105"
+      className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform hover:scale-105"
       onClick={() => {
         console.log(`Card ${id} clicked`);
         openModal(id);
       }}
     >
-      <div className="relative w-full flex flex-col justify-center p-2">
-        <div className="flex justify-center w-full mb-2 mt-1">
+      <div className="relative flex w-full flex-col justify-center p-2">
+        <div className="mt-1 mb-2 flex w-full justify-center">
           <div className="flex space-x-3">
-            <div className="w-2 h-2 transform rotate-45 bg-yellow-500"></div>
-            <div className="w-2 h-2 transform rotate-45 bg-yellow-500"></div>
-            <div className="w-2 h-2 transform rotate-45 bg-yellow-500"></div>
-            <div className="w-2 h-2 transform rotate-45 bg-yellow-500"></div>
+            <div className="h-2 w-2 rotate-45 transform bg-yellow-500"></div>
+            <div className="h-2 w-2 rotate-45 transform bg-yellow-500"></div>
+            <div className="h-2 w-2 rotate-45 transform bg-yellow-500"></div>
+            <div className="h-2 w-2 rotate-45 transform bg-yellow-500"></div>
           </div>
         </div>
         {isLoading ? (
-          <div className="aspect-[223/310] w-52 flex items-center justify-center rounded-t-md">
-            <span className="text-white text-sm">Loading...</span>
+          <div className="flex aspect-[223/310] w-52 items-center justify-center rounded-t-md">
+            <span className="text-sm text-white">Loading...</span>
           </div>
         ) : cardData === null ? (
-          <div className="aspect-[223/310] w-52 flex items-center justify-center rounded-t-md">
-            <span className="text-white text-sm">Card not found</span>
+          <div className="flex aspect-[223/310] w-52 items-center justify-center rounded-t-md">
+            <span className="text-sm text-white">Card not found</span>
           </div>
         ) : imageError || !imageSrc ? (
-          <div className="aspect-[223/310] w-52 flex items-center justify-center rounded-t-md">
-            <span className="text-white text-sm">Image failed to load</span>
+          <div className="flex aspect-[223/310] w-52 items-center justify-center rounded-t-md">
+            <span className="text-sm text-white">Image failed to load</span>
           </div>
         ) : (
           <Image
             src={imageSrc}
             alt={`Card ${cardData?.name || id}`}
-            className="rounded-t-md rounded-xl"
+            className="rounded-xl rounded-t-md"
             width={223}
             height={310}
             onError={handleImageError}

@@ -1,3 +1,4 @@
+// src/components/deck/DeckGrid.tsx
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { ContextMenu } from './ContextMenu';
@@ -19,7 +20,6 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     deckId: string;
   } | null>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  const [checkedDecks, setCheckedDecks] = useState<string[]>([]);
 
   const handleContextMenu = (
     e: React.MouseEvent<Element, MouseEvent>,
@@ -32,16 +32,6 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
   const closeContextMenu = () => {
     setContextMenu(null);
   };
-
-  const handleCheck = (deckId: string) => {
-    setCheckedDecks((prev) =>
-      prev.includes(deckId)
-        ? prev.filter((id) => id !== deckId)
-        : [...prev, deckId],
-    );
-  };
-
-  const isDeckChecked = (deckId: string) => checkedDecks.includes(deckId);
 
   // Use useEffect to handle clicks outside the context menu
   useEffect(() => {
@@ -64,13 +54,7 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
   return (
     <div className="flex flex-wrap gap-6">
       {decks.map((deck) => (
-        <Deck
-          key={deck.id}
-          deck={deck}
-          onCheck={handleCheck}
-          onContextMenu={handleContextMenu}
-          isChecked={isDeckChecked(deck.id)}
-        />
+        <Deck key={deck.id} deck={deck} onContextMenu={handleContextMenu} />
       ))}
       {contextMenu && (
         <ContextMenu
