@@ -1,7 +1,7 @@
 import Card from "./Card";
 import { loadCardIds } from "@/app/actions/load-card-ids";
 
-import { ITEMS_PER_PAGE } from "@/constants";
+import { ITEMS_PER_PAGE } from "@/lib/constants";
 import Pagination from "./Pagination";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   cardIds?: string[];
 }
 export async function CardGrid({ currentPage = 1, cardIds }: Props) {
-  const fetchedCardIds = cardIds ?? await loadCardIds(currentPage);
+  const fetchedCardIds = cardIds ?? (await loadCardIds(currentPage));
   // const cardIds: string[] = []
 
   const totalCardCount = await loadCardIds();
