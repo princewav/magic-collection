@@ -1,11 +1,8 @@
-// src/components/deck/DeckForm.tsx
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -14,23 +11,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckIcon, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { ManaColor } from "@/types/deck";
-import { deckSchema } from "@/app/decks/new/validation";
-import { z } from "zod";
-import { COLOR_OPTIONS } from "@/lib/constants";
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckIcon, Loader2 } from 'lucide-react';
+import { ManaColor } from '@/types/deck';
+import { deckSchema } from '@/app/decks/new/validation';
+import { z } from 'zod';
+import { COLOR_OPTIONS } from '@/lib/constants';
 
 interface DeckFormProps {
   onSubmit: (values: z.infer<typeof deckSchema>) => Promise<void>;
@@ -48,7 +44,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   const form = useForm<z.infer<typeof deckSchema>>({
     resolver: zodResolver(deckSchema),
     defaultValues: {
-      name: "",
+      name: '',
       description: null,
       format: null,
       imageUrl: null,
@@ -60,17 +56,15 @@ export const DeckForm: React.FC<DeckFormProps> = ({
     setSelectedColors((prevColors) => {
       if (prevColors.includes(color)) {
         const newColors = prevColors.filter((c) => c !== color);
-        form.setValue("colors", newColors as ManaColor[]);
+        form.setValue('colors', newColors as ManaColor[]);
         return newColors;
       } else {
         const newColors = [...prevColors, color];
-        form.setValue("colors", newColors as ManaColor[]);
+        form.setValue('colors', newColors as ManaColor[]);
         return newColors;
       }
     });
   };
-
-
 
   return (
     <Card>
@@ -104,7 +98,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     <Textarea
                       placeholder="Describe your deck strategy..."
                       {...field}
-                      value={field.value || ""}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -120,7 +114,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                   <FormLabel>Format</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value || ""}
+                    defaultValue={field.value || ''}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -155,7 +149,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     <Input
                       placeholder="https://example.com/image.jpg"
                       {...field}
-                      value={field.value || ""}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormDescription>
@@ -180,10 +174,10 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                         onClick={() => toggleColor(color.value as ManaColor)}
                         className={`${color.bgClass} ${
                           color.textClass
-                        } px-4 py-2 rounded-md border-2 flex items-center gap-2 ${
+                        } flex items-center gap-2 rounded-md border-2 px-4 py-2 ${
                           selectedColors.includes(color.value)
                             ? `${color.borderClass} border-2`
-                            : "border-transparent"
+                            : 'border-transparent'
                         }`}
                       >
                         {selectedColors.includes(color.value) && (
@@ -198,7 +192,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
               )}
             />
 
-            <div className="flex gap-4 justify-end">
+            <div className="flex justify-end gap-4">
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
@@ -206,7 +200,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     Creating...
                   </>
                 ) : (
-                  "Create Deck"
+                  'Create Deck'
                 )}
               </Button>
             </div>
