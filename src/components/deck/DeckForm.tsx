@@ -45,7 +45,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
     resolver: zodResolver(deckSchema),
     defaultValues: {
       name: '',
-      description: null,
+      description: '',
       format: null,
       imageUrl: null,
       colors: [],
