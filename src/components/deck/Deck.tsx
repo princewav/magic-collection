@@ -2,6 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Checkbox } from '@/components/ui/checkbox';
 
 import { ManaSymbol } from '@/components/ManaSymbol';
 
@@ -19,8 +20,12 @@ export const Deck: React.FC<DeckProps> = ({ deck, handleContextMenu }) => {
   return (
     <div
       key={deck.id}
-      className="bg-card hover:bg-card/90 border-muted w-70 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg"
+      className="bg-card hover:bg-card/90 border-muted relative w-70 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg"
     >
+      <Checkbox
+        id={`deck-${deck.id}`}
+        className="border-primary/50 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-5 cursor-pointer rounded-full shadow-sm border-3"
+      />
       <Link
         href={`/decks/${deck.id}`}
         onContextMenu={(e) => handleContextMenu(e, deck.id)}
