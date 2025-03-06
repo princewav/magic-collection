@@ -27,20 +27,21 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { ManaColor } from "@/types/deck";
 
 const formSchema = z.object({
   name: z.string().min(3, {
     message: "Deck name must be at least 3 characters long",
   }),
-  description: z.string().optional(),
-  format: z.string().optional(),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  colors: z
-    .array(z.enum(["white", "blue", "black", "red", "green", "colorless"]))
-    .default([]),
+  description: z.string().optional().nullable(),
+  format: z.string().optional().nullable(),
+  imageUrl: z.string().url().optional().nullable(),
+  colors: z.array(z.enum(["W", "U", "R", "B", "G", "C"])).default([]),
 });
 
-export default function NewDeckPage() {
+interface NewDeckPageProps {}
+
+export default function NewDeckPage({}: NewDeckPageProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -49,22 +50,22 @@ export default function NewDeckPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      description: "",
-      format: "",
-      imageUrl: "",
+      description: null,
+      format: null,
+      imageUrl: null,
       colors: [],
     },
   });
 
-  const toggleColor = (color: string) => {
+  const toggleColor = (color: ManaColor) => {
     setSelectedColors((prevColors) => {
       if (prevColors.includes(color)) {
         const newColors = prevColors.filter((c) => c !== color);
-        form.setValue("colors", newColors as any);
+        form.setValue("colors", newColors as ManaColor[]);
         return newColors;
       } else {
         const newColors = [...prevColors, color];
-        form.setValue("colors", newColors as any);
+        form.setValue("colors", newColors as ManaColor[]);
         return newColors;
       }
     });
@@ -72,6 +73,7 @@ export default function NewDeckPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    console.log("Submitting:", values);
     try {
       const response = await fetch("/api/decks", {
         method: "POST",
@@ -82,7 +84,9 @@ export default function NewDeckPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create deck");
+        const errorData = await response.json();
+        console.error("Error Data:", errorData);
+        throw new Error(errorData.message || "Failed to create deck");
       }
 
       toast.success("Deck Created", {
@@ -90,10 +94,11 @@ export default function NewDeckPage() {
       });
       router.push("/decks");
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating deck:", error);
       toast.error("Error", {
-        description: "Failed to create deck. Please try again.",
+        description:
+          error.message || "Failed to create deck. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -103,42 +108,42 @@ export default function NewDeckPage() {
   const colorOptions = [
     {
       name: "White",
-      value: "white",
+      value: "W",
       bgClass: "bg-amber-100",
       textClass: "text-amber-800",
       borderClass: "border-amber-300",
     },
     {
       name: "Blue",
-      value: "blue",
+      value: "U",
       bgClass: "bg-blue-100",
       textClass: "text-blue-800",
       borderClass: "border-blue-300",
     },
     {
       name: "Black",
-      value: "black",
+      value: "B",
       bgClass: "bg-gray-800",
       textClass: "text-gray-100",
       borderClass: "border-gray-900",
     },
     {
       name: "Red",
-      value: "red",
+      value: "R",
       bgClass: "bg-red-100",
       textClass: "text-red-800",
       borderClass: "border-red-300",
     },
     {
       name: "Green",
-      value: "green",
+      value: "G",
       bgClass: "bg-green-100",
       textClass: "text-green-800",
       borderClass: "border-green-300",
     },
     {
       name: "Colorless",
-      value: "colorless",
+      value: "C",
       bgClass: "bg-gray-100",
       textClass: "text-gray-800",
       borderClass: "border-gray-300",
@@ -180,6 +185,7 @@ export default function NewDeckPage() {
                       <Textarea
                         placeholder="Describe your deck strategy..."
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -195,7 +201,7 @@ export default function NewDeckPage() {
                     <FormLabel>Format</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      defaultValue={field.value || ""}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -230,6 +236,7 @@ export default function NewDeckPage() {
                       <Input
                         placeholder="https://example.com/image.jpg"
                         {...field}
+                        value={field.value || ""}
                       />
                     </FormControl>
                     <FormDescription>
@@ -251,7 +258,7 @@ export default function NewDeckPage() {
                         <button
                           type="button"
                           key={color.value}
-                          onClick={() => toggleColor(color.value)}
+                          onClick={() => toggleColor(color.value as ManaColor)}
                           className={`${color.bgClass} ${
                             color.textClass
                           } px-4 py-2 rounded-md border-2 flex items-center gap-2 ${

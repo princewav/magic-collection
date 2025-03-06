@@ -1,5 +1,4 @@
 import { Card, Deck, DeckCard } from "@prisma/client";
-import { JsonValue } from "@prisma/client/runtime/library";
 
 // Original Prisma deck type with related deckCards
 export type DeckWithDeckCards = Deck & {
@@ -21,3 +20,5 @@ export type TransformedDeck = Omit<DeckWithDeckCards, "deckCards"> & {
 
 // This type represents what getDeckById returns
 export type DeckByIdResult = TransformedDeck | null;
+
+export type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G';

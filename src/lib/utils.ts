@@ -51,3 +51,17 @@ export const getPageNumber = (searchParams: {
 
   return 1; // Default to page 1 if no valid page is provided
 };
+
+
+function getColorHex(color: string): string {
+  const colorMap: Record<string, string> = {
+    W: "#F9FAF4", // White
+    U: "#0E68AB", // Blue
+    B: "#150B00", // Black
+    R: "#D3202A", // Red
+    G: "#00733E", // Green
+    // Add more mappings as needed
+  };
+
+  return colorMap[color] || "#CCCCCC"; // Default gray if color not found
+}

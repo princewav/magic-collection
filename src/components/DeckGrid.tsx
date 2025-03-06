@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ManaSymbol } from "./ManaSymbol";
 
 type DeckGridProps = {
   decks: {
@@ -18,7 +19,7 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
         <Link
           href={`/decks/${deck.id}`}
           key={deck.id}
-          className="bg-card hover:bg-card/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg"
+          className="bg-card hover:bg-card/90 rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg border border-muted w-70"
         >
           <div className="h-48 relative">
             {deck.imageUrl ? (
@@ -40,12 +41,7 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
             <h3 className="font-semibold text-lg">{deck.name}</h3>
             <div className="flex gap-2 mt-2">
               {deck.colors.map((color, index) => (
-                <span
-                  key={index}
-                  className="w-6 h-6 rounded-full"
-                  style={{ backgroundColor: getColorHex(color) }}
-                  title={color}
-                />
+                <ManaSymbol key={index} symbol={color} />
               ))}
             </div>
           </div>
@@ -56,17 +52,5 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
 };
 
 // Helper function to convert color names to hex codes
-function getColorHex(color: string): string {
-  const colorMap: Record<string, string> = {
-    W: "#F9FAF4", // White
-    U: "#0E68AB", // Blue
-    B: "#150B00", // Black
-    R: "#D3202A", // Red
-    G: "#00733E", // Green
-    // Add more mappings as needed
-  };
-
-  return colorMap[color] || "#CCCCCC"; // Default gray if color not found
-}
 
 export default DeckGrid;
