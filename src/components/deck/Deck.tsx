@@ -7,14 +7,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ManaSymbol } from '@/components/ManaSymbol';
 import { cn } from '@/lib/utils';
 import { useDeckSelection } from '@/context/DeckSelectionContext';
+import { Deck as DeckType } from '@/types/deck';
 
 interface DeckProps {
-  deck: {
-    id: string;
-    name: string;
-    imageUrl: string | null;
-    colors: string[];
-  };
+  deck: DeckType;
   onContextMenu: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     deckId: string,

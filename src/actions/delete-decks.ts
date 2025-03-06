@@ -3,17 +3,20 @@
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 
-export async function deleteDeck(id: string) {
+export async function deleteDecks(ids: string[]) {
   try {
     await prisma.deck.deleteMany({
       where: {
-        id,
+        id: {
+          in: ids,
+        },
       },
     });
+    console.log('Decks deleted successfully');
   } catch (e) {
     console.error(e);
     return {
-      error: 'Failed to delete deck',
+      error: 'Failed to delete decks',
     };
   }
 

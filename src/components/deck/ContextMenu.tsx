@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import { CSSProperties } from 'react';
 import { Edit, Copy, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { deleteDeck } from '@/actions/delete-deck';
+import { deleteDecks } from '@/actions/delete-decks';
 
 interface ContextMenuProps {
   x: number;
@@ -31,7 +31,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
     const handleDelete = async () => {
       const confirmed = confirm('Are you sure you want to delete this deck?');
       if (confirmed) {
-        await deleteDeck(deckId);
+        await deleteDecks([deckId]);
         router.refresh();
         onClose();
       }
