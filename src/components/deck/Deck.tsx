@@ -60,6 +60,7 @@ export const Deck: React.FC<DeckProps> = ({
         className="border-primary/50 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-7 cursor-pointer rounded-full border-3 shadow-sm"
         checked={localChecked}
         onCheckedChange={handleCheckboxChange}
+        stroke={3}
       />
       <Link href={`/decks/${deck.id}`} onContextMenu={handleContextMenu}>
         <div className="relative h-48 overflow-hidden">
