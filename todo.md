@@ -4,3 +4,5 @@
 
 - [ ] chore: refactor src\app\decks\new\page.tsx in smaller components
 - [ ] fix: validation check for missing colors
+- [ ] fix: when i click in the decklist but not if there is no deck, close context menu
+

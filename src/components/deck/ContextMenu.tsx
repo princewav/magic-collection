@@ -33,9 +33,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   };
 
   const handleDelete = async () => {
-    await deleteDeck(deckId);
-    router.refresh();
-    onClose();
+    const confirmed = confirm('Are you sure you want to delete this deck?');
+    if (confirmed) {
+      await deleteDeck(deckId);
+      router.refresh();
+      onClose();
+    }
   };
   
   const handleDuplicate = () => {
