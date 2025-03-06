@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { ContextMenu } from './ContextMenu';
 import { Deck } from '@/components/deck/Deck';
 
@@ -19,12 +19,12 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     deckId: string;
   } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const [checkedDecks, setCheckedDecks] = useState<string[]>([]);
 
   const handleContextMenu = (
-    e: React.MouseEvent<Element>,
+    e: React.MouseEvent<Element, MouseEvent>,
     deckId: string,
   ) => {
-    e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, deckId });
   };
 
@@ -32,31 +32,33 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     setContextMenu(null);
   };
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (
-        contextMenu &&
-        gridRef.current &&
-        !gridRef.current.contains(e.target as Node)
-      ) {
-        closeContextMenu();
-      }
-    };
+  const handleCheck = (deckId: string) => {
+    setCheckedDecks((prev) =>
+      prev.includes(deckId) ? prev.filter((id) => id !== deckId) : [...prev, deckId],
+    );
+  };
 
-    document.addEventListener('click', handleClick);
+  const isDeckChecked = (deckId: string) => checkedDecks.includes(deckId);
 
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [contextMenu]);
+  const handleGridClick = (e: React.MouseEvent) => {
+    if (contextMenu && gridRef.current && !gridRef.current.contains(e.target as Node)) {
+      closeContextMenu();
+    }
+  };
 
   return (
-    <div className="flex flex-wrap gap-6" ref={gridRef}>
+    <div
+      className="flex flex-wrap gap-6"
+      ref={gridRef}
+      onClick={handleGridClick}
+    >
       {decks.map((deck) => (
         <Deck
           key={deck.id}
           deck={deck}
-          handleContextMenu={(e) => handleContextMenu(e, deck.id)}
+          onCheck={handleCheck}
+          onContextMenu={handleContextMenu}
+          isChecked={isDeckChecked(deck.id)}
         />
       ))}
       {contextMenu && (
@@ -70,5 +72,3 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     </div>
   );
 };
-
-export default DeckGrid;

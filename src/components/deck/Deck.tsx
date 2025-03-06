@@ -1,5 +1,4 @@
-// src/components/deck/Deck.tsx
-import React from 'react';
+import React, { useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,10 +12,33 @@ interface DeckProps {
     imageUrl: string | null;
     colors: string[];
   };
-  handleContextMenu: (event: React.MouseEvent, deckId: string) => void;
+  onContextMenu: (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    deckId: string,
+  ) => void;
+  onCheck: (deckId: string) => void;
+  isChecked: boolean;
 }
 
-export const Deck: React.FC<DeckProps> = ({ deck, handleContextMenu }) => {
+export const Deck: React.FC<DeckProps> = ({
+  deck,
+  onContextMenu,
+  onCheck,
+  isChecked,
+}) => {
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      e.preventDefault();
+      e.stopPropagation(); // Stop event propagation
+      onContextMenu(e, deck.id);
+    },
+    [deck.id, onContextMenu],
+  );
+
+  const handleCheckboxChange = useCallback(() => {
+    onCheck(deck.id);
+  }, [deck.id, onCheck]);
+
   return (
     <div
       key={deck.id}
@@ -24,12 +46,11 @@ export const Deck: React.FC<DeckProps> = ({ deck, handleContextMenu }) => {
     >
       <Checkbox
         id={`deck-${deck.id}`}
-        className="border-primary/50 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-5 cursor-pointer rounded-full shadow-sm border-3"
+        className="border-primary/50 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-5 cursor-pointer rounded-full border-3 shadow-sm"
+        checked={isChecked}
+        onCheckedChange={handleCheckboxChange}
       />
-      <Link
-        href={`/decks/${deck.id}`}
-        onContextMenu={(e) => handleContextMenu(e, deck.id)}
-      >
+      <Link href={`/decks/${deck.id}`} onContextMenu={handleContextMenu}>
         <div className="relative h-48">
           {deck.imageUrl ? (
             <Image
