@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { DeckGrid } from "@/components/DeckGrid";
+import { DeckGrid } from "@/components/deck/DeckGrid";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
