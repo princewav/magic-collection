@@ -1,21 +1,40 @@
-Please provide concise answers. Don't explain obvious concepts. You can assume that I am very knowledgable about most programming topics.
+# Next.js Code Generation Conventions for LLM
 
-Whenever you are writing React code, make sure to
-- define an interface for your component props
-- modularize components into smaller, reusable pieces
-- Follow Next.js patterns, use app router and correctly use server and client components.
-- Use Tailwind CSS for styling.
-- Use Shadcn UI for components.
-- Use TanStack Query (react-query) for frontend data fetching.
-- Use React Hook Form for form handling.
-- Use Zod for validation.
-- Use React Context for state management.
-- Follow AirBnB style guide for code formatting.
-- Use PascalCase when creating new React files. UserCard, not user-card.
-- Use named exports when creating new react components.
-- DO NOT TEACH ME HOW TO SET UP THE PROJECT, JUMP STRAIGHT TO WRITING COMPONENTS AND CODE.
+## General Principles
+- Follow **KISS (Keep It Simple, Stupid)**, **DRY (Don't Repeat Yourself)**, **YAGNI (You Ain't Gonna Need It)**, and **SOLID** principles.
+- Always evaluate if a **simpler, more elegant, and robust solution** exists.
+- Provide confidence level (1-10) when suggesting alternative solutions, but **do not modify code until approved**.
 
-Whenever you are specifically asked to generate a commit message, make sure to use lowercase for generating commit messages, don't write description;
-use shadcn@... instead of shadcn-ui@... when generating commands to install shadcn components.
+## React Code Style and Patterns
+- Define **interfaces for component props**.
+- Modularize components into **smaller, reusable pieces**.
+- Follow **Next.js App Router** patterns, correctly using **server and client components**.
+- Use **Tailwind CSS** for styling.
+- Use **Shadcn UI** for components.
+- Use **TanStack Query (react-query)** for frontend data fetching.
+- Use **React Hook Form** for form handling.
+- Use **Zod** for validation.
+- Use **React Context** for state management.
+- Use **PascalCase** for filenames (e.g., `UserCard.tsx`, not `user-card.tsx`).
+- Use **named exports** for components.
+- If a **function exceeds 10 lines**, split it into **smaller functions**.
+- If a **component exceeds 30 lines**, split it into **smaller components**.
 
-when generating code, put a comment at the top with the intended relative path of the file.
+## Code Structure and Organization
+- Include a **comment at the top** of each file specifying its **relative path**.
+- Ensure code is **modular and maintainable**.
+- Avoid **over-engineering**.
+
+## Commit Message Conventions
+- Use **lowercase** for commit messages.
+- Do **not** include descriptions.
+- Example: `fix: button alignment`
+
+## Shadcn Installation Commands
+- Use `shadcn@...`, not `shadcn-ui@...`.
+
+## Prohibited Actions
+- **Do not explain obvious programming concepts**.
+- **Do not include project setup instructions**.
+- **Do not generate over-engineered solutions** without prior discussion.
+
