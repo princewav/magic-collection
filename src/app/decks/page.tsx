@@ -9,15 +9,17 @@ export const metadata: Metadata = {
 
 const mockDecks = [
   {
-    id: "4",
-    name: "Deck 4",
-    imageUrl: "https://via.placeholder.com/300x200",
+    id: "40",
+    name: "Izzet Wizards",
+    imageUrl:
+      "https://cards.scryfall.io/art_crop/front/0/4/04779a7e-b453-48b9-b392-6d6fd0b8d283.jpg?1686969766",
     colors: ["red", "blue"],
   },
   {
     id: "4",
-    name: "Deck 4",
-    imageUrl: "https://via.placeholder.com/300x200",
+    name: "Boros Convoke",
+    imageUrl:
+      "https://cards.scryfall.io/art_crop/front/7/8/7829c0ae-f72f-4195-ad43-775d7218565c.jpg?1738356154",
     colors: ["red", "white"],
   },
 ];
