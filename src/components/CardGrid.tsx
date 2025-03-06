@@ -8,7 +8,7 @@ interface Props {
   currentPage?: number;
   cardIds?: string[];
 }
-export default async function CardGrid({ currentPage = 1, cardIds }: Props) {
+export async function CardGrid({ currentPage = 1, cardIds }: Props) {
   const fetchedCardIds = cardIds ?? await loadCardIds(currentPage);
   // const cardIds: string[] = []
 

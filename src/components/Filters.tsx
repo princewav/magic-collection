@@ -1,6 +1,6 @@
 import { ManaSymbol } from "./ManaSymbol";
 
-export default function Filters() {
+export function Filters() {
   return (
     <div className="bg-foreground/20 p-4 rounded-md shadow-md mb-3">
       <div className="flex items-center space-x-2 flex-wrap">

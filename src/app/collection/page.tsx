@@ -1,4 +1,4 @@
-import CardGrid from "@/components/CardGrid";
+import { CardGrid } from "@/components/CardGrid";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,9 +9,8 @@ export const metadata: Metadata = {
 export default async function CollectionPage() {
   return (
     <main className="flex flex-col p-4">
-      
       <div className="flex items-center justify-between">
-      <h1 className="text-4xl font-bold">My Collection</h1>
+        <h1 className="text-4xl font-bold">My Collection</h1>
       </div>
       <CardGrid cardIds={[]} />
     </main>

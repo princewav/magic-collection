@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'cards.scryfall.io',
+        port: '',
+        pathname: '/art_crop/front/**', // Added this pattern for art_crop images
+      },
+      {
+        protocol: 'https',
         hostname: 'via.placeholder.com',
         port: '',
         pathname: '/**',
