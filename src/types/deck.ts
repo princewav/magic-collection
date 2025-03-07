@@ -27,4 +27,6 @@ export type Deck = {
   name: string;
   imageUrl: string | null; // Keep as null if it doesn't exist
   colors: ManaColor[];
+  format?: string;
+  description?: string;
 };

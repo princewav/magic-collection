@@ -4,6 +4,7 @@ import { CSSProperties } from 'react';
 import { Edit, Copy, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { deleteDecks } from '@/actions/delete-decks';
+import { duplicateDeck } from '@/actions/duplicate-decks';
 
 interface DeckContextMenuProps {
   x: number;
@@ -58,9 +59,13 @@ export const DeckContextMenu: React.FC<DeckContextMenuProps> = ({
     }
   };
 
-  const handleDuplicate = () => {
-    alert(`Duplicate deck ${deckId}`);
-    onClose();
+  const handleDuplicate = async () => {
+    const confirmed = confirm('Are you sure you want to duplicate this deck?');
+    if (confirmed) {
+      await duplicateDeck(deckId);
+      router.refresh();
+      onClose();
+    }
   };
 
   return (
