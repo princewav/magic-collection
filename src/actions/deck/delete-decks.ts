@@ -1,17 +1,25 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { prisma } from '@/lib/prisma';
+import PouchDB from 'pouchdb';
+import { Deck } from '@/types/deck';
+
+const db = new PouchDB<Deck>('decks');
 
 export async function deleteDecks(ids: string[]) {
   try {
-    await prisma.deck.deleteMany({
-      where: {
-        id: {
-          in: ids,
-        },
+    const response = await db.find({
+      selector: {
+        _id: { $in: ids },
+        type: 'deck',
       },
     });
+
+    await Promise.all(
+      response.docs.map(async (deck) => {
+        await db.remove(deck);
+      }),
+    );
     console.log('Decks deleted successfully');
   } catch (e) {
     console.error(e);

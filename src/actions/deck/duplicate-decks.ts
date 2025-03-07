@@ -1,31 +1,27 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { prisma } from '@/lib/prisma';
-import { InputJsonValue } from '@prisma/client/runtime/library';
+import PouchDB from 'pouchdb';
+import { Deck } from '@/types/deck';
+
+const db = new PouchDB('decks');
 
 export async function duplicateDeck(deckId: string): Promise<string> {
   try {
-    const deck = await prisma.deck.findUnique({
-      where: {
-        id: deckId,
-      },
-    });
-
-    if (!deck) {
+    const deck = await db.get<Deck>(deckId);
+    if (deck.type !== 'deck') {
       throw new Error('Deck not found');
     }
 
-    const { id, ...newDeckData } = {
-      ...deck,
+    const { _id, _rev, ...newDeckData } = deck;
+    const newDeck = {
+      ...newDeckData,
       name: `Copy of ${deck.name}`,
-      colors: deck.colors as InputJsonValue,
     };
 
-    const newDeck = await prisma.deck.create({ data: newDeckData });
-
+    const response = await db.post(newDeck);
     revalidatePath('/decks');
-    return newDeck.id;
+    return response.id;
   } catch (error: any) {
     console.error('Error duplicating deck:', error);
     throw new Error(`Failed to duplicate deck: ${error.message}`);
