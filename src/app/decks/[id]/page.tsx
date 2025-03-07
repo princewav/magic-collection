@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { Filters } from '@/components/Filters';
 import { CardGrid } from '@/components/CardGrid';
 import { DeckInfo } from '@/components/DeckInfo';
-import { getDeckById } from '@/actions/load-decks';
+import { getDeckById } from '@/actions/deck/load-decks';
 
 interface Props {
   params: {

@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash } from 'lucide-react';
 import { useDeckSelection } from '@/context/DeckSelectionContext';
-import { deleteDecks } from '@/actions/delete-decks';
+import { deleteDecks } from '@/actions/deck/delete-decks';
 
 interface DeleteDecksButtonProps {
   deckCount: number;

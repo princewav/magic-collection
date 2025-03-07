@@ -3,8 +3,8 @@ import React, { useRef, useEffect } from 'react';
 import { CSSProperties } from 'react';
 import { Edit, Copy, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { deleteDecks } from '@/actions/delete-decks';
-import { duplicateDeck } from '@/actions/duplicate-decks';
+import { deleteDecks } from '@/actions/deck/delete-decks';
+import { duplicateDeck } from '@/actions/deck/duplicate-decks';
 
 interface DeckContextMenuProps {
   x: number;
