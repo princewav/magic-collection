@@ -41,6 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 
 next-env.d.ts
+data/*
+!data/.gitkeep
 data/oracle-cards-20250304100214.json
 data/card.db
 data/card.db-journal
