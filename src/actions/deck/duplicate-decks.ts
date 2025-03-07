@@ -1,29 +1,17 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import PouchDB from 'pouchdb';
-import { Deck } from '@/types/deck';
+import { deckRepository } from '@/repositories/DeckRepository';
 
-const db = new PouchDB('decks');
-
-export async function duplicateDeck(deckId: string): Promise<string> {
+export async function duplicateDecks(ids: string[]) {
   try {
-    const deck = await db.get<Deck>(deckId);
-    if (deck.type !== 'deck') {
-      throw new Error('Deck not found');
-    }
-
-    const { _id, _rev, ...newDeckData } = deck;
-    const newDeck = {
-      ...newDeckData,
-      name: `Copy of ${deck.name}`,
+    await deckRepository.duplicateMany(ids);
+    console.log('Decks duplicated successfully');
+  } catch (e) {
+    console.error(e);
+    return {
+      error: 'Failed to duplicate decks',
     };
-
-    const response = await db.post(newDeck);
-    revalidatePath('/decks');
-    return response.id;
-  } catch (error: any) {
-    console.error('Error duplicating deck:', error);
-    throw new Error(`Failed to duplicate deck: ${error.message}`);
   }
+  revalidatePath('/');
 }
