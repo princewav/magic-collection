@@ -1,25 +1,27 @@
-import PouchDB from 'pouchdb';
 import { BaseRepository } from './BaseRepository';
 
 export class PouchDbRepository<
   T extends { id: string },
 > extends BaseRepository<T> {
-  protected db: PouchDB.Database<T & PouchDB.Core.AllDocsMeta>;
+  protected connection;
   protected collectionName: string;
 
-  constructor(db: unknown, collectionName: string) {
-    super(db);
-    this.db = db as PouchDB.Database<T & PouchDB.Core.AllDocsMeta>;
+  constructor(
+    connection: PouchDB.Database<T & PouchDB.Core.AllDocsMeta>,
+    collectionName: string,
+  ) {
+    super(connection);
+    this.connection = connection;
     this.collectionName = collectionName;
   }
 
   async create(item: T): Promise<T> {
     const { id, ...doc } = item;
-    const response = await this.db.post({
+    const response = await this.connection.post({
       ...doc,
       type: this.collectionName,
     } as any);
-    
+
     return {
       ...item,
       _id: response.id,
@@ -29,7 +31,7 @@ export class PouchDbRepository<
 
   async get(ids: string[]): Promise<T[] | null> {
     try {
-      const response = await this.find({
+      const response = await this.connection.find({
         selector: {
           _id: { $in: ids },
           type: this.collectionName,
@@ -42,15 +44,17 @@ export class PouchDbRepository<
   }
 
   async getAll(): Promise<T[]> {
-    const result = await this.db.allDocs({ include_docs: true });
-    return result.rows.map((row) => row.doc) as T[];
+    const result = await this.connection.find({
+      selector: { type: this.collectionName },
+    });
+    return result.docs as T[];
   }
 
   async update(id: string, item: Partial<T>): Promise<T | null> {
     try {
-      const existing = await this.db.get<T & PouchDB.Core.IdMeta>(id);
+      const existing = await this.connection.get<T & PouchDB.Core.IdMeta>(id);
       const updated = { ...existing, ...item } as T & PouchDB.Core.IdMeta;
-      await this.db.put(updated);
+      await this.connection.put(updated);
       return updated as T;
     } catch (error) {
       return null;
@@ -59,8 +63,8 @@ export class PouchDbRepository<
 
   async delete(id: string): Promise<boolean> {
     try {
-      const doc = await this.db.get(id);
-      await this.db.remove(doc);
+      const doc = await this.connection.get(id);
+      await this.connection.remove(doc);
       return true;
     } catch (error) {
       return false;
@@ -68,14 +72,7 @@ export class PouchDbRepository<
   }
 
   async remove(id: string): Promise<void> {
-    const doc = await this.db.get(id);
-    await this.db.remove(doc);
-  }
-
-  async find(
-    selector: PouchDB.Find.Selector,
-  ): Promise<PouchDB.Find.FindResponse<T>> {
-    const response = await this.db.find({ selector });
-    return response as PouchDB.Find.FindResponse<T>;
+    const doc = await this.connection.get(id);
+    await this.connection.remove(doc);
   }
 }

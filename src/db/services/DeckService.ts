@@ -6,15 +6,6 @@ import { RepoCls } from '../db';
 export class DeckService extends BaseService<Deck> {
   public repo = new RepoCls<Deck>(DB, 'decks');
 
-  async findAll(): Promise<Deck[]> {
-    try {
-      return await this.repo.getAll();
-    } catch (error) {
-      console.error('Error finding all decks:', error);
-      throw error;
-    }
-  }
-
   async duplicateMany(ids: string[]) {
     try {
       const response = (await this.repo.get(ids)) || [];

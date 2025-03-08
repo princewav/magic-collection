@@ -6,7 +6,12 @@ import { loadDecks } from '@/actions/deck/load-decks';
 
 export default async function DecksPage() {
   const decks = await loadDecks();
-
+  console.log(decks[10]);
+  return (
+    <div>
+      {decks.length}
+    </div>
+  )
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="re mb-4 flex items-center justify-between">

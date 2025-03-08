@@ -1,14 +1,9 @@
-import { POUCHDB_PATH } from '@/lib/constants';
-import PouchDB from 'pouchdb';
-
-export const db = new PouchDB(POUCHDB_PATH);
-
 export abstract class BaseRepository<T> {
   protected abstract collectionName: string;
-  protected db: unknown;
+  protected connection: unknown;
 
-  constructor(db: unknown) {
-    this.db = db;
+  constructor(connection: unknown) {
+    this.connection = connection;
   }
 
   abstract create(item: T): Promise<T>;
