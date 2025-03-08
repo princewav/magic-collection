@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { Filters } from '@/components/Filters';
 import { CardGrid } from '@/components/CardGrid';
-import { DeckInfo } from '@/components/DeckInfo';
+import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 
 interface Props {
