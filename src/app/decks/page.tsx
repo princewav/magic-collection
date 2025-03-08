@@ -2,10 +2,10 @@ import { DeckGrid } from '@/components/deck/DeckGrid';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { DeckSelectionProvider } from '@/context/DeckSelectionContext';
-import { getDecks } from '@/actions/deck/load-decks';
+import { loadDecks } from '@/actions/deck/load-decks';
 
 export default async function DecksPage() {
-  const decks = await getDecks();
+  const decks = await loadDecks();
 
   return (
     <div className="container mx-auto px-4 py-8">

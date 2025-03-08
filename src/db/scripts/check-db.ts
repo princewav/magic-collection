@@ -1,4 +1,4 @@
-import { db } from '../BaseRepository';
+import { db } from '../repositories/BaseRepository';
 
 async function countCards() {
   try {

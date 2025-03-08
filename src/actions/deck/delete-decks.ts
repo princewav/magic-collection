@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { deckRepository } from '@/repositories/DeckRepository';
+import { deckService } from '@/db/services/DeckService';
 
 export async function deleteDecks(ids: string[]) {
   try {

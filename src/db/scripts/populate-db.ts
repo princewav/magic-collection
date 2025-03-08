@@ -1,7 +1,7 @@
 import { CARD_DATA_PATH } from '../../lib/constants';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { db } from '../BaseRepository';
+import { db } from '../repositories/BaseRepository';
 
 interface Card {
   id: string;

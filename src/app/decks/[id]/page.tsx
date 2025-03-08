@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { Filters } from '@/components/Filters';
 import { CardGrid } from '@/components/CardGrid';
 import { DeckInfo } from '@/components/DeckInfo';
-import { getDeckById } from '@/actions/deck/load-decks';
+import { loadDeckById } from '@/actions/deck/load-decks';
 
 interface Props {
   params: {
@@ -13,7 +13,7 @@ interface Props {
 
 export default async function DeckDetailPage({ params }: Props) {
   const { id } = params;
-  const deck = await getDeckById(id);
+  const deck = await loadDeckById(id);
 
   if (!deck) {
     return notFound();

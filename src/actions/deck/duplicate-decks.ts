@@ -1,11 +1,11 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { deckRepository } from '@/repositories/DeckRepository';
+import { deckService } from '@/db/services/DeckService';
 
 export async function duplicateDecks(ids: string[]) {
   try {
-    await deckRepository.duplicateMany(ids);
+    await deckService.duplicateMany(ids);
     console.log('Decks duplicated successfully');
   } catch (e) {
     console.error(e);

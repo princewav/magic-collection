@@ -1,26 +1,47 @@
 import PouchDB from 'pouchdb';
 import { BaseRepository } from './BaseRepository';
 
-export class CouchDbRepository<T extends object> extends BaseRepository<T> {
-  constructor(collectionName: string) {
-    super(collectionName);
-    this.db = new PouchDB<T>(collectionName);
+export class PouchDbRepository<
+  T extends { id: string },
+> extends BaseRepository<T> {
+  protected db: PouchDB.Database<T & PouchDB.Core.AllDocsMeta>;
+  protected collectionName: string;
+
+  constructor(db: unknown, collectionName: string) {
+    super(db);
+    this.db = db as PouchDB.Database<T & PouchDB.Core.AllDocsMeta>;
+    this.collectionName = collectionName;
   }
 
   async create(item: T): Promise<T> {
-    const response = await this.db.post(item);
-    return { ...item, _id: response.id, _rev: response.rev } as T;
+    const { id, ...doc } = item;
+    const response = await this.db.post({
+      ...doc,
+      type: this.collectionName,
+    } as any);
+    
+    return {
+      ...item,
+      _id: response.id,
+      _rev: response.rev,
+    } as T;
   }
 
-  async findById(id: string): Promise<T | null> {
+  async get(ids: string[]): Promise<T[] | null> {
     try {
-      return await this.db.get(id);
+      const response = await this.find({
+        selector: {
+          _id: { $in: ids },
+          type: this.collectionName,
+        },
+      });
+      return response.docs;
     } catch (error) {
       return null;
     }
   }
 
-  async findAll(): Promise<T[]> {
+  async getAll(): Promise<T[]> {
     const result = await this.db.allDocs({ include_docs: true });
     return result.rows.map((row) => row.doc) as T[];
   }
@@ -46,8 +67,9 @@ export class CouchDbRepository<T extends object> extends BaseRepository<T> {
     }
   }
 
-  async remove(doc: T & PouchDB.Core.IdMeta): Promise<void> {
-    this.db.remove(doc);
+  async remove(id: string): Promise<void> {
+    const doc = await this.db.get(id);
+    await this.db.remove(doc);
   }
 
   async find(
