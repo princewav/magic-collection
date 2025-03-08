@@ -1,16 +1,14 @@
-import PouchDB from 'pouchdb';
-import { Deck } from '@/types/deck';
+import { CouchDbRepository } from './CouchDbRepository';
+import { Deck } from '../types/deck';
 
-class DeckRepository {
-  private db: PouchDB.Database<Deck>;
-
+export class DeckRepository extends CouchDbRepository<Deck> {
   constructor() {
-    this.db = new PouchDB<Deck>('decks');
+    super('decks');
   }
 
   async deleteMany(ids: string[]) {
     try {
-      const response = await this.db.find({
+      const response = await this.find({
         selector: {
           _id: { $in: ids },
           type: 'deck',
@@ -19,7 +17,7 @@ class DeckRepository {
 
       await Promise.all(
         response.docs.map(async (deck) => {
-          await this.db.remove(deck);
+          await this.remove(deck);
         }),
       );
       return true;
@@ -31,7 +29,7 @@ class DeckRepository {
 
   async duplicateMany(ids: string[]) {
     try {
-      const response = await this.db.find({
+      const response = await this.find({
         selector: {
           _id: { $in: ids },
           type: 'deck',
@@ -45,7 +43,7 @@ class DeckRepository {
         name: `${deck.name} (Copy)`,
       }));
 
-      await Promise.all(duplicatedDecks.map((deck) => this.db.put(deck)));
+      await Promise.all(duplicatedDecks.map((deck) => this.put(deck)));
       return duplicatedDecks;
     } catch (e) {
       console.error(e);
@@ -55,7 +53,7 @@ class DeckRepository {
 
   async findAll() {
     try {
-      const response = await this.db.find({
+      const response = await this.find({
         selector: {
           type: 'deck',
         },
@@ -69,7 +67,7 @@ class DeckRepository {
 
   async findById(id: string) {
     try {
-      const deck = await this.db.get(id);
+      const deck = await this.findById(id);
       if (deck.type !== 'deck') {
         throw new Error('Deck not found');
       }
