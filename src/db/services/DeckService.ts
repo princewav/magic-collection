@@ -23,4 +23,5 @@ export class DeckService extends BaseService<Deck> {
     }
   }
 }
+
 export const deckService = new DeckService();

@@ -1,4 +1,4 @@
-export type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G';
+export type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G' | 'C';
 export type Deck = {
   id: string;
   name: string;

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { deckService } from "@/db/services/DeckService";
 
-export const deckSchema = z.object({
+
+const deckSchema = z.object({
   name: z.string().min(3, {
     message: "Deck name must be at least 3 characters long",
   }),
@@ -17,14 +18,14 @@ async function POST(request: NextRequest) {
     const json = await request.json();
     const body = deckSchema.parse(json);
 
-    const deck = await prisma.deck.create({
-      data: {
-        name: body.name,
-        description: body.description || null,
-        format: body.format || null,
-        colors: body.colors, // This will be converted to JSON by Prisma
-        imageUrl: body.imageUrl || null,
-      },
+    const deck = await deckService.repo.create({
+      id: '',
+      name: body.name,
+      description: body.description || '',
+      format: body.format || '',
+      colors: body.colors || [],
+      imageUrl: body.imageUrl || null,
+      type: "deck"
     });
     console.log(deck);
 
