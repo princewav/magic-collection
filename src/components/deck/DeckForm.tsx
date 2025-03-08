@@ -25,14 +25,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckIcon, Loader2 } from 'lucide-react';
 import { ManaColor } from '@/types/deck';
 import { deckSchema } from '@/app/decks/new/validation';
-import { z } from 'zod';
 import { COLOR_OPTIONS } from '@/lib/constants';
 
+interface DeckFormData {
+  name: string;
+  description?: string;
+  format?: string | null;
+  imageUrl?: string | null;
+  colors: ManaColor[];
+}
+
 interface DeckFormProps {
-  onSubmit: (values: z.infer<typeof deckSchema>) => Promise<void>;
+  onSubmit: (data: DeckFormData) => Promise<void>;
   isSubmitting: boolean;
   setSelectedColors: React.Dispatch<React.SetStateAction<string[]>>;
   selectedColors: string[];
+  initialData?: DeckFormData;
 }
 
 export const DeckForm: React.FC<DeckFormProps> = ({
@@ -40,10 +48,11 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   isSubmitting,
   setSelectedColors,
   selectedColors,
+  initialData,
 }) => {
-  const form = useForm<z.infer<typeof deckSchema>>({
+  const form = useForm<DeckFormData>({
     resolver: zodResolver(deckSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       name: '',
       description: '',
       format: null,
