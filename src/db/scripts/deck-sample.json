@@ -1,0 +1,9 @@
+{
+  "id": "deck-123",
+  "name": "Sample Deck",
+  "imageUrl": null,
+  "colors": ["W", "U"],
+  "format": "Standard",
+  "description": "This is a sample deck for testing purposes.",
+  "type": "deck"
+}

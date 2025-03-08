@@ -42,6 +42,6 @@ export const COLOR_OPTIONS = [
     borderClass: "border-gray-300",
   },
 ];
-export const CARD_DATA_PATH = "data/oracle-cards-20250304100214.json";
+export const CARD_DATA_PATH = "src/data/sample-cards.json";
 export const POUCHDB_PATH = 'data/pouchdb/magic';
 export const ITEMS_PER_PAGE = 18;

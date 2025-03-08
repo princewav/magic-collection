@@ -1,0 +1,19 @@
+[
+  {
+    "id": "65e8c9b1e4b0a1a2b3c4d5e6",
+    "name": "Sample Card 1",
+    "type": "Creature",
+    "colors": ["W"],
+    "manaCost": "{1}{W}",
+    "power": "2",
+    "toughness": "2"
+  },
+  {
+    "id": "65e8c9b1e4b0a1a2b3c4d5e7",
+    "name": "Sample Card 2",
+    "type": "Instant",
+    "colors": ["U"],
+    "manaCost": "{U}",
+    "text": "Draw a card."
+  }
+]

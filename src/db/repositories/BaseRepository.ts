@@ -1,9 +1,9 @@
 export abstract class BaseRepository<T> {
   protected abstract collectionName: string;
-  protected connection: unknown;
+  protected db: unknown;
 
-  constructor(connection: unknown) {
-    this.connection = connection;
+  constructor(db: unknown) {
+    this.db = db;
   }
 
   abstract create(item: T): Promise<T>;

@@ -1,23 +1,29 @@
 import { MongoClient, Db } from 'mongodb';
 import { MongoRepository } from './repositories/MongoRepository';
 
-export class MongoDBConnection {
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const dbName = process.env.MONGODB_DB || 'magic';
+
+if (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://')) {
+  throw new Error(
+    'Invalid MongoDB connection string. Must start with mongodb:// or mongodb+srv://',
+  );
+}
+
+class MongoDBConnection {
   private static instance: MongoDBConnection;
   private client: MongoClient;
-  private connection: Db | null = null;
+  private db: Db | null = null;
 
-  private constructor(
-    private uri: string,
-    private dbName: string,
-  ) {
-    this.client = new MongoClient(this.uri);
+  private constructor() {
+    this.client = new MongoClient(uri);
+    console.log('MongoDB connection initialized');
   }
 
-  public static getInstance(): MongoDBConnection {
+  public static async getInstance(): Promise<MongoDBConnection> {
     if (!MongoDBConnection.instance) {
-      const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-      const dbName = process.env.MONGODB_DB || 'magic-collection';
-      MongoDBConnection.instance = new MongoDBConnection(uri, dbName);
+      MongoDBConnection.instance = new MongoDBConnection();
+      await MongoDBConnection.instance.connect();
     }
     return MongoDBConnection.instance;
   }
@@ -25,7 +31,7 @@ export class MongoDBConnection {
   public async connect(): Promise<void> {
     try {
       await this.client.connect();
-      this.connection = this.client.db(this.dbName);
+      this.db = this.client.db(dbName);
       console.log('Connected to MongoDB');
     } catch (error) {
       console.error('Failed to connect to MongoDB:', error);
@@ -34,10 +40,10 @@ export class MongoDBConnection {
   }
 
   public getDatabase(): Db {
-    if (!this.connection) {
+    if (!this.db) {
       throw new Error('MongoDB not connected');
     }
-    return this.connection;
+    return this.db;
   }
 
   public async close(): Promise<void> {
@@ -50,5 +56,10 @@ export class MongoDBConnection {
   }
 }
 
-export const DB = MongoDBConnection.getInstance();
+const initDB = async () => {
+  const connection = await MongoDBConnection.getInstance();
+  return connection.getDatabase();
+};
+
+export const DB = await initDB();
 export const RepoCls = MongoRepository;

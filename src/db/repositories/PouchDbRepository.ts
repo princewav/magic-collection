@@ -3,21 +3,21 @@ import { BaseRepository } from './BaseRepository';
 export class PouchDbRepository<
   T extends { id: string },
 > extends BaseRepository<T> {
-  protected connection;
+  protected db: PouchDB.Database<T & PouchDB.Core.AllDocsMeta>;
   protected collectionName: string;
 
   constructor(
-    connection: PouchDB.Database<T & PouchDB.Core.AllDocsMeta>,
+    db: PouchDB.Database<T & PouchDB.Core.AllDocsMeta>,
     collectionName: string,
   ) {
-    super(connection);
-    this.connection = connection;
+    super(db);
+    this.db = db;
     this.collectionName = collectionName;
   }
 
   async create(item: T): Promise<T> {
     const { id, ...doc } = item;
-    const response = await this.connection.post({
+    const response = await this.db.post({
       ...doc,
       type: this.collectionName,
     } as any);
@@ -31,7 +31,7 @@ export class PouchDbRepository<
 
   async get(ids: string[]): Promise<T[] | null> {
     try {
-      const response = await this.connection.find({
+      const response = await this.db.find({
         selector: {
           _id: { $in: ids },
           type: this.collectionName,
@@ -44,7 +44,7 @@ export class PouchDbRepository<
   }
 
   async getAll(): Promise<T[]> {
-    const result = await this.connection.find({
+    const result = await this.db.find({
       selector: { type: this.collectionName },
     });
     return result.docs as T[];
@@ -52,9 +52,9 @@ export class PouchDbRepository<
 
   async update(id: string, item: Partial<T>): Promise<T | null> {
     try {
-      const existing = await this.connection.get<T & PouchDB.Core.IdMeta>(id);
+      const existing = await this.db.get<T & PouchDB.Core.IdMeta>(id);
       const updated = { ...existing, ...item } as T & PouchDB.Core.IdMeta;
-      await this.connection.put(updated);
+      await this.db.put(updated);
       return updated as T;
     } catch (error) {
       return null;
@@ -63,8 +63,8 @@ export class PouchDbRepository<
 
   async delete(id: string): Promise<boolean> {
     try {
-      const doc = await this.connection.get(id);
-      await this.connection.remove(doc);
+      const doc = await this.db.get(id);
+      await this.db.remove(doc);
       return true;
     } catch (error) {
       return false;
@@ -72,7 +72,7 @@ export class PouchDbRepository<
   }
 
   async remove(id: string): Promise<void> {
-    const doc = await this.connection.get(id);
-    await this.connection.remove(doc);
+    const doc = await this.db.get(id);
+    await this.db.remove(doc);
   }
 }

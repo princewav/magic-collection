@@ -1,16 +1,13 @@
-import { MongoDBConnection } from '../db';
 import { BaseRepository } from './BaseRepository';
-import { Collection, ObjectId } from 'mongodb';
+import { Collection, ObjectId, Db } from 'mongodb';
 
-export class MongoRepository<
-  T extends { id: string },
-> extends BaseRepository<T> {
+export class MongoRepository<T extends { id: string }> extends BaseRepository<T> {
   protected collection: Collection;
   protected collectionName: string;
 
-  constructor(connection: MongoDBConnection, collectionName: string) {
-    super(connection);
-    this.collection = connection.getDatabase().collection(collectionName);
+  constructor(db: Db, collectionName: string) {
+    super(db);
+    this.collection = db.collection(collectionName);
     this.collectionName = collectionName;
   }
 
