@@ -5,7 +5,7 @@ import { deckService } from '@/db/services/DeckService';
 
 export async function deleteDecks(ids: string[]) {
   try {
-    await deckRepository.deleteMany(ids);
+    await deckService.deleteMany(ids);
     console.log('Decks deleted successfully');
   } catch (e) {
     console.error(e);

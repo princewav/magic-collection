@@ -25,7 +25,7 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
       const objectIds = ids.map((id) => new ObjectId(id));
       const cursor = this.collection.find({ _id: { $in: objectIds } });
       const docs = await cursor.toArray();
-      return docs as unknown as T[];
+      return docs.map(({_id, ...doc}) => ({id: _id.toString(), ...doc})) as unknown as T[];
     } catch (error) {
       return null;
     }
@@ -34,7 +34,10 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
   async getAll(): Promise<T[]> {
     const cursor = this.collection.find({});
     const docs = await cursor.toArray();
-    return docs as unknown as T[];
+    return docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as T[];
   }
 
   async update(id: string, item: Partial<T>): Promise<T | null> {
