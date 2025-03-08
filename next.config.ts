@@ -1,6 +1,7 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Your existing image configurations
   images: {
     remotePatterns: [
       {
@@ -13,7 +14,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'cards.scryfall.io',
         port: '',
-        pathname: '/art_crop/front/**', // Added this pattern for art_crop images
+        pathname: '/art_crop/front/**',
       },
       {
         protocol: 'https',
@@ -29,6 +30,27 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // Add webpack configuration to handle PouchDB
+  // webpack: (config, { isServer }) => {
+  //   // PouchDB has a dependency on 'leveldown' which uses native modules
+  //   if (!isServer) {
+  //     // Don't attempt to use native modules in the browser
+  //     config.resolve.fallback = {
+  //       ...config.resolve.fallback,
+  //       fs: false,
+  //       path: false,
+  //       os: false,
+  //       crypto: false,
+  //       pouchdb: require.resolve('pouchdb-browser'),
+  //     };
+  //   }
+
+  //   return config;
+  // },
+
+  // Use the correct property name as per the error message
+  serverExternalPackages: ['pouchdb', 'leveldown'],
 };
 
 export default nextConfig;
