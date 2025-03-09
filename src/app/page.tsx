@@ -1,9 +1,10 @@
-import { CardGrid } from '@/components/DeckCardGrid';
+import { DeckCardGrid } from '@/components/DeckCardGrid';
 import { getPageNumber } from '@/lib/utils';
 import { Metadata } from 'next';
 import { Filters } from '@/components/Filters';
 import CardModal from '@/components/CardModal';
 import { CardModalProvider } from '@/context/CardModalContext';
+import { CardGrid } from '@/components/CardGrid copy';
 
 export const metadata: Metadata = {
   title: 'My Awesome Cards',
@@ -20,7 +21,7 @@ const Page = async (props: {
       <Filters />
       <CardModalProvider>
         <main className="antialiased">
-          <CardGrid currentPage={currentPage} />
+          {/* <DeckCardGrid currentPage={currentPage} /> */}
         </main>
         <CardModal />
       </CardModalProvider>

@@ -4,11 +4,13 @@ describe('parseDeckList', () => {
   it('should parse main deck cards', () => {
     const input = `
 4 Seachrome Coast (ONE) 258
-2 Split Up (DSK) 32`;
+2 Split Up (DSK) 32
+2 Day of Judgment`;
     const result = parseDeckList(input);
     expect(result.mainDeck).toEqual([
       { name: 'Seachrome Coast', set: 'ONE', quantity: 4, setNumber: 258 },
       { name: 'Split Up', set: 'DSK', quantity: 2, setNumber: 32 },
+      { name: 'Day of Judgment', set: '', quantity: 2, setNumber: 0 },
     ]);
     expect(result.sideboard).toEqual([]);
   });

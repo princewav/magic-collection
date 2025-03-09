@@ -22,12 +22,12 @@ export function parseDeckList(text: string): DeckList {
       currentSection = 'sideboard';
       continue;
     }
-    const match = trimmedLine.match(/^(\d+)\s+([^()]+)\s+\((\w+)\)\s*(\d*)$/);
+    const match = trimmedLine.match(/^(\d+)\s+([^()]+)(?:\s+\((\w+)\))?\s*?(\d*)?$/)
     if (match) {
       const [, count, name, set, setNumber] = match;
       deckList[currentSection].push({
         name: name.trim(),
-        set: set.trim(),
+        set: set?.trim() || '',
         quantity: parseInt(count),
         setNumber: parseInt(setNumber || '0'),
       });

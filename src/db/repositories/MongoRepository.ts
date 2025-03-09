@@ -1,8 +1,8 @@
 import { BaseRepository } from './BaseRepository';
-import { Collection, ObjectId, Db } from 'mongodb';
+import { Collection, ObjectId, Db, Filter, Document } from 'mongodb';
 
 export class MongoRepository<T extends { id: string }> extends BaseRepository<T> {
-  protected collection: Collection;
+  protected collection: Collection<Document>;
   protected collectionName: string;
 
   constructor(db: Db, collectionName: string) {
@@ -91,9 +91,9 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
     await this.collection.deleteOne({ _id: objectId });
   }
 
-  async findBy(selector: Partial<T>): Promise<T[]> {
+  async findBy(selector: Filter<T>): Promise<T[]> {
     try {
-      const cursor = this.collection.find(selector);
+      const cursor = this.collection.find(selector as Filter<Document>);
       const docs = await cursor.toArray();
       return docs.map(({ _id, ...doc }) => ({
         id: _id.toString(),

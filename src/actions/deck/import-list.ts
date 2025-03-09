@@ -14,7 +14,10 @@ const importDeckSchema = z.object({
 });
 
 async function convertNameToId(card: ParsedCard): Promise<DeckCard | null> {
-  const cardData = await cardService.getByNameAndSet(card.name, card.set);
+  const cardData = await (card.set
+    ? cardService.getByNameAndSet(card.name, card.set)
+    : cardService.getByName(card.name));
+
   if (!cardData || cardData.length === 0) {
     console.log(`Card not found: ${card.name} (${card.set})`);
     return null;
