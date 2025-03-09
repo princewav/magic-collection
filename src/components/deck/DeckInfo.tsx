@@ -53,7 +53,9 @@ export const DeckInfo = ({ deck }: Props) => {
         <Link href={`/decks/${deck.id}/edit`}>
           <Button className="w-30" variant="outline"><Edit/>Edit Deck</Button>
         </Link>
-        <Button className="w-full" variant="outline"><Import/>Import List</Button>
+        <Link href={`/decks/${deck.id}/import`}>
+          <Button className="w-full" variant="outline"><Import/>Import List</Button>
+        </Link>
       </div>
     </div>
   );
