@@ -71,4 +71,18 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
     const objectId = new ObjectId(id);
     await this.collection.deleteOne({ _id: objectId });
   }
+
+  async findBy(selector: Partial<T>): Promise<T[]> {
+    try {
+      const cursor = this.collection.find(selector);
+      const docs = await cursor.toArray();
+      return docs.map(({ _id, ...doc }) => ({
+        id: _id.toString(),
+        ...doc,
+      })) as unknown as T[];
+    } catch (error) {
+      return [];
+    }
+  }
+  
 }
