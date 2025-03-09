@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { Filters } from '@/components/Filters';
-import { CardGrid } from '@/components/CardGrid';
+import { DeckCardGrid } from '@/components/DeckCardGrid';
 import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 
@@ -21,7 +21,7 @@ export default async function DeckDetailPage({ params }: Props) {
     <div className="container mx-auto p-4">
       <DeckInfo deck={deck} />
       <Filters />
-      <CardGrid />
+      <DeckCardGrid deck={deck} />
     </div>
   );
 }

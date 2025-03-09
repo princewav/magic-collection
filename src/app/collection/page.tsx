@@ -1,9 +1,9 @@
-import { CardGrid } from "@/components/CardGrid";
-import { Metadata } from "next";
+import { CardGrid } from '@/components/DeckCardGrid';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Collection",
-  description: "View your card collection.",
+  title: 'Collection',
+  description: 'View your card collection.',
 };
 
 export default async function CollectionPage() {
