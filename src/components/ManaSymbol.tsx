@@ -2,16 +2,20 @@ import React from 'react';
 
 interface ManaSymbolProps {
   symbol: string;
+  size: number;
 }
 
-export const ManaSymbol: React.FC<ManaSymbolProps> = ({ symbol }) => {
-  const imageUrl = `/images/mana/${symbol}.svg`; // Assuming images are in public/mana-symbols
+export const ManaSymbol: React.FC<ManaSymbolProps> = ({
+  symbol,
+  size = 20,
+}) => {
+  const imageUrl = `/images/mana/${symbol}.svg`;
 
   return (
     <img
       src={imageUrl}
       alt={symbol}
-      className="w-6 h-6"
+      style={{ width: size, height: size }}
       title={symbol}
     />
   );
