@@ -1,74 +1,116 @@
-export function sortCardsByQuantity<T extends { quantity: number }>(
+import { Card } from '@/types/card';
+import { compose } from '../utils';
+
+type SortDirection = 'asc' | 'desc';
+
+function sortNumeric<T, K extends keyof T>(
   cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc' ? a.quantity - b.quantity : b.quantity - a.quantity,
-  );
+  key: K,
+  direction: SortDirection,
+): T[] {
+  return [...cards].sort((a, b) => {
+    const valueA = a[key] as unknown as number;
+    const valueB = b[key] as unknown as number;
+    return direction === 'asc' ? valueA - valueB : valueB - valueA;
+  });
 }
-export function sortCardsByName<T extends { name: string }>(
+
+function sortAlphabetic<T, K extends keyof T>(
   cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc'
-      ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name),
-  );
+  key: K,
+  direction: SortDirection,
+): T[] {
+  return [...cards].sort((a, b) => {
+    const valueA = a[key] as unknown as string;
+    const valueB = b[key] as unknown as string;
+    return direction === 'asc'
+      ? valueA.localeCompare(valueB)
+      : valueB.localeCompare(valueA);
+  });
 }
-export function sortCardsBySet<T extends { set: string }>(
+
+function sortStringArrays<T, K extends keyof T>(
   cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc'
-      ? a.set.localeCompare(b.set)
-      : b.set.localeCompare(a.set),
-  );
+  key: K,
+  direction: SortDirection,
+): T[] {
+  return [...cards].sort((a, b) => {
+    const valueA = (a[key] as unknown as string[]).join('');
+    const valueB = (b[key] as unknown as string[]).join('');
+    return direction === 'asc'
+      ? valueA.localeCompare(valueB)
+      : valueB.localeCompare(valueA);
+  });
 }
-export function sortCardsBySetNumber<T extends { setNumber: number }>(
+
+function sortLands<T extends { type_line: string }>(
   cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc' ? a.setNumber - b.setNumber : b.setNumber - a.setNumber,
-  );
+  order: 'first' | 'last',
+): T[] {
+  return [...cards].sort((a, b) => {
+    const isLandA = (a.type_line as unknown as string).toLowerCase().includes('land');
+    const isLandB = (b.type_line as unknown as string).toLowerCase().includes('land');
+    if (isLandA !== isLandB) return order === 'first' ? 1 : -1;
+    return 0;
+  });
 }
-export function sortCardsByColor<T extends { colors: string[] }>(
-  cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc'
-      ? a.colors.join('').localeCompare(b.colors.join(''))
-      : b.colors.join('').localeCompare(a.colors.join('')),
-  );
-}
-export function sortCardsByRarity<T extends { rarity: string }>(
-  cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc'
-      ? a.rarity.localeCompare(b.rarity)
-      : b.rarity.localeCompare(a.rarity),
-  );
-}
-export function sortCardsByManaCost<T extends { cmc: number }>(
-  cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc' ? a.cmc - b.cmc : b.cmc - a.cmc,
-  );
-}
-export function sortCardsByCardType<T extends { cardType: string }>(
-  cards: T[],
-  direction: 'asc' | 'desc',
-) {
-  return cards.sort((a, b) =>
-    direction === 'asc'
-      ? a.cardType.localeCompare(b.cardType)
-      : b.cardType.localeCompare(a.cardType),
-  );
-}
+
+// Factory functions che restituiscono funzioni di ordinamento
+export const sort = {
+  byQuantity:
+    <T extends { quantity: number }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortNumeric(cards, 'quantity', direction),
+
+  byName:
+    <T extends { name: string }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortAlphabetic(cards, 'name', direction),
+
+  bySet:
+    <T extends { set: string }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortAlphabetic(cards, 'set', direction),
+
+  bySetNumber:
+    <T extends { setNumber: number }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortNumeric(cards, 'setNumber', direction),
+
+  byColor:
+    <T extends { colors: string[] }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortStringArrays(cards, 'colors', direction),
+
+  byRarity:
+    <T extends { rarity: string }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortAlphabetic(cards, 'rarity', direction),
+
+  byManaCost:
+    <T extends { cmc: number }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortNumeric(cards, 'cmc', direction),
+
+  byCardType:
+    <T extends { cardType: string }>(direction: SortDirection) =>
+    (cards: T[]): T[] =>
+      sortAlphabetic(cards, 'cardType', direction),
+
+  landsLast:
+    <T extends { type_line: string }>() =>
+    (cards: T[]): T[] =>
+      sortLands(cards, 'last'),
+
+  landsFirst:
+    <T extends { type_line: string }>() =>
+    (cards: T[]): T[] =>
+      sortLands(cards, 'first'),
+};
+
+export const defaultSort = compose<Card>(
+  sort.landsLast(),
+  sort.byColor('asc'),
+  sort.byManaCost('asc'),
+  sort.byName('asc'),
+);

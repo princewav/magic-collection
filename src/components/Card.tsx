@@ -8,7 +8,7 @@ interface CardProps {
   card: CardType & { quantity: number };
 }
 
-export default function Card({ card }: CardProps) {
+export function Card({ card }: CardProps) {
   const { openModal } = useCardModal();
   return (
     <div
@@ -39,3 +39,4 @@ export default function Card({ card }: CardProps) {
     </div>
   );
 }
+

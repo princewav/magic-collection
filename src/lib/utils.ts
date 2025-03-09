@@ -53,7 +53,8 @@ export const getPageNumber = async (searchParams: {
   return 1;
 };
 
-export const composeFn =
-  <T>(...fns: Array<(arg: T) => T>) =>
-  (value: T): T =>
-    fns.reduceRight((acc, fn) => fn(acc), value);
+export function compose<T>(...fns: Array<(arg: T[]) => T[]>) {
+  return (initialValue: T[]): T[] =>
+    fns.reduceRight((value, fn) => fn(value), initialValue);
+}
+
