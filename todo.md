@@ -7,12 +7,12 @@
 - [x] fix: when i click in the decklist but not if there is no deck, close context menu
 - [x] remove route.ts in decks? move it to actions?
 - [x] fix: import con info carte (set, setNumber) opzionali
-- [ ] feat: fare aprire card modal nel deck
-- [ ] feat: opzioni di ordinamento avanzate
+- [x] feat: fare aprire card modal nel deck
 - [ ] fix: ordinamento con terre alla fine
-- [ ] feat: accumulatore di rarità
 - [ ] fix: validazione dell import list
 - [ ] fix: sistemare la creazione del deck e il bottone di submit
+- [ ] feat: opzioni di ordinamento avanzate
+- [ ] feat: accumulatore di rarità
 
 
 

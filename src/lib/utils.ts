@@ -53,15 +53,7 @@ export const getPageNumber = async (searchParams: {
   return 1;
 };
 
-function getColorHex(color: string): string {
-  const colorMap: Record<string, string> = {
-    W: '#F9FAF4', // White
-    U: '#0E68AB', // Blue
-    B: '#150B00', // Black
-    R: '#D3202A', // Red
-    G: '#00733E', // Green
-    // Add more mappings as needed
-  };
-
-  return colorMap[color] || '#CCCCCC'; // Default gray if color not found
-}
+export const composeFn =
+  <T>(...fns: Array<(arg: T) => T>) =>
+  (value: T): T =>
+    fns.reduceRight((acc, fn) => fn(acc), value);
