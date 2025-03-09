@@ -17,7 +17,7 @@ class MongoDBConnection {
 
   private constructor() {
     this.client = new MongoClient(uri);
-    console.log('MongoDB connection initialized');
+    console.debug('MongoDB connection initialized');
   }
 
   public static async getInstance(): Promise<MongoDBConnection> {
@@ -32,7 +32,7 @@ class MongoDBConnection {
     try {
       await this.client.connect();
       this.db = this.client.db(dbName);
-      console.log('Connected to MongoDB');
+      console.debug('Connected to MongoDB');
     } catch (error) {
       console.error('Failed to connect to MongoDB:', error);
       throw error;
@@ -49,7 +49,7 @@ class MongoDBConnection {
   public async close(): Promise<void> {
     try {
       await this.client.close();
-      console.log('MongoDB connection closed');
+      console.debug('MongoDB connection closed');
     } catch (error) {
       console.error('Error closing MongoDB connection:', error);
     }

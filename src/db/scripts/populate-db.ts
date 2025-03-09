@@ -16,7 +16,7 @@ async function populateCardsCollection() {
   try {
     const cards = await fetchCards();
     await cardService.repo.createMany(cards);
-    console.log('Cards collection populated successfully');
+    console.debug('Cards collection populated successfully');
     process.exit(0);
   } catch (error) {
     console.error('Error populating cards collection:', error);

@@ -9,5 +9,5 @@ export type ToastProps = {
 
 export const toast = (props: ToastProps) => {
   // In a real implementation, this would show a toast
-  console.log("Toast:", props);
+  console.debug('Toast:', props);
 };

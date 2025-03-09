@@ -14,7 +14,7 @@ export default function Card({ card }: CardProps) {
     <div
       className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform hover:scale-105"
       onClick={() => {
-        openModal(card.id);
+        openModal(card);
       }}
     >
       <div className="relative flex w-full flex-col justify-center p-2">

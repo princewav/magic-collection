@@ -1,11 +1,12 @@
 "use client";
 
+import { Card } from '@/types/card';
 import { createContext, useState, useContext, ReactNode } from 'react';
 
 interface CardModalContextType {
   isOpen: boolean;
-  cardId: string | null;
-  openModal: (cardId: string) => void;
+  card: Card | null;
+  openModal: (card: Card) => void;
   closeModal: () => void;
 }
 
@@ -17,21 +18,21 @@ interface CardModalProviderProps {
 
 export function CardModalProvider({ children }: CardModalProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [cardId, setCardId] = useState<string | null>(null);
+  const [card, setCard] = useState<Card | null>(null);
 
-  const openModal = (cardId: string) => {
-    setCardId(cardId);
+  const openModal = (card: Card) => {
+    setCard(card);
     setIsOpen(true);
   };
 
   const closeModal = () => {
-    setCardId(null);
+    setCard(null);
     setIsOpen(false);
   };
 
   const value: CardModalContextType = {
     isOpen,
-    cardId,
+    card,
     openModal,
     closeModal,
   };

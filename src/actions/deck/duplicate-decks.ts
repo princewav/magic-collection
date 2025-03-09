@@ -6,7 +6,7 @@ import { deckService } from '@/db/services/DeckService';
 export async function duplicateDecks(ids: string[]) {
   try {
     await deckService.duplicateMany(ids);
-    console.log('Decks duplicated successfully');
+    console.debug('Decks duplicated successfully');
   } catch (e) {
     console.error(e);
     return {

@@ -23,43 +23,9 @@ interface CardData {
 }
 
 export default function CardModal() {
-  const { isOpen, cardId, closeModal } = useCardModal();
-  const [cardData, setCardData] = useState<CardData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { isOpen, card, closeModal } = useCardModal();
   const [imageError, setImageError] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!cardId || !isOpen) {
-      return;
-    }
-
-    const fetchCardData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(
-          `https://api.scryfall.com/cards/${cardId}`,
-        );
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Card not found.');
-          }
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setCardData(data);
-      } catch (e) {
-        setError((e as Error).message);
-        console.error(`Error fetching card data for ${cardId}:`, e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCardData();
-  }, [cardId, isOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -84,27 +50,7 @@ export default function CardModal() {
     return null;
   }
 
-  if (loading) {
-    return (
-      <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
-        <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">
-          Loading...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
-        <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">
-          Error: {error}
-        </div>
-      </div>
-    );
-  }
-
-  if (!cardData) {
+  if (!card) {
     return (
       <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
         <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">
@@ -119,9 +65,7 @@ export default function CardModal() {
   };
 
   const powerToughness =
-    cardData.power && cardData.toughness
-      ? `${cardData.power}/${cardData.toughness}`
-      : null;
+    card.power && card.toughness ? `${card.power} / ${card.toughness}` : null;
 
   return (
     <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900 p-4">
@@ -147,10 +91,10 @@ export default function CardModal() {
               ) : (
                 <Image
                   src={
-                    cardData.image_uris?.normal ||
+                    card.image_uris?.normal ||
                     'https://via.placeholder.com/223x310'
                   }
-                  alt={cardData.name}
+                  alt={card.name}
                   className="h-full w-full rounded-t-md object-contain"
                   width={223}
                   height={310}
@@ -161,11 +105,11 @@ export default function CardModal() {
             <div className="flex w-1/2 flex-col justify-between">
               <div className="flex flex-col space-y-4">
                 <h2 className="text-3xl font-bold text-white">
-                  {cardData.name}
+                  {card.name}
                 </h2>
-                <p className="text-xl text-gray-400">{cardData.mana_cost}</p>
-                <p className="text-xl text-gray-300">{cardData.type_line}</p>
-                <p className="text-xl text-gray-300">{cardData.oracle_text}</p>
+                <p className="text-xl text-gray-400">{card.mana_cost}</p>
+                <p className="text-xl text-gray-300">{card.type_line}</p>
+                <p className="text-xl text-gray-300">{card.oracle_text}</p>
               </div>
               {powerToughness && (
                 <div className="mt-2 flex items-center justify-end">

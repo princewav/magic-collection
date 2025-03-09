@@ -3,13 +3,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { DeckSelectionProvider } from '@/context/DeckSelectionContext';
 import { loadDecks } from '@/actions/deck/load-decks';
-import { CardModalProvider } from '@/context/CardModalContext';
-import CardModal from '@/components/CardModal';
 
 export default async function DecksPage() {
   const decks = await loadDecks();
   return (
-    <CardModalProvider>
       <div className="container mx-auto px-4 py-8">
         <div className="re mb-4 flex items-center justify-between">
           <h1 className="flex items-center text-3xl font-bold">My Decks</h1>
@@ -31,7 +28,5 @@ export default async function DecksPage() {
           </DeckSelectionProvider>
         )}
       </div>
-      <CardModal />
-    </CardModalProvider>
   );
 }

@@ -19,7 +19,7 @@ async function convertNameToId(card: ParsedCard): Promise<DeckCard | null> {
     : cardService.getByName(card.name));
 
   if (!cardData || cardData.length === 0) {
-    console.log(`Card not found: ${card.name} (${card.set})`);
+    console.error(`Card not found: ${card.name} (${card.set})`);
     return null;
   }
   return {
