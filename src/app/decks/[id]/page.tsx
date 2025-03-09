@@ -25,10 +25,10 @@ export default async function DeckDetailPage({ params }: Props) {
       <DeckInfo deck={deck} />
       <CardModalProvider>
         <Filters />
-        <h2 className="mb-4 text-2xl font-bold">Main Deck</h2>
+        <h2 className="text-2xl font-bold">Main Deck</h2>
         <DeckCardGrid decklist={deck.maindeck} />
         <Separator className="my-10 h-2" />
-        <h2 className="mt-0 mb-4 text-2xl font-bold">Sideboard</h2>
+        <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
         <DeckCardGrid decklist={deck.sideboard} />
         <CardModal />
       </CardModalProvider>
