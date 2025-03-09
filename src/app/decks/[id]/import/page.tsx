@@ -1,6 +1,7 @@
 import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 import { ImportForm } from '@/components/deck/ImportForm';
+import { importDeckList } from '@/actions/deck/import-list';
 
 interface ImportDeckPageProps {
   params: Promise<{ id: string }>;
@@ -19,10 +20,20 @@ export default async function ImportDeckPage({ params }: ImportDeckPageProps) {
     );
   }
 
+  async function handleImport(decklist: string) {
+    'use server';
+    try {
+      const result = await importDeckList(id, decklist);
+      return result;
+    } catch (error) {
+      return { success: false, message: 'An unexpected error occurred' };
+    }
+  }
+
   return (
     <div className="space-y-4 container mx-auto p-4">
       <DeckInfo deck={deck} />
-      <ImportForm deckId={deck.id} />
+      <ImportForm deckId={deck.id} onImport={handleImport} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { parseDeckList } from '@/lib/deck/list-parser';
+import { parseDeckList, ParsedCard } from '@/lib/deck/list-parser';
+import { cardService } from '@/db/services/CardService';
 
 type ImportDeckResult = {
   success: boolean;
@@ -11,6 +12,16 @@ const ImportDeckSchema = z.object({
   cardList: z.string().min(1, 'Card list cannot be empty'),
 });
 
+async function convertNameToId(card: ParsedCard) {
+  const cardData = await cardService.getByNameAndSet(card.name, card.set)
+  const cardInfo = cardData && cardData.length > 0 ? {id: cardData[0].id} : {}
+  if (!cardInfo) {
+    return { success: false, message: `Card "${card.name}" not found` };
+  }
+  const { name, ...restOfCard} = card;
+  return { ...restOfCard, id: cardInfo.id };
+}
+
 export async function importDeckList(
   deckId: string,
   cardList: string,
@@ -19,10 +30,9 @@ export async function importDeckList(
     const validatedData = ImportDeckSchema.parse({ deckId, cardList });
 
     const deckList = parseDeckList(validatedData.cardList);
-    console.log(deckList);
 
-    // TODO: Implement import logic
-    // Process deckList and update deck with validatedData.deckId
+    const convertedCards = await Promise.all(deckList.mainDeck.map(card => convertNameToId(card)));
+    console.log(convertedCards);
 
     return { success: true };
   } catch (error) {

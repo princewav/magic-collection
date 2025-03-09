@@ -1,4 +1,4 @@
-export interface Card {
+export interface ParsedCard {
   name: string;
   set: string;
   quantity: number;
@@ -6,8 +6,8 @@ export interface Card {
 }
 
 export interface DeckList {
-  mainDeck: Card[];
-  sideboard: Card[];
+  mainDeck: ParsedCard[];
+  sideboard: ParsedCard[];
 }
 
 export function parseDeckList(text: string): DeckList {
