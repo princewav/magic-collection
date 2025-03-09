@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { Filters } from '@/components/Filters';
-import { DeckCardGrid } from '@/components/DeckCardGrid';
+import { DeckCardGrid } from '@/components/deck/DeckCardGrid';
 import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 import { CardModalProvider } from '@/context/CardModalContext';

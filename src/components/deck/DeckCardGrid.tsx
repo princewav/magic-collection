@@ -1,7 +1,7 @@
 import { loadCardsById } from '@/actions/load-cards';
 
 import { Deck, DeckCard } from '@/types/deck';
-import { Card } from './Card';
+import { Card } from '../Card';
 import { defaultSort } from '@/lib/deck/sorting';
 import { Card as CardType } from '@/types/card';
 

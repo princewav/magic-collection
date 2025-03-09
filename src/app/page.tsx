@@ -1,4 +1,4 @@
-import { DeckCardGrid } from '@/components/DeckCardGrid';
+import { DeckCardGrid } from '@/components/deck/DeckCardGrid';
 import { getPageNumber } from '@/lib/utils';
 import { Metadata } from 'next';
 import { Filters } from '@/components/Filters';

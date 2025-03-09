@@ -1,4 +1,4 @@
-import { CardGrid } from '@/components/DeckCardGrid';
+import { CardGrid } from '@/components/deck/DeckCardGrid';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
