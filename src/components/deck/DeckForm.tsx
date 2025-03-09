@@ -47,7 +47,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   isSubmitting,
   initialData,
 }) => {
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<ManaColor[]>(initialData?.colors || []);
   const form = useForm<DeckFormData>({
     resolver: zodResolver(deckSchema),
     defaultValues: initialData || {
@@ -177,12 +177,12 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                         className={`${color.bgClass} ${
                           color.textClass
                         } flex items-center gap-2 rounded-md border-2 px-4 py-2 ${
-                          selectedColors.includes(color.value)
+                          selectedColors.includes(color.value as ManaColor)
                             ? `${color.borderClass} border-2`
                             : 'border-transparent'
                         }`}
                       >
-                        {selectedColors.includes(color.value) && (
+                        {selectedColors.includes(color.value as ManaColor) && (
                           <CheckIcon size={16} />
                         )}
                         {color.name}

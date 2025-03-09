@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { DeckForm } from '@/components/deck/DeckForm';
 import { Deck } from '@/types/deck';
+import { updateDeck } from '@/actions/deck/update-deck';
 
 interface EditDeckClientProps {
   deck: Deck;
@@ -27,21 +28,6 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
       handleError(error);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const updateDeck = async (id: string, values: z.infer<typeof deckSchema>) => {
-    const response = await fetch(`/api/decks/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to update deck');
     }
   };
 
