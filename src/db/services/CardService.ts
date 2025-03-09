@@ -7,7 +7,7 @@ export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
 
   async getByNameAndSet(name: string, set: string) {
-    return this.repo.findBy({ name, set });
+    return this.repo.findBy({ name: name, set: set.toLowerCase() });
   }
 }
 

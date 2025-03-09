@@ -20,12 +20,31 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
     } as T;
   }
 
+  async createMany<T extends { id?: string }>(
+    items: Omit<T, 'id'>[],
+  ): Promise<T[]> {
+    const docs = items.map((item) => {
+      const { id, ...itemWithoutId } = item as any;
+      return itemWithoutId;
+    });
+    const result = await this.collection.insertMany(docs);
+    return Object.values(result.insertedIds).map((insertedId, index) => {
+      return {
+        ...items[index],
+        id: insertedId.toString(),
+      } as unknown as T;
+    });
+  }
+
   async get(ids: string[]): Promise<T[] | null> {
     try {
       const objectIds = ids.map((id) => new ObjectId(id));
       const cursor = this.collection.find({ _id: { $in: objectIds } });
       const docs = await cursor.toArray();
-      return docs.map(({_id, ...doc}) => ({id: _id.toString(), ...doc})) as unknown as T[];
+      return docs.map(({ _id, ...doc }) => ({
+        id: _id.toString(),
+        ...doc,
+      })) as unknown as T[];
     } catch (error) {
       return null;
     }
@@ -84,5 +103,4 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
       return [];
     }
   }
-  
 }

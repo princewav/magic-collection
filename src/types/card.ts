@@ -55,3 +55,63 @@ export type Card = {
   flavor_text?: string;
   cardmarket_uri?: string;
 };
+
+export function extractMtgCardData(sourceObj: unknown & Card): Card {
+  // Pick only the properties we need
+  const {
+    type,
+    id,
+    cardmarket_id,
+    name,
+    released_at,
+    scryfall_uri,
+    layout,
+    image_uris,
+    mana_cost,
+    cmc,
+    type_line,
+    oracle_text,
+    power,
+    toughness,
+    colors,
+    color_identity,
+    keywords,
+    legalities,
+    set,
+    set_name,
+    scryfall_set_uri,
+    collector_number,
+    rarity,
+    flavor_text,
+    cardmarket_uri,
+  } = sourceObj;
+
+  // Return a new object with just the properties we want
+  return {
+    type,
+    id,
+    cardmarket_id,
+    name,
+    released_at,
+    scryfall_uri,
+    layout,
+    image_uris,
+    mana_cost,
+    cmc,
+    type_line,
+    oracle_text,
+    power,
+    toughness,
+    colors,
+    color_identity,
+    keywords,
+    legalities,
+    set,
+    set_name,
+    scryfall_set_uri,
+    collector_number,
+    rarity,
+    ...(flavor_text !== undefined && { flavor_text }),
+    ...(cardmarket_uri !== undefined && { cardmarket_uri }),
+  };
+}
