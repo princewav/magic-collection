@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   title: 'My Awesome Cards',
 };
 
-const Page = (props: {
+const Page = async (props: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
   const searchParams = props.searchParams || {};
-  const currentPage = getPageNumber(searchParams);
+  const currentPage = await getPageNumber(searchParams);
 
   return (
     <div className="min-h-screen px-4 pt-2 pb-4">

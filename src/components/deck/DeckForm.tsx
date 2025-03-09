@@ -26,6 +26,7 @@ import { CheckIcon, Loader2 } from 'lucide-react';
 import { ManaColor } from '@/types/deck';
 import { deckSchema } from '@/app/decks/new/validation';
 import { COLOR_OPTIONS } from '@/lib/constants';
+import { useState } from 'react';
 
 interface DeckFormData {
   name: string;
@@ -38,18 +39,15 @@ interface DeckFormData {
 interface DeckFormProps {
   onSubmit: (data: DeckFormData) => Promise<void>;
   isSubmitting: boolean;
-  setSelectedColors: React.Dispatch<React.SetStateAction<string[]>>;
-  selectedColors: string[];
   initialData?: DeckFormData;
 }
 
 export const DeckForm: React.FC<DeckFormProps> = ({
   onSubmit,
   isSubmitting,
-  setSelectedColors,
-  selectedColors,
   initialData,
 }) => {
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const form = useForm<DeckFormData>({
     resolver: zodResolver(deckSchema),
     defaultValues: initialData || {
@@ -62,17 +60,12 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   });
 
   const toggleColor = (color: ManaColor) => {
-    setSelectedColors((prevColors) => {
-      if (prevColors.includes(color)) {
-        const newColors = prevColors.filter((c) => c !== color);
-        form.setValue('colors', newColors as ManaColor[]);
-        return newColors;
-      } else {
-        const newColors = [...prevColors, color];
-        form.setValue('colors', newColors as ManaColor[]);
-        return newColors;
-      }
-    });
+    const newColors = selectedColors.includes(color)
+      ? selectedColors.filter((c) => c !== color)
+      : [...selectedColors, color];
+
+    setSelectedColors(newColors);
+    form.setValue('colors', newColors as ManaColor[]);
   };
 
   return (

@@ -67,8 +67,6 @@ export default async function EditDeckPage({ params: { id } }: EditDeckPageProps
       <DeckForm
         onSubmit={handleDeckUpdate}
         isSubmitting={isSubmitting}
-        selectedColors={selectedColors}
-        setSelectedColors={setSelectedColors}
       />
       <div className="mt-4 flex justify-end gap-4">
         <Button
