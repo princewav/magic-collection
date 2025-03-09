@@ -40,7 +40,8 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
 export const getPageNumber = async (searchParams: {
   [key: string]: string | string[] | undefined;
 }): Promise<number> => {
-  const page = await searchParams?.page;
+  // In Next.js 15, searchParams is asynchronous
+  const { page } = await searchParams;
 
   if (typeof page === 'string') {
     const pageNumber = parseInt(page, 10);

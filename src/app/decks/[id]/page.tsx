@@ -6,13 +6,11 @@ import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 
 interface Props {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function DeckDetailPage({ params }: Props) {
-  const { id } = params;
+  const { id } = await params;
   const deck = await loadDeckById(id);
 
   if (!deck) {

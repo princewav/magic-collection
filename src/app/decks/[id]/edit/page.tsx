@@ -2,12 +2,13 @@ import { loadDeckById } from '@/actions/deck/load-decks';
 import { EditDeckClient } from './EditDeckClient';
 
 interface EditDeckPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function EditDeckPage({
-  params: { id },
+  params,
 }: EditDeckPageProps) {
+  const { id } = await params;
   const deck = await loadDeckById(id);
 
   if (!deck) {
