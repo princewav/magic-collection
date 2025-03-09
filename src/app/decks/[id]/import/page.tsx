@@ -1,7 +1,6 @@
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
+import { ImportForm } from '@/components/deck/ImportForm';
 
 interface ImportDeckPageProps {
   params: Promise<{ id: string }>;
@@ -23,8 +22,7 @@ export default async function ImportDeckPage({ params }: ImportDeckPageProps) {
   return (
     <div className="space-y-4 container mx-auto p-4">
       <DeckInfo deck={deck} />
-      <Textarea className="min-h-[300px]" placeholder="Paste your decklist here..." />
-      <Button className="w-full">Import</Button>
+      <ImportForm deckId={deck.id} />
     </div>
   );
 }
