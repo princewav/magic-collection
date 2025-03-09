@@ -1,3 +1,10 @@
+export type DeckCard = {
+  quantity: number;
+  id: string;
+  set: string;
+  setNumber: number;
+};
+
 export type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G' | 'C';
 export type Deck = {
   id: string;
@@ -7,4 +14,7 @@ export type Deck = {
   format?: string;
   description?: string;
   type: 'deck';
+  maindeck: DeckCard[];
+  sideboard: DeckCard[];
+  maybeboard?: DeckCard[];
 };

@@ -4,7 +4,7 @@ import { cardService } from '../services/CardService';
 
 async function fetchCards(): Promise<Card[]> {
   const filePath = new URL(
-    '../../../data/oracle-cards-20250304100214.json',
+    '../../../data/default-cards-20250308225834.json',
     import.meta.url,
   );
   const rawData = fs.readFileSync(filePath, 'utf-8');
