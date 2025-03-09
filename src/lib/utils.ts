@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,53 +15,52 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the current page is among the first 3 pages,
   // show the first 3, an ellipsis, and the last 2 pages.
   if (currentPage <= 3) {
-    return [1, 2, 3, "...", totalPages - 1, totalPages];
+    return [1, 2, 3, '...', totalPages - 1, totalPages];
   }
 
   // If the current page is among the last 3 pages,
   // show the first 2, an ellipsis, and the last 3 pages.
   if (currentPage >= totalPages - 2) {
-    return [1, 2, "...", totalPages - 2, totalPages - 1, totalPages];
+    return [1, 2, '...', totalPages - 2, totalPages - 1, totalPages];
   }
 
   // Otherwise, show the first page, an ellipsis, the current page and its neighbors,
   // another ellipsis, and the last page.
   return [
     1,
-    "...",
+    '...',
     currentPage - 1,
     currentPage,
     currentPage + 1,
-    "...",
+    '...',
     totalPages,
   ];
 };
 
-export const getPageNumber = (searchParams: {
+export const getPageNumber = async (searchParams: {
   [key: string]: string | string[] | undefined;
-}): number => {
-  const page = searchParams?.page;
+}): Promise<number> => {
+  const page = await searchParams?.page;
 
-  if (typeof page === "string") {
+  if (typeof page === 'string') {
     const pageNumber = parseInt(page, 10);
-    if (!isNaN(pageNumber) && pageNumber > 0) {
+    if (!isNaN(pageNumber)) {
       return pageNumber;
     }
   }
 
-  return 1; // Default to page 1 if no valid page is provided
+  return 1;
 };
-
 
 function getColorHex(color: string): string {
   const colorMap: Record<string, string> = {
-    W: "#F9FAF4", // White
-    U: "#0E68AB", // Blue
-    B: "#150B00", // Black
-    R: "#D3202A", // Red
-    G: "#00733E", // Green
+    W: '#F9FAF4', // White
+    U: '#0E68AB', // Blue
+    B: '#150B00', // Black
+    R: '#D3202A', // Red
+    G: '#00733E', // Green
     // Add more mappings as needed
   };
 
-  return colorMap[color] || "#CCCCCC"; // Default gray if color not found
+  return colorMap[color] || '#CCCCCC'; // Default gray if color not found
 }
