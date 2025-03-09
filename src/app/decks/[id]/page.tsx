@@ -6,6 +6,7 @@ import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 import { CardModalProvider } from '@/context/CardModalContext';
 import CardModal from '@/components/CardModal';
+import { Separator } from '@/components/ui/separator';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -24,7 +25,11 @@ export default async function DeckDetailPage({ params }: Props) {
       <DeckInfo deck={deck} />
       <CardModalProvider>
         <Filters />
-        <DeckCardGrid deck={deck} />
+        <h2 className="mb-4 text-2xl font-bold">Main Deck</h2>
+        <DeckCardGrid decklist={deck.maindeck} />
+        <Separator className="my-10 h-2" />
+        <h2 className="mt-0 mb-4 text-2xl font-bold">Sideboard</h2>
+        <DeckCardGrid decklist={deck.sideboard} />
         <CardModal />
       </CardModalProvider>
     </div>

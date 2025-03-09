@@ -1,26 +1,26 @@
 import { loadCardsById } from '@/actions/load-cards';
 
-import { Deck } from '@/types/deck';
+import { Deck, DeckCard } from '@/types/deck';
 import { Card } from './Card';
 import { defaultSort } from '@/lib/deck/sorting';
 import { Card as CardType } from '@/types/card';
 
 interface Props {
-  deck?: Deck;
+  decklist?: DeckCard[];
 }
 
 interface CardWithQuantity extends CardType {
   quantity: number;
 }
 
-export async function DeckCardGrid({ deck }: Props) {
-  const cardIds: string[] = deck?.maindeck?.map((card) => card.id) || [];
+export async function DeckCardGrid({ decklist }: Props) {
+  const cardIds: string[] = decklist?.map((card) => card.id) || [];
   const cards = await loadCardsById(cardIds);
   const sortedCards = defaultSort(cards);
   const cardsWithQuantity: CardWithQuantity[] = sortedCards.map(
     (card: CardType) => ({
       ...card,
-      quantity: deck?.maindeck?.find((c) => c.id === card.id)?.quantity || 0,
+      quantity: decklist?.find((c) => c.id === card.id)?.quantity || 0,
     }),
   );
 
