@@ -199,10 +199,10 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
+                    Updating...
                   </>
                 ) : (
-                  'Create Deck'
+                  'Edit Deck'
                 )}
               </Button>
             </div>
