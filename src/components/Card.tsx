@@ -3,7 +3,6 @@
 import { useCardModal } from '@/context/CardModalContext';
 import Image from 'next/image';
 import { Card as CardType } from '@/types/card';
-import { DeckCard } from '@/types/deck';
 
 interface CardProps {
   card: CardType & { quantity: number };
