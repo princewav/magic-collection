@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseDeckList } from '@/lib/deck/list-parser';
 
 type ImportDeckResult = {
   success: boolean;
@@ -17,10 +18,11 @@ export async function importDeckList(
   try {
     const validatedData = ImportDeckSchema.parse({ deckId, cardList });
 
-    
+    const deckList = parseDeckList(validatedData.cardList);
+    console.log(deckList);
 
     // TODO: Implement import logic
-    // Process validatedData.cardList and update deck with validatedData.deckId
+    // Process deckList and update deck with validatedData.deckId
 
     return { success: true };
   } catch (error) {

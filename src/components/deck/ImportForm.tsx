@@ -40,13 +40,6 @@ export function ImportForm({ deckId }: ImportFormProps) {
       handleSubmit();
     }}>
       {error && <p className="text-red-500">{error}</p>}
-      <Textarea
-        className="min-h-[300px] mb-4"
-        placeholder="Paste your decklist here..."
-        value={decklist}
-        onChange={(e) => setDecklist(e.target.value)}
-        disabled={isPending}
-      />
       <Button
         className="w-full"
         onClick={handleSubmit}
@@ -54,6 +47,13 @@ export function ImportForm({ deckId }: ImportFormProps) {
       >
         {isPending ? 'Importing...' : 'Import'}
       </Button>
+      <Textarea
+        className="min-h-[300px] mb-4"
+        placeholder="Paste your decklist here..."
+        value={decklist}
+        onChange={(e) => setDecklist(e.target.value)}
+        disabled={isPending}
+      />
     </form>
   );
 }
