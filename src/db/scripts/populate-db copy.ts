@@ -39,7 +39,6 @@ async function populateCardsCollection() {
     console.log('Cards fetched:', cards.length);
     const collection = DB.collection('decks');
     const collections = await DB.listCollections().toArray();
-    console.log(collections);
 
     const operations = cards.map(card => ({
       updateOne: {

@@ -30,11 +30,8 @@ export default function CardModal() {
   const [imageError, setImageError] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  console.log(`CardModal rendered, isOpen: ${isOpen}, cardId: ${cardId}`);
-
   useEffect(() => {
     if (!cardId || !isOpen) {
-      console.log('CardModal useEffect - cardId or isOpen is false, returning');
       return;
     }
 
@@ -42,7 +39,6 @@ export default function CardModal() {
       setLoading(true);
       setError(null);
       try {
-        console.log(`Fetching card data for ${cardId}`);
         const response = await fetch(
           `https://api.scryfall.com/cards/${cardId}`,
         );
@@ -54,7 +50,6 @@ export default function CardModal() {
         }
         const data = await response.json();
         setCardData(data);
-        console.log(`Card data fetched successfully for ${cardId}`);
       } catch (e) {
         setError((e as Error).message);
         console.error(`Error fetching card data for ${cardId}:`, e);
@@ -72,7 +67,6 @@ export default function CardModal() {
         modalRef.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
-        console.log('Clicked outside the modal, closing it');
         closeModal();
       }
     };
@@ -87,12 +81,10 @@ export default function CardModal() {
   }, [isOpen, closeModal]);
 
   if (!isOpen) {
-    console.log('CardModal is not open, returning null');
     return null;
   }
 
   if (loading) {
-    console.log('CardModal is loading');
     return (
       <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
         <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">
@@ -103,7 +95,6 @@ export default function CardModal() {
   }
 
   if (error) {
-    console.log('CardModal has an error');
     return (
       <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
         <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">
@@ -114,7 +105,6 @@ export default function CardModal() {
   }
 
   if (!cardData) {
-    console.log('CardModal - card data not found');
     return (
       <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
         <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">

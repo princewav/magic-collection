@@ -11,7 +11,6 @@ export interface DeckList {
 }
 
 export function parseDeckList(text: string): DeckList {
-  console.log(text);
   const lines = text.trim().split('\n');
   const deckList: DeckList = { mainDeck: [], sideboard: [] };
   let currentSection: keyof DeckList = 'mainDeck';

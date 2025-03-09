@@ -24,8 +24,6 @@ export default function Card({ id }: CardProps) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(`Card ${id} fetch accepted`);
-        console.log(data);
         setCardData(data);
       } catch (error: any) {
         console.error('Failed to fetch card ', error);
@@ -48,7 +46,6 @@ export default function Card({ id }: CardProps) {
     <div
       className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform hover:scale-105"
       onClick={() => {
-        console.log(`Card ${id} clicked`);
         openModal(id);
       }}
     >
