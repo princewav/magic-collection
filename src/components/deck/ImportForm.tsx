@@ -47,10 +47,10 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
   });
 
   const onSubmit = async (data: ImportFormValues) => {
-    // const isValid = await form.trigger();
-    // if (!isValid) return;
+    const isValid = await form.trigger();
+    if (!isValid) return;
 
-    // if (!window.confirm('Are you sure? This action cannot be undone.')) return;
+    if (!window.confirm('Are you sure? This action cannot be undone.')) return;
 
     console.log(data.decklist);
     setError(null);

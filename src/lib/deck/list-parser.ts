@@ -35,7 +35,7 @@ export function parseDeckList(
       deckList[currentSection].push(cardEntry);
       hasValidCards = true;
     } catch {
-      errors.push(trimmedLine);
+      errors.push(`Invalid card: ${trimmedLine}`);
     }
   }
 
