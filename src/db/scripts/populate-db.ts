@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { extractMtgCardData, Card } from '@/types/card';
 import { cardService } from '../services/CardService';
+import logger from '@/lib/logger';
 
 async function fetchCards(): Promise<Card[]> {
   const filePath = new URL(
@@ -16,7 +17,7 @@ async function populateCardsCollection() {
   try {
     const cards = await fetchCards();
     await cardService.repo.createMany(cards);
-    console.debug('Cards collection populated successfully');
+    logger.debug('Cards collection populated successfully');
     process.exit(0);
   } catch (error) {
     console.error('Error populating cards collection:', error);

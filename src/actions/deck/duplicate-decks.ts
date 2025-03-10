@@ -2,11 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { deckService } from '@/db/services/DeckService';
+import logger from '@/lib/logger';
 
 export async function duplicateDecks(ids: string[]) {
   try {
     await deckService.duplicateMany(ids);
-    console.debug('Decks duplicated successfully');
+    logger.debug('Decks duplicated successfully');
   } catch (e) {
     console.error(e);
     return {

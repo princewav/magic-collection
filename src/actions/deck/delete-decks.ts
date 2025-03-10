@@ -2,11 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { deckService } from '@/db/services/DeckService';
+import logger from '@/lib/logger';
 
 export async function deleteDecks(ids: string[]) {
   try {
     await deckService.deleteMany(ids);
-    console.debug('Decks deleted successfully');
+    logger.debug('Decks deleted successfully');
   } catch (e) {
     console.error(e);
     return {

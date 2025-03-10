@@ -4,10 +4,10 @@
 export type ToastProps = {
   title: string;
   description?: string;
-  variant?: "default" | "destructive";
+  variant?: 'default' | 'destructive';
 };
 
 export const toast = (props: ToastProps) => {
   // In a real implementation, this would show a toast
-  console.debug('Toast:', props);
+  logger.debug('Toast:', props);
 };
