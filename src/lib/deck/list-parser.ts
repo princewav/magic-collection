@@ -10,10 +10,13 @@ export interface DeckList {
   sideboard: ParsedCard[];
 }
 
+const CARD_LINE_REGEX = /^(\d+)\s+([^()]+)(?:\s+\((\w+)\))?\s*?(\d*)?$/;
+
 export function parseDeckList(text: string): DeckList {
   const lines = text.trim().split('\n');
   const deckList: DeckList = { mainDeck: [], sideboard: [] };
   let currentSection: keyof DeckList = 'mainDeck';
+  let hasValidCards = false;
 
   for (const line of lines) {
     const trimmedLine = line.trim();
@@ -22,17 +25,33 @@ export function parseDeckList(text: string): DeckList {
       currentSection = 'sideboard';
       continue;
     }
-    const match = trimmedLine.match(/^(\d+)\s+([^()]+)(?:\s+\((\w+)\))?\s*?(\d*)?$/)
-    if (match) {
-      const [, count, name, set, setNumber] = match;
-      deckList[currentSection].push({
-        name: name.trim(),
-        set: set?.trim() || '',
-        quantity: parseInt(count),
-        setNumber: parseInt(setNumber || '0'),
-      });
+    
+    try {
+      const cardEntry = parseCardLine(trimmedLine);
+      deckList[currentSection].push(cardEntry);
+      hasValidCards = true;
+    } catch {
+      // Ignore invalid lines
     }
   }
 
+  if (!hasValidCards) {
+    throw new Error(`No valid card lines found. Example invalid line: '${lines[0]?.trim() || 'empty line'}'`);
+  }
+
   return deckList;
+}
+
+export function parseCardLine(line: string): ParsedCard {
+  const match = line.match(CARD_LINE_REGEX);
+  if (!match) {
+    throw new Error(`Invalid card line format: '${line}'`);
+  }
+  const [, count, name, set, setNumber] = match;
+  return {
+    name: name.trim(),
+    set: set?.trim() || '',
+    quantity: parseInt(count),
+    setNumber: parseInt(setNumber || '0'),
+  };
 }

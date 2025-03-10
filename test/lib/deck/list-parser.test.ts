@@ -1,4 +1,4 @@
-import { parseDeckList } from '../../../src/lib/deck/list-parser';
+import { parseDeckList, parseCardLine } from '../../../src/lib/deck/list-parser';
 
 describe('parseDeckList', () => {
   it('should parse main deck cards', () => {
@@ -50,5 +50,31 @@ Sideboard
     expect(result.mainDeck).toEqual([
       { name: 'Seachrome Coast', set: 'ONE', quantity: 4, setNumber: 258 },
     ]);
+  });
+
+  it('should throw error for invalid card line format', () => {
+    expect(() => parseCardLine('invalid format')).toThrow('Invalid card line format');
+  });
+
+  it('should include invalid line in parseCardLine error message', () => {
+    const invalidLine = 'invalid card line';
+    expect(() => parseCardLine(invalidLine)).toThrow(`Invalid card line format: '${invalidLine}'`);
+  });
+
+  it('should include example invalid line in parseDeckList error message', () => {
+    const invalidList = 'invalid line\nanother invalid line';
+    expect(() => parseDeckList(invalidList)).toThrow(/Example invalid line: 'invalid line'/);
+  });
+
+  it('should parse valid lines and throw error for invalid lines', () => {
+    const input = `1 Plains\ninvalid line`;
+  
+    // Parse the deck list and verify valid line
+    const result = parseDeckList(input);
+    expect(result.mainDeck).toHaveLength(1);
+    expect(result.mainDeck[0].name).toBe('Plains');
+  
+    // Verify error was thrown for invalid line
+    expect(() => parseCardLine('invalid line')).toThrow(/Invalid card line format/);
   });
 });

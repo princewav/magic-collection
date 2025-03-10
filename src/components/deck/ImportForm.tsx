@@ -43,7 +43,12 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
     },
   });
 
-  const onSubmit = (data: ImportFormValues) => {
+  const onSubmit = async (data: ImportFormValues) => {
+    const isValid = await form.trigger();
+    if (!isValid) return;
+
+    if (!window.confirm('Are you sure? This action cannot be undone.')) return;
+
     setError(null);
     startTransition(async () => {
       try {
@@ -60,9 +65,14 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
     });
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(form.getValues());
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FormField
           control={form.control}
           name="decklist"
