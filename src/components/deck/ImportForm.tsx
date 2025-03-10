@@ -14,8 +14,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { z } from 'zod';
 import { useState, useTransition } from 'react';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 const importSchema = z.object({
   decklist: z.string().min(1, 'Decklist is required'),
@@ -28,6 +28,7 @@ interface ImportFormProps {
   onImport: (decklist: string) => Promise<{
     success: boolean;
     message?: string;
+    errors?: string[];
   }>;
 }
 
@@ -50,19 +51,26 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
     if (!window.confirm('Are you sure? This action cannot be undone.')) return;
 
     setError(null);
-    startTransition(async () => {
-      try {
+    try {
+      startTransition(async () => {
         const result = await onImport(data.decklist);
         if (result.success) {
           toast.success('Decklist imported successfully');
+          if (result.errors?.length) {
+            result.errors.forEach(error => {
+              toast.error(error);
+            });
+          }
           router.push(`/decks/${deckId}`);
         } else {
           setError(result.message || 'Import failed');
         }
-      } catch (error) {
-        setError('An unexpected error occurred');
-      }
-    });
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Invalid deck list format';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -4,6 +4,7 @@ import './globals.css';
 import { CardModalProvider } from '@/context/CardModalContext';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className={cn(inter.className, 'dark')}>
         <Navbar />
         <CardModalProvider>{children}</CardModalProvider>
+        <Toaster />
       </body>
     </html>
   );
