@@ -17,10 +17,10 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import logger from '@/lib/logger';
+import { Import } from 'lucide-react';
 
 const importSchema = z.object({
-  decklist: z.string().min(1, 'Decklist is required'),
-  // decklist: z.string().min(1, 'Decklist is required'),
+  decklist: z.string().trim().min(1, 'Decklist is required'),
 });
 
 type ImportFormValues = z.infer<typeof importSchema>;
@@ -86,34 +86,44 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="decklist"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Decklist</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Paste your decklist here..."
-                  {...field}
-                  value={`dfgdfgd1 
-1 Plains`}
-                  className="min-h-[200px]"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+      <form onSubmit={handleSubmit}>
+        <div className="flex flex-row items-center justify-between mb-4 mt-8">
+          <h2 className="m-0 text-2xl font-semibold">Import Decklist</h2>
+          <div>
+            <Button type="submit" disabled={isPending} className="w-40">
+              {isPending ? (
+                'Importing...'
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Import />
+                  Submit
+                </span>
+              )}
+            </Button>
+          </div>
+        </div>
+        <div className="flex-1">
+          <FormField
+            control={form.control}
+            name="decklist"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    placeholder="Paste your decklist here..."
+                    {...field}
+                    className="min-h-[180px]"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {error && (
+            <p className="text-destructive text-sm font-medium">{error}</p>
           )}
-        />
-
-        {error && (
-          <p className="text-destructive text-sm font-medium">{error}</p>
-        )}
-
-        <Button type="submit" disabled={isPending}>
-          {isPending ? 'Importing...' : 'Import Decklist'}
-        </Button>
+        </div>
       </form>
     </Form>
   );

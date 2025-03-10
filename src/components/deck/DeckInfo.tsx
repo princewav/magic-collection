@@ -1,9 +1,12 @@
+'use client';
+
 import Image from 'next/image';
 import { Deck } from '@/types/deck';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Edit, Import } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
+import { usePathname } from 'next/navigation';
 
 interface Props {
   deck: Deck;
@@ -32,6 +35,7 @@ export const DeckInfo = ({ deck }: Props) => {
   const sideboardCount = deck.sideboard?.reduce((acc, card) => acc + card.quantity, 0) || 0;
 
   const colors = getColors();
+  const pathname = usePathname();
   return (
     <div className="bg-foreground/10 mb-4 flex items-center justify-between rounded-md p-4 shadow-md">
       <div className="flex items-center space-x-4">
@@ -73,12 +77,14 @@ export const DeckInfo = ({ deck }: Props) => {
             Edit Deck
           </Button>
         </Link>
-        <Link href={`/decks/${deck.id}/import`}>
-          <Button className="w-full" variant="outline">
-            <Import />
-            Import List
-          </Button>
-        </Link>
+        {!pathname?.endsWith('/import') && (
+          <Link href={`/decks/${deck.id}/import`}>
+            <Button className="w-full" variant="outline">
+              <Import />
+              Import List
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
