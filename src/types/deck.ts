@@ -14,7 +14,7 @@ export type Deck = {
   format?: string;
   description?: string;
   type: 'deck';
-  maindeck: DeckCard[];
-  sideboard: DeckCard[];
+  maindeck?: DeckCard[];
+  sideboard?: DeckCard[];
   maybeboard?: DeckCard[];
 };

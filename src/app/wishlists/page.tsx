@@ -1,4 +1,3 @@
-import { CardGrid } from '@/components/deck/DeckCardGrid';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,7 +11,7 @@ export default async function WishlistPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold">My Wishlist</h1>
       </div>
-      <CardGrid cardIds={[]} />
+      {/* <CardGrid cardIds={[]} /> */}
     </main>
   );
 }

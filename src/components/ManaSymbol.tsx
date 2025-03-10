@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ManaSymbolProps {
   symbol: string;
-  size: number;
+  size?: number;
 }
 
 export const ManaSymbol: React.FC<ManaSymbolProps> = ({
