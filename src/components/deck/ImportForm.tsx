@@ -16,9 +16,11 @@ import { z } from 'zod';
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import logger from '@/lib/logger';
 
 const importSchema = z.object({
   decklist: z.string().min(1, 'Decklist is required'),
+  // decklist: z.string().min(1, 'Decklist is required'),
 });
 
 type ImportFormValues = z.infer<typeof importSchema>;
@@ -45,29 +47,33 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
   });
 
   const onSubmit = async (data: ImportFormValues) => {
-    const isValid = await form.trigger();
-    if (!isValid) return;
+    // const isValid = await form.trigger();
+    // if (!isValid) return;
 
-    if (!window.confirm('Are you sure? This action cannot be undone.')) return;
+    // if (!window.confirm('Are you sure? This action cannot be undone.')) return;
 
+    console.log(data.decklist);
     setError(null);
     try {
       startTransition(async () => {
+        logger.warn('Importing decklist:', data.decklist);
         const result = await onImport(data.decklist);
+        logger.info('Import result:', result);
+        if (result.errors?.length) {
+          result.errors.forEach((error) => {
+            toast.error(error);
+          });
+        }
         if (result.success) {
           toast.success('Decklist imported successfully');
-          if (result.errors?.length) {
-            result.errors.forEach(error => {
-              toast.error(error);
-            });
-          }
           router.push(`/decks/${deckId}`);
         } else {
-          setError(result.message || 'Import failed');
+          setError(result.errors?.[0] || 'Import failed');
         }
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Invalid deck list format';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Invalid deck list format';
       setError(errorMessage);
       toast.error(errorMessage);
     }
@@ -91,6 +97,8 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
                 <Textarea
                   placeholder="Paste your decklist here..."
                   {...field}
+                  value={`dfgdfgd1 
+1 Plains`}
                   className="min-h-[200px]"
                 />
               </FormControl>
@@ -100,7 +108,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
         />
 
         {error && (
-          <p className="text-sm font-medium text-destructive">{error}</p>
+          <p className="text-destructive text-sm font-medium">{error}</p>
         )}
 
         <Button type="submit" disabled={isPending}>

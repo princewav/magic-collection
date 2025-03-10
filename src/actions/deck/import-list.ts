@@ -6,7 +6,7 @@ import { DeckCard } from '@/types/deck';
 
 type ImportDeckResult = {
   success: boolean;
-  message?: string;
+  errors?: string[];
 };
 
 const importDeckSchema = z.object({
@@ -35,7 +35,7 @@ export async function importDeckList(
   cardList: string,
 ): Promise<ImportDeckResult> {
   try {
-    const { mainDeck, sideboard } = parseDeckList(
+    const { mainDeck, sideboard, errors } = parseDeckList(
       importDeckSchema.parse({ cardList }).cardList,
     );
 
@@ -48,27 +48,16 @@ export async function importDeckList(
       ),
     ]);
 
-
-    if (
-      mainDeckCards.length !== mainDeck.length ||
-      sideboardCards.length !== sideboard.length
-    ) {
-      return {
-        success: false,
-        message: 'Failed to convert some card names to IDs',
-      };
-    }
-
     await deckService.repo.update(deckId, {
       maindeck: mainDeckCards,
       sideboard: sideboardCards,
     });
 
-    return { success: true };
+    return { success: true, errors };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Unknown error',
+      errors: [error instanceof Error ? error.message : 'Unknown error'],
     };
   }
 }

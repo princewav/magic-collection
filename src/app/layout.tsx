@@ -4,7 +4,7 @@ import './globals.css';
 import { CardModalProvider } from '@/context/CardModalContext';
 import Navbar from '@/components/Navbar';
 import { cn } from '@/lib/utils';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 

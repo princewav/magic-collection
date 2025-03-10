@@ -12,7 +12,10 @@ export interface DeckList {
 
 const CARD_LINE_REGEX = /^(\d+)\s+([^()]+)(?:\s+\((\w+)\))?\s*?(\d*)?$/;
 
-export function parseDeckList(text: string): DeckList {
+export function parseDeckList(
+  text: string,
+  errorLines?: string[],
+): DeckList & { errors: string[] } {
   const lines = text.trim().split('\n');
   const deckList: DeckList = { mainDeck: [], sideboard: [] };
   let currentSection: keyof DeckList = 'mainDeck';
@@ -25,21 +28,23 @@ export function parseDeckList(text: string): DeckList {
       currentSection = 'sideboard';
       continue;
     }
-    
+
     try {
       const cardEntry = parseCardLine(trimmedLine);
       deckList[currentSection].push(cardEntry);
       hasValidCards = true;
     } catch {
-      // Ignore invalid lines
+      errorLines?.push(trimmedLine);
     }
   }
 
   if (!hasValidCards) {
-    throw new Error(`No valid card lines found. Example invalid line: '${lines[0]?.trim() || 'empty line'}'`);
+    throw new Error(
+      `No valid card lines found. Example invalid line: '${lines[0]?.trim() || 'empty line'}'`,
+    );
   }
 
-  return deckList;
+  return { ...deckList, errors: errorLines || [] };
 }
 
 export function parseCardLine(line: string): ParsedCard {
