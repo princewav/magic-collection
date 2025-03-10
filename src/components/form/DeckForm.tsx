@@ -40,12 +40,14 @@ interface DeckFormProps {
   onSubmit: (data: DeckFormData) => Promise<void>;
   isSubmitting: boolean;
   initialData?: DeckFormData;
+  isEdit?: boolean;
 }
 
 export const DeckForm: React.FC<DeckFormProps> = ({
   onSubmit,
   isSubmitting,
   initialData,
+  isEdit = false,
 }) => {
   const [selectedColors, setSelectedColors] = useState<ManaColor[]>(initialData?.colors || []);
   const form = useForm<DeckFormData>({
@@ -202,7 +204,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     Updating...
                   </>
                 ) : (
-                  'Edit Deck'
+                  isEdit ? 'Update Deck' : 'Add Deck'
                 )}
               </Button>
             </div>

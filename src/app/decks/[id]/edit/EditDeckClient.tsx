@@ -52,6 +52,7 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
         onSubmit={handleDeckUpdate}
         isSubmitting={isSubmitting}
         initialData={deck}
+        isEdit={true}
       />
       <div className="mt-4 flex justify-end gap-4">
         <Button
