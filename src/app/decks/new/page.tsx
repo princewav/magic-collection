@@ -1,7 +1,7 @@
 // src/app/decks/new/page.tsx
 'use client';
 
-import { DeckForm } from '@/components/deck/DeckForm';
+import { DeckForm } from '@/components/form/DeckForm';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';

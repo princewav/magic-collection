@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { deckSchema } from '@/app/decks/new/validation';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { DeckForm } from '@/components/deck/DeckForm';
+import { DeckForm } from '@/components/form/DeckForm';
 import { Deck } from '@/types/deck';
 import { updateDeck } from '@/actions/deck/update-deck';
 
