@@ -18,6 +18,7 @@ export function parseDeckList(
 ): DeckList & { errors: string[] } {
   const lines = text.trim().split('\n');
   const deckList: DeckList = { mainDeck: [], sideboard: [] };
+  const errors = errorLines || [];
   let currentSection: keyof DeckList = 'mainDeck';
   let hasValidCards = false;
 
@@ -34,7 +35,7 @@ export function parseDeckList(
       deckList[currentSection].push(cardEntry);
       hasValidCards = true;
     } catch {
-      errorLines?.push(trimmedLine);
+      errors.push(trimmedLine);
     }
   }
 
@@ -44,7 +45,7 @@ export function parseDeckList(
     );
   }
 
-  return { ...deckList, errors: errorLines || [] };
+  return { ...deckList, errors };
 }
 
 export function parseCardLine(line: string): ParsedCard {

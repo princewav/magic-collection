@@ -77,4 +77,12 @@ Sideboard
     // Verify error was thrown for invalid line
     expect(() => parseCardLine('invalid line')).toThrow(/Invalid card line format/);
   });
+
+  
+  it('should include all invalid lines in errors', () => {
+    const invalidList = 'invalid line\n1 Plains\nanother invalid line';
+    const result = parseDeckList(invalidList);
+    expect(result.errors).toEqual(['invalid line', 'another invalid line']);
+  });
+
 });
