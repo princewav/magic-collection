@@ -13,6 +13,7 @@ export const createDeck = async (values: z.infer<typeof deckSchema>) => {
       type: 'deck',
       imageUrl: values.imageUrl ?? null,
       format: values.format ?? undefined,
+      colors: values.colors,
     });
     revalidatePath('/decks');
     return deck;

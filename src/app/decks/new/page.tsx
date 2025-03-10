@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { deckSchema } from './validation';
 import { z } from 'zod';
+import { createDeck } from '@/actions/deck/create-deck';
 
 interface NewDeckPageProps {}
 
@@ -19,43 +20,19 @@ export default function NewDeckPage({}: NewDeckPageProps) {
     setIsSubmitting(true);
     try {
       await createDeck(values);
-      handleSuccess();
+      toast.success('Deck Created', {
+        description: 'Your new deck has been created successfully.',
+      });
+      router.push('/decks');
+      router.refresh();
     } catch (error: any) {
-      handleError(error);
+      console.error('Error creating deck:', error);
+      toast.error('Error', {
+        description: error.message || 'Failed to create deck. Please try again.',
+      });
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const createDeck = async (values: z.infer<typeof deckSchema>) => {
-    const response = await fetch('/api/decks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error Data:', errorData);
-      throw new Error(errorData.message || 'Failed to create deck');
-    }
-  };
-
-  const handleSuccess = () => {
-    toast.success('Deck Created', {
-      description: 'Your new deck has been created successfully.',
-    });
-    router.push('/decks');
-    router.refresh();
-  };
-
-  const handleError = (error: any) => {
-    console.error('Error creating deck:', error);
-    toast.error('Error', {
-      description: error.message || 'Failed to create deck. Please try again.',
-    });
   };
 
   return (
