@@ -58,3 +58,6 @@ export function compose<T>(...fns: Array<(arg: T[]) => T[]>) {
     fns.reduceRight((value, fn) => fn(value), initialValue);
 }
 
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
