@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 
 interface CsvImportButtonProps {
   parseCsv: (data: string, type: string) => Promise<void>;
+  collectionType: string;
 }
 
-export default function CsvImportButton({ parseCsv }: CsvImportButtonProps) {
+export default function CsvImportButton({ parseCsv, collectionType }: CsvImportButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,7 +33,7 @@ export default function CsvImportButton({ parseCsv }: CsvImportButtonProps) {
 
     try {
       const text = await file.text();
-      await parseCsv(text, file.type);
+      await parseCsv(text, collectionType);
       toast.success('CSV file imported successfully');
     } catch (error) {
       toast.error('Failed to import CSV file');

@@ -4,8 +4,10 @@ import { NextResponse } from 'next/server';
 import { parse } from 'csv-parse/sync';
 import { collectionCardService } from '@/db/services/CardService';
 
-
-export async function parseCSVandInsert(data: string, type: string): Promise<void> {
+export async function parseCSVandInsert(
+  data: string,
+  type: string,
+): Promise<void> {
   const records = parse(data, {
     columns: [
       'binderName',

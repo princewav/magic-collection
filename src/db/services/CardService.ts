@@ -25,6 +25,10 @@ export class CardService extends BaseService<Card> {
 
 export class CollectionCardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'collection-cards');
+
+  async getByType(type: string) {
+    return this.repo.findBy({ collectionType: type });
+  }
 }
 
 export const cardService = new CardService();
