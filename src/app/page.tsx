@@ -1,20 +1,14 @@
-import { DeckCardGrid } from '@/components/deck/DeckCardGrid';
-import { getPageNumber } from '@/lib/utils';
 import { Metadata } from 'next';
 import { Filters } from '@/components/Filters';
 import CardModal from '@/components/CardModal';
 import { CardModalProvider } from '@/context/CardModalContext';
-import { CardGrid } from '@/components/CardGrid copy';
 
 export const metadata: Metadata = {
   title: 'My Awesome Cards',
 };
 
 const Page = async (props: {
-  searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  const searchParams = props.searchParams || {};
-  const currentPage = await getPageNumber(searchParams);
 
   return (
     <div className="min-h-screen px-4 pt-2 pb-4">
