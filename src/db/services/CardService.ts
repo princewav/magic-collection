@@ -2,7 +2,6 @@ import { Card } from '@/types/card';
 import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
-import { Filter } from 'mongodb';
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
@@ -24,4 +23,9 @@ export class CardService extends BaseService<Card> {
   }
 }
 
+export class CollectionCardService extends BaseService<Card> {
+  public repo = new RepoCls<Card>(DB, 'collection-cards');
+}
+
 export const cardService = new CardService();
+export const collectionCardService = new CollectionCardService();

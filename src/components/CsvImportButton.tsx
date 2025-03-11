@@ -1,34 +1,52 @@
-'use client'
+'use client';
 
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Import } from 'lucide-react';
-import { Loader2 } from 'lucide-react';
-import { parseCSV } from '@/actions/parse-csv';
+import { Import, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
-export default function CsvImportButton() {
+interface CsvImportButtonProps {
+  parseCsv: (data: string, type: string) => Promise<void>;
+}
+
+export default function CsvImportButton({ parseCsv }: CsvImportButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'text/csv') {
+      toast.error('Please upload a valid CSV file');
+      return;
+    }
+
     setIsLoading(true);
+
     try {
-      const file = event.target.files?.[0];
-      if (file && file.type === 'text/csv') {
-        const formData = new FormData();
-        formData.append('file', file);
-        await parseCSV(formData);
-      } else {
-        alert('Please upload a valid CSV file.');
-      }
+      const text = await file.text();
+      await parseCsv(text, file.type);
+      toast.success('CSV file imported successfully');
+    } catch (error) {
+      toast.error('Failed to import CSV file');
+      console.error(error);
     } finally {
       setIsLoading(false);
+      // Reset the input value so the same file can be uploaded again if needed
+      event.target.value = '';
     }
   };
 
   return (
     <>
-      <Button onClick={() => fileInputRef.current?.click()} disabled={isLoading}>
+      <Button onClick={handleButtonClick} disabled={isLoading}>
         {isLoading ? (
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         ) : (
@@ -36,7 +54,14 @@ export default function CsvImportButton() {
         )}
         Import
       </Button>
-      <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileUpload} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        className="hidden"
+        onChange={handleFileChange}
+        disabled={isLoading}
+      />
     </>
   );
 }

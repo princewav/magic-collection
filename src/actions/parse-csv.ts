@@ -1,11 +1,12 @@
+'use server';
+
 import { NextResponse } from 'next/server';
 import { parse } from 'csv-parse/sync';
+import { collectionCardService } from '@/db/services/CardService';
 
-export async function parseCSV(formData: FormData) {
-  const file = formData.get('file') as File;
-  const text = await file.text();
 
-  const records = parse(text, {
+export async function parseCSVandInsert(data: string, type: string): Promise<void> {
+  const records = parse(data, {
     columns: [
       'binderName',
       'binderType',
@@ -23,14 +24,18 @@ export async function parseCSV(formData: FormData) {
       'altered',
       'condition',
       'language',
-      'purchasePriceCurrency'
+      'purchasePriceCurrency',
     ],
     skip_empty_lines: true,
-    from_line: 2
+    from_line: 2,
   });
 
   // Process and validate records here
-  console.log(records);
-
-  return NextResponse.json({ success: true, data: records });
+  console.log(type);
+  const processedRecords = records.map((record: Record<string, unknown>) => ({
+    ...record,
+    collectionType: type,
+  }));
+  console.log(processedRecords);
+  await collectionCardService.repo.createMany(processedRecords);
 }
