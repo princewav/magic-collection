@@ -115,3 +115,36 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
     ...(cardmarket_uri !== undefined && { cardmarket_uri }),
   };
 }
+
+export type CollectionCard = {
+  _id?: string; // MongoDB ObjectId
+  binderName: string;
+  binderType: string;
+  cardName: string;
+  setCode: string;
+  setName: string;
+  collectorNumber: string;
+  foil: 'normal' | 'foil' | 'etched'; // Expanded for different foil types
+  rarity: 'common' | 'uncommon' | 'rare' | 'mythic' | 'special';
+  quantity: number;
+  manaBoxId: string;
+  scryfallId: string;
+  purchasePrice: number;
+  purchasePriceCurrency: string;
+  misprint: boolean;
+  altered: boolean;
+  condition:
+    | 'near_mint'
+    | 'lightly_played'
+    | 'moderately_played'
+    | 'heavily_played'
+    | 'damaged';
+  language: string; // ISO language code (e.g., "en", "jp", "de")
+
+  // Optional fields you might want to consider
+  dateAdded?: Date;
+  tags?: string[];
+  notes?: string;
+  imageUri?: string;
+  collectionType: "paper" | "arena"
+}
