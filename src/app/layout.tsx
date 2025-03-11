@@ -2,7 +2,7 @@ import type { Metadata } from 'next/types';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { CardModalProvider } from '@/context/CardModalContext';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/navbar/Navbar';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 
