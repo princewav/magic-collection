@@ -1,8 +1,16 @@
 'use server';
 
-import { NextResponse } from 'next/server';
 import { parse } from 'csv-parse/sync';
-import { collectionCardService } from '@/db/services/CardService';
+import { collectionCardService, cardService } from '@/db/services/CardService';
+import { CollectionCard } from '@/types/card';
+
+async function getCardId(card: CollectionCard) {
+  const cardData = await cardService.getByNameAndSet(card.cardName, card.setCode);
+  if (!cardData || cardData.length === 0) {
+    throw new Error(`Card not found: ${card.cardName} (${card.setCode})`);
+  }
+  return cardData[0].id;
+}
 
 export async function parseCSVandInsert(
   data: string,
@@ -33,11 +41,11 @@ export async function parseCSVandInsert(
   });
 
   // Process and validate records here
-  console.log(type);
-  const processedRecords = records.map((record: Record<string, unknown>) => ({
+  const processedRecords = Promise.all(records.map((record: CollectionCard) => ({
     ...record,
     collectionType: type,
-  }));
-  console.log(processedRecords);
-  await collectionCardService.repo.createMany(processedRecords);
+    cardId: getCardId(record)
+  })))
+  await collectionCardService.repo.dropCollection();
+  await collectionCardService.repo.createMany(await processedRecords);
 }

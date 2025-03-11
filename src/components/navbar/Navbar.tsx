@@ -90,9 +90,6 @@ const DropdownOverview = ({
           className="from-muted/50 to-muted flex size-full flex-col justify-end rounded-md bg-gradient-to-b p-6 no-underline outline-none select-none focus:shadow-md"
           href={href}
         >
-          {imageSrc && (
-            <Image src={imageSrc} alt="" width={15} height={15} />
-          )}
           <div className="mb-2 text-lg font-medium">{title}</div>
           <p className="text-muted-foreground text-sm leading-tight">
             {description}

@@ -103,4 +103,8 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
       return [];
     }
   }
+
+  async dropCollection() {
+    return this.collection.drop();
+  }
 }
