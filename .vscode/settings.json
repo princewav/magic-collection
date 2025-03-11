@@ -5,7 +5,9 @@
     "**/.hg": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
-    "**/CVS": true
+    "**/CVS": true,
+    "node_modules": true,
+    "next-env.d.ts": true
   },
   "hide-files.files": [],
   "todo-tree.tree.showBadges": true
