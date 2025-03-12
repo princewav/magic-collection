@@ -16,5 +16,5 @@ export async function loadCardsInCollection(type: 'paper' | 'arena'): Promise<Co
   if (!cards) {
     throw new Error('Failed to load cards in collection: ' + type);
   }
-  return cards.slice(0, 50);
+  return cards;
 }

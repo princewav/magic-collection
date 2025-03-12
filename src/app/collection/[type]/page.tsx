@@ -20,7 +20,8 @@ type Props = {
 export default async function CollectionPage({ params }: Props) {
   const { type } = await params;
   const collectionCards = await loadCardsInCollection(type);
-  const cardIds = collectionCards.map((card) => card.cardId);
+  const quantity = collectionCards.reduce((acc, card) => acc + card.quantity, 0);
+  const cardIds = collectionCards.slice(0, 50).map((card) => card.cardId);
   const cards = await loadCardsById(cardIds);
   const cardsWithQuantity = cards.map((card) => ({
     ...card,
@@ -31,7 +32,9 @@ export default async function CollectionPage({ params }: Props) {
   return (
     <main className="flex flex-col p-4">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-4xl font-bold">{capitalize(type)} collection</h1>
+        <h1 className="text-4xl font-bold">
+          {capitalize(type)} collection: {collectionCards.length} unique cards ({quantity} total)
+        </h1>
         <CsvImportButton collectionType={type} parseCsv={parseCSVandInsert} />
       </div>
       <Filters />
