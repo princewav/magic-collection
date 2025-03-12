@@ -31,9 +31,10 @@ import { useState } from 'react';
 interface DeckFormData {
   name: string;
   description?: string;
-  format?: string | null;
+  format: string;
   imageUrl?: string | null;
   colors: ManaColor[];
+  type: 'paper' | 'arena';
 }
 
 interface DeckFormProps {
@@ -49,15 +50,18 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   initialData,
   isEdit = false,
 }) => {
-  const [selectedColors, setSelectedColors] = useState<ManaColor[]>(initialData?.colors || []);
+  const [selectedColors, setSelectedColors] = useState<ManaColor[]>(
+    initialData?.colors || [],
+  );
   const form = useForm<DeckFormData>({
     resolver: zodResolver(deckSchema),
     defaultValues: initialData || {
       name: '',
       description: '',
-      format: null,
+      format: 'standard',
       imageUrl: null,
       colors: [],
+      type: 'paper',
     },
   });
 
@@ -110,39 +114,64 @@ export const DeckForm: React.FC<DeckFormProps> = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="format"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Format</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value || ''}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a format" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="modern">Modern</SelectItem>
-                      <SelectItem value="commander">Commander</SelectItem>
-                      <SelectItem value="legacy">Legacy</SelectItem>
-                      <SelectItem value="vintage">Vintage</SelectItem>
-                      <SelectItem value="pauper">Pauper</SelectItem>
-                      <SelectItem value="pioneer">Pioneer</SelectItem>
-                      <SelectItem value="brawl">Brawl</SelectItem>
-                      <SelectItem value="historic">Historic</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            <div className="flex items-center gap-20">
+              <FormField
+                control={form.control}
+                name="format"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Format</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value || ''}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a format" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard</SelectItem>
+                        <SelectItem value="modern">Modern</SelectItem>
+                        <SelectItem value="commander">Commander</SelectItem>
+                        <SelectItem value="legacy">Legacy</SelectItem>
+                        <SelectItem value="vintage">Vintage</SelectItem>
+                        <SelectItem value="pauper">Pauper</SelectItem>
+                        <SelectItem value="pioneer">Pioneer</SelectItem>
+                        <SelectItem value="brawl">Brawl</SelectItem>
+                        <SelectItem value="historic">Historic</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value || ''}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a deck type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="paper">Paper</SelectItem>
+                        <SelectItem value="arena">Arena</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="imageUrl"
@@ -203,8 +232,10 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Updating...
                   </>
+                ) : isEdit ? (
+                  'Update Deck'
                 ) : (
-                  isEdit ? 'Update Deck' : 'Add Deck'
+                  'Add Deck'
                 )}
               </Button>
             </div>
