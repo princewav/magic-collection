@@ -15,7 +15,7 @@ interface CardWithQuantity extends CardType {
   quantity: number;
 }
 
-export async function DeckCardGrid({ decklist, collectedCards, type }: Props) {
+export async function DeckCardGrid({ decklist, collectedCards }: Props) {
   const cardIds: string[] =
     decklist?.map((card) => card.cardId).filter(Boolean) || [];
   const cards = await loadCardsById(cardIds);
@@ -41,7 +41,6 @@ export async function DeckCardGrid({ decklist, collectedCards, type }: Props) {
 
   return (
     <>
-      {type === 'arena' ? (
         <div className="right-0 mb-2 flex items-center gap-3">
           <p className="flex items-center gap-1">
             <Image
@@ -80,7 +79,7 @@ export async function DeckCardGrid({ decklist, collectedCards, type }: Props) {
             {rarityTotals.mythic || 0}
           </p>
         </div>
-      ) : null}
+
       <div className="mx-auto flex flex-wrap gap-3 mt-2">
         {cardsWithQuantity?.map((card: CardWithQuantity) => (
           <Card
