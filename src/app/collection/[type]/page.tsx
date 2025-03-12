@@ -21,9 +21,11 @@ export default async function CollectionPage({ params }: Props) {
   const { type } = await params;
   const collectionCards = await loadCardsInCollection(type);
   const cardIds = collectionCards.map((card) => card.cardId);
-  console.log(cardIds);
   const cards = await loadCardsById(cardIds);
-  console.log(cards);
+  const cardsWithQuantity = cards.map((card) => ({
+    ...card,
+    quantity: collectionCards.find((c) => c.cardId === card.id)?.quantity || 0,
+  }));
 
 
   return (
@@ -33,7 +35,7 @@ export default async function CollectionPage({ params }: Props) {
         <CsvImportButton collectionType={type} parseCsv={parseCSVandInsert} />
       </div>
       <Filters />
-      <CardGrid cards={cards} />
+      <CardGrid cards={cardsWithQuantity} />
     </main>
   );
 }

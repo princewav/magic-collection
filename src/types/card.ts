@@ -120,7 +120,7 @@ export type CollectionCard = {
   id: string;
   binderName: string;
   binderType: string;
-  cardName: string;
+  name: string;
   setCode: string;
   setName: string;
   collectorNumber: string;

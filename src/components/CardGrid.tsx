@@ -3,7 +3,7 @@ import { Card } from './Card';
 import { CollectionCard } from '@/types/card';
 
 interface Props {
-  cards?: (CardType & CollectionCard)[];
+  cards?: (CardType & {quantity: number})[];
 }
 export async function CardGrid({ cards }: Props) {
   return (
