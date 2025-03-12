@@ -4,7 +4,7 @@ import { cardService, collectionCardService } from "@/db/services/CardService";
 import { Card, CollectionCard } from "@/types/card";
 
 export async function loadCardsById(ids: string[]): Promise<Card[]> {
-  const cards = await cardService.repo.get(ids);
+  const cards = await cardService.getByCardId(ids);
   if (!cards) {
     throw new Error('Failed to load cards with ids: ' + ids.join(', '));
   }

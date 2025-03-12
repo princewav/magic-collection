@@ -35,8 +35,8 @@ function sortStringArrays<T, K extends keyof T>(
   direction: SortDirection,
 ): T[] {
   return [...cards].sort((a, b) => {
-    const valueA = (a[key] as unknown as string[]).join('');
-    const valueB = (b[key] as unknown as string[]).join('');
+    const valueA = (a[key] as unknown as string[] || []).join('');
+    const valueB = (b[key] as unknown as string[] || []).join('');
     return direction === 'asc'
       ? valueA.localeCompare(valueB)
       : valueB.localeCompare(valueA);
@@ -48,6 +48,7 @@ function sortLands<T extends { type_line: string }>(
   order: 'first' | 'last',
 ): T[] {
   return [...cards].sort((a, b) => {
+    if (!a?.type_line || !b?.type_line) return 0;
     const isLandA = (a.type_line as unknown as string).toLowerCase().includes('land');
     const isLandB = (b.type_line as unknown as string).toLowerCase().includes('land');
     if (isLandA !== isLandB) return order === 'first' ? 1 : -1;

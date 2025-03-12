@@ -21,11 +21,11 @@ export default async function CollectionPage({ params }: Props) {
   const { type } = await params;
   const collectionCards = await loadCardsInCollection(type);
   const quantity = collectionCards.reduce((acc, card) => acc + card.quantity, 0);
-  const cardIds = collectionCards.slice(0, 50).map((card) => card.cardId);
+  const cardIds = collectionCards.slice(50, 100).map((card) => card.cardId);
   const cards = await loadCardsById(cardIds);
   const cardsWithQuantity = cards.map((card) => ({
     ...card,
-    quantity: collectionCards.find((c) => c.cardId === card.id)?.quantity || 0,
+    quantity: collectionCards.find((c) => c.cardId === card.cardId)?.quantity || 0,
   }));
 
 

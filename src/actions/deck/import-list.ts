@@ -23,7 +23,7 @@ async function convertNameToId(card: ParsedCard): Promise<DeckCard | null> {
     return null;
   }
   return {
-    id: cardData[0].id,
+    cardId: cardData[0].cardId,
     set: card.set,
     quantity: card.quantity,
     setNumber: card.setNumber,

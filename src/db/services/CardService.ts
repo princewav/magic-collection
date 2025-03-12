@@ -7,7 +7,7 @@ export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
 
   async getByNameAndSet(name: string, set: string, setNumber: string = '') {
-    if (!name || !set) {
+    if (!name) {
       return [];
     }
 
@@ -29,7 +29,7 @@ export class CardService extends BaseService<Card> {
     for (const strategy of searchStrategies) {
       const query = {
         name: strategy.exact ? name : new RegExp(name, 'i'),
-        set: normalizedSet,
+        ...(set ? { set: normalizedSet } : {}),
         ...(strategy.includeSetNumber && setNumber ? { collector_number: setNumber } : {}),
       };
 
@@ -49,6 +49,15 @@ export class CardService extends BaseService<Card> {
       return exactMatch;
     }
     return this.repo.findBy({ name: new RegExp(name, 'i') });
+  }
+
+  async getByCardId(ids: string[]): Promise<Card[] | null> {
+    const cursor = this.repo.collection.find({ cardId: { $in: ids } });
+    const docs = await cursor.toArray();
+    return docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as Card[];
   }
 }
 

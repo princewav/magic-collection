@@ -1,7 +1,7 @@
 export type Card = {
-  type: string;
   id: string;
-  cardmarket_id: number;
+  cardId: string
+  cardmarket_id: number | null;
   name: string;
   released_at: string;
   scryfall_uri: string;
@@ -59,7 +59,6 @@ export type Card = {
 export function extractMtgCardData(sourceObj: unknown & Card): Card {
   // Pick only the properties we need
   const {
-    type,
     id,
     cardmarket_id,
     name,
@@ -88,8 +87,8 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
 
   // Return a new object with just the properties we want
   return {
-    type,
-    id,
+    id: '',
+    cardId: id,
     cardmarket_id,
     name,
     released_at,

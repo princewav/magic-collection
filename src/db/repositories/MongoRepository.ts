@@ -2,7 +2,7 @@ import { BaseRepository } from './BaseRepository';
 import { Collection, ObjectId, Db, Filter, Document } from 'mongodb';
 
 export class MongoRepository<T extends { id: string }> extends BaseRepository<T> {
-  protected collection: Collection<Document>;
+  public collection: Collection<Document>;
   protected collectionName: string;
 
   constructor(db: Db, collectionName: string) {

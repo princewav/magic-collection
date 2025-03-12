@@ -13,7 +13,7 @@ async function getCardId(card: CollectionCard) {
   if (!cardData || cardData.length === 0) {
     throw new Error(`Card not found: ${card.name} (${card.setCode}) ${card.collectorNumber}`);
   }
-  return cardData[0].id;
+  return cardData[0].cardId;
 }
 
 export async function parseCSVandInsert(

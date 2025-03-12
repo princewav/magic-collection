@@ -15,13 +15,13 @@ interface CardWithQuantity extends CardType {
 }
 
 export async function DeckCardGrid({ decklist }: Props) {
-  const cardIds: string[] = decklist?.map((card) => card.id) || [];
+  const cardIds: string[] = decklist?.map((card) => card.cardId).filter(Boolean) || [];
   const cards = await loadCardsById(cardIds);
   const sortedCards = defaultSort(cards);
   const cardsWithQuantity: CardWithQuantity[] = sortedCards.map(
     (card: CardType) => ({
       ...card,
-      quantity: decklist?.find((c) => c.id === card.id)?.quantity || 0,
+      quantity: decklist?.find((c) => c.cardId === card.cardId)?.quantity || 0,
     }),
   );
 
