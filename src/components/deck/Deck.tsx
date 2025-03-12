@@ -38,7 +38,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
     <div
       key={deck.id}
       className={cn(
-        'group bg-card hover:bg-card/90 border-muted relative w-70 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
+        'group bg-card hover:bg-card/90 border-muted relative w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
           : '',
@@ -52,7 +52,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
         stroke={3}
       />
       <Link href={`/decks/${deck.id}`} onContextMenu={handleContextMenu}>
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-30 overflow-hidden">
           {deck.imageUrl ? (
             <Image
               src={deck.imageUrl}
@@ -67,7 +67,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
           )}
         </div>
         <div className="p-4">
-          <h3 className="text-lg font-semibold">{deck.name}</h3>
+          <h3 className="font-semibold">{deck.name}</h3>
           <div className="mt-2 flex gap-2">
             {deck.colors.map((color, index) => (
               <ManaSymbol key={index} symbol={color} />

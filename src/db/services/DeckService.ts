@@ -22,6 +22,15 @@ export class DeckService extends BaseService<Deck> {
       throw new Error('Failed to duplicate decks');
     }
   }
+
+  async findByType(type: 'paper' | 'arena') {
+    try {
+      return await this.repo.findBy({ type });
+    } catch (e) {
+      console.error(e);
+      throw new Error('Failed to get decks');
+    }
+  }
 }
 
 export const deckService = new DeckService();

@@ -14,7 +14,7 @@ export type Deck = {
   colors: ManaColor[];
   format?: string;
   description?: string;
-  type: 'deck';
+  type: 'paper' | 'arena';
   maindeck?: DeckCard[];
   sideboard?: DeckCard[];
   maybeboard?: DeckCard[];

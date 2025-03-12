@@ -33,8 +33,11 @@ export async function loadCollectionCardsByName(cardNames: string[]): Promise<Co
   }
 }
 
-export async function loadDecks(): Promise<Deck[]> {
+export async function loadDecks(type?: 'paper' | 'arena'): Promise<Deck[]> {
   try {
+    if (type) {
+      return await deckService.findByType(type);
+    }
     return await deckService.repo.getAll();
   } catch (e) {
     console.error(e);
