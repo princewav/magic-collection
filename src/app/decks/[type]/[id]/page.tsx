@@ -10,11 +10,11 @@ import { Separator } from '@/components/ui/separator';
 import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; type: 'paper' | 'arena' }>;
 }
 
 export default async function DeckDetailPage({ params }: Props) {
-  const { id } = await params;
+  const { id, type } = await params;
   const deck = await loadDeckById(id);
   const maindeckCardNames = deck?.maindeck?.map((card) => card.name) || [];
   const maindeckCollectedCards =
@@ -49,12 +49,14 @@ export default async function DeckDetailPage({ params }: Props) {
         <DeckCardGrid
           decklist={deck.maindeck}
           collectedCards={maindeckCollectedQuantities}
+          type={type}
         />
         <Separator className="my-10 h-2" />
         <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
         <DeckCardGrid
           decklist={deck.sideboard}
           collectedCards={sideboardCollectedQuantities}
+          type={type}
         />
         <CardModal />
       </CardModalProvider>

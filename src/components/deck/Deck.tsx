@@ -1,4 +1,5 @@
-// src/components/deck/Deck.tsx
+"use client"
+
 import React, { useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import { ManaSymbol } from '@/components/ManaSymbol';
 import { cn } from '@/lib/utils';
 import { useDeckSelection } from '@/context/DeckSelectionContext';
 import { Deck as DeckType } from '@/types/deck';
+import { useParams } from 'next/navigation';
 
 interface DeckProps {
   deck: DeckType;
@@ -20,6 +22,9 @@ interface DeckProps {
 export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
   const { selectedDecks, toggleDeckSelection } = useDeckSelection();
   const isChecked = selectedDecks.includes(deck.id);
+
+  const { type } = useParams();
+  console.log(type);
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -51,7 +56,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
         onCheckedChange={handleCheckboxChange}
         stroke={3}
       />
-      <Link href={`/decks/${deck.id}`} onContextMenu={handleContextMenu}>
+      <Link href={`/decks/${type}/${deck.id}`} onContextMenu={handleContextMenu}>
         <div className="relative h-30 overflow-hidden">
           {deck.imageUrl ? (
             <Image
