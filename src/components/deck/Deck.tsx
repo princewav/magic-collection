@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
 
 import { ManaSymbol } from '@/components/ManaSymbol';
-import { cn } from '@/lib/utils';
+import { capitalize, cn } from '@/lib/utils';
 import { useDeckSelection } from '@/context/DeckSelectionContext';
 import { Deck as DeckType } from '@/types/deck';
 import { useParams } from 'next/navigation';
@@ -63,13 +63,16 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
               src={deck.imageUrl}
               alt={deck.name}
               fill
-              className="object-cover transition-all duration-300 ease-in-out group-hover:scale-[1.06]"
+              className="object-cover"
             />
           ) : (
             <div className="bg-muted flex h-full w-full items-center justify-center">
               <span className="text-muted-foreground">No image available</span>
             </div>
           )}
+          <div className="mt-2 text-white bg-black/70 absolute bottom-2 right-2 rounded-md px-2 py-1 text-sm">
+            {capitalize(deck.format || '')}
+          </div>
         </div>
         <div className="p-4">
           <h3 className="font-semibold">{deck.name}</h3>
