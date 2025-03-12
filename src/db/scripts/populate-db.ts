@@ -16,7 +16,9 @@ async function fetchCards(): Promise<Card[]> {
 async function populateCardsCollection() {
   try {
     const cards = await fetchCards();
-    await cardService.repo.createMany(cards);
+    console.log(cards.length);
+    const result = await cardService.repo.createMany(cards);
+    console.log(result.length);
     logger.debug('Cards collection populated successfully');
     process.exit(0);
   } catch (error) {

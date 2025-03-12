@@ -117,7 +117,7 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
 }
 
 export type CollectionCard = {
-  _id?: string; // MongoDB ObjectId
+  id: string;
   binderName: string;
   binderType: string;
   cardName: string;
@@ -146,5 +146,6 @@ export type CollectionCard = {
   tags?: string[];
   notes?: string;
   imageUri?: string;
-  collectionType: "paper" | "arena"
+  collectionType: "paper" | "arena";
+  cardId: string;
 }

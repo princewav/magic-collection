@@ -4,7 +4,7 @@ import CsvImportButton from '@/components/CsvImportButton';
 import { parseCSVandInsert } from '@/actions/parse-csv';
 import { Filters } from '@/components/Filters';
 import { CardGrid } from '@/components/CardGrid';
-import { loadCardsInCollection } from '@/actions/load-cards';
+import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
 
 export const metadata: Metadata = {
   title: 'Collection',
@@ -13,14 +13,18 @@ export const metadata: Metadata = {
 
 type Props = {
   params: Promise<{
-    type: string;
+    type: 'paper' | 'arena';
   }>;
 };
 
 export default async function CollectionPage({ params }: Props) {
   const { type } = await params;
-  const cards = await loadCardsInCollection(type);
-  console.log("cards", cards);
+  const collectionCards = await loadCardsInCollection(type);
+  const cardIds = collectionCards.map((card) => card.cardId);
+  console.log(cardIds);
+  const cards = await loadCardsById(cardIds);
+  console.log(cards);
+
 
   return (
     <main className="flex flex-col p-4">
@@ -29,7 +33,7 @@ export default async function CollectionPage({ params }: Props) {
         <CsvImportButton collectionType={type} parseCsv={parseCSVandInsert} />
       </div>
       <Filters />
-      <CardGrid cards={[]} />
+      <CardGrid cards={cards} />
     </main>
   );
 }

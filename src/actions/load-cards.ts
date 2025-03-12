@@ -1,7 +1,7 @@
 'use server';
 
 import { cardService, collectionCardService } from "@/db/services/CardService";
-import { Card } from "@/types/card";
+import { Card, CollectionCard } from "@/types/card";
 
 export async function loadCardsById(ids: string[]): Promise<Card[]> {
   const cards = await cardService.repo.get(ids);
@@ -11,7 +11,7 @@ export async function loadCardsById(ids: string[]): Promise<Card[]> {
   return cards;
 } 
 
-export async function loadCardsInCollection(type: string): Promise<Card[]> {
+export async function loadCardsInCollection(type: 'paper' | 'arena'): Promise<CollectionCard[]> {
   const cards = await collectionCardService.getByType(type);
   if (!cards) {
     throw new Error('Failed to load cards in collection: ' + type);

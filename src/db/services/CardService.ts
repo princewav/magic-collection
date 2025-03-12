@@ -1,4 +1,4 @@
-import { Card } from '@/types/card';
+import { Card, CollectionCard } from '@/types/card';
 import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
@@ -23,10 +23,10 @@ export class CardService extends BaseService<Card> {
   }
 }
 
-export class CollectionCardService extends BaseService<Card> {
-  public repo = new RepoCls<Card>(DB, 'collection-cards');
+export class CollectionCardService extends BaseService<CollectionCard> {
+  public repo = new RepoCls<CollectionCard>(DB, 'collection-cards');
 
-  async getByType(type: string) {
+  async getByType(type: 'paper' | 'arena') {
     return this.repo.findBy({ collectionType: type });
   }
 
