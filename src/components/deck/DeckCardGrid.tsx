@@ -2,20 +2,23 @@ import { loadCardsById } from '@/actions/load-cards';
 
 import { Deck, DeckCard } from '@/types/deck';
 import { Card } from '../Card';
+import { CollectionCard } from '@/types/card';
 import { defaultSort } from '@/lib/deck/sorting';
 import { Card as CardType } from '@/types/card';
 import Image from 'next/image';
 
 interface Props {
   decklist?: DeckCard[];
+  collectedCards?: {name: string, quantity: number}[];
 }
 
 interface CardWithQuantity extends CardType {
   quantity: number;
 }
 
-export async function DeckCardGrid({ decklist }: Props) {
-  const cardIds: string[] = decklist?.map((card) => card.cardId).filter(Boolean) || [];
+export async function DeckCardGrid({ decklist, collectedCards }: Props) {
+  const cardIds: string[] =
+    decklist?.map((card) => card.cardId).filter(Boolean) || [];
   const cards = await loadCardsById(cardIds);
   const sortedCards = defaultSort(cards);
   const cardsWithQuantity: CardWithQuantity[] = sortedCards.map(
@@ -39,7 +42,7 @@ export async function DeckCardGrid({ decklist }: Props) {
 
   return (
     <>
-      <div className="right-0 flex items-center gap-3 mb-2">
+      <div className="right-0 mb-2 flex items-center gap-3">
         <p className="flex items-center gap-1">
           <Image
             src="/images/rarities/common.png"
@@ -80,7 +83,14 @@ export async function DeckCardGrid({ decklist }: Props) {
 
       <div className="mx-auto flex flex-wrap gap-3">
         {cardsWithQuantity?.map((card: CardWithQuantity) => (
-          <Card key={card.id} card={card} />
+          <Card
+            key={card.id}
+            card={card}
+            collectedQuantity={
+              collectedCards?.find((c) => c.name === card.name)?.quantity ||
+              0
+            }
+          />
         ))}
       </div>
     </>

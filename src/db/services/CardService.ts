@@ -67,6 +67,23 @@ export class CollectionCardService extends BaseService<CollectionCard> {
   async getByType(type: 'paper' | 'arena') {
     return this.repo.findBy({ collectionType: type });
   }
+
+  async getByCardId(ids: string[]): Promise<CollectionCard[] | null> {
+    const cursor = this.repo.collection.find({ cardId: { $in: ids } });
+    const docs = await cursor.toArray();
+    return docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as CollectionCard[];
+  }
+  async getByCardNames(names: string[]): Promise<CollectionCard[] | null> {
+    const cursor = this.repo.collection.find({ name: { $in: names } });
+    const docs = await cursor.toArray();
+    return docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as CollectionCard[];
+  }
 }
 
 export const cardService = new CardService();

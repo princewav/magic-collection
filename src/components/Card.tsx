@@ -6,9 +6,10 @@ import { Card as CardType } from '@/types/card';
 
 interface CardProps {
   card: CardType & { quantity: number };
+  collectedQuantity?: number;
 }
 
-export function Card({ card }: CardProps) {
+export function Card({ card, collectedQuantity = 0 }: CardProps) {
   const { openModal } = useCardModal();
   return (
     <div
@@ -20,12 +21,21 @@ export function Card({ card }: CardProps) {
       <div className="relative flex w-full flex-col justify-center p-2">
         <div className="mb-2 flex w-full justify-center">
           <div className="flex space-x-3">
-            {Array.from({ length: card.quantity }, (_, i) => (
+            {Array.from({ length: collectedQuantity }, (_, i) => (
               <div
                 key={i}
                 className="h-2 w-2 rotate-45 transform bg-yellow-500"
               />
             ))}
+            {Array.from(
+              { length: card.quantity - collectedQuantity },
+              (_, i) => (
+                <div
+                  key={i}
+                  className="h-2 w-2 rotate-45 transform bg-gray-500"
+                />
+              ),
+            )}
           </div>
         </div>
         <Image

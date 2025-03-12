@@ -1,5 +1,6 @@
 export type DeckCard = {
   quantity: number;
+  name: string;
   cardId: string;
   set: string;
   setNumber: number;
