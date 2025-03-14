@@ -10,12 +10,12 @@ export const createDeck = async (values: z.infer<typeof deckSchema>) => {
     const deck = await deckService.repo.create({
       ...values,
       id: '',
-      type: 'deck',
+      type: values.type,
       imageUrl: values.imageUrl ?? null,
       format: values.format ?? undefined,
       colors: values.colors,
     });
-    revalidatePath('/decks');
+    revalidatePath(`/decks/${values.type}`);
     return deck;
   } catch (error) {
     console.error('Error creating deck:', error);

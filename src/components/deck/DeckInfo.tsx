@@ -4,15 +4,19 @@ import Image from 'next/image';
 import { Deck } from '@/types/deck';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Edit, Import } from 'lucide-react';
+import { Download, Edit, Import } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 interface Props {
   deck: Deck;
 }
 
 export const DeckInfo = ({ deck }: Props) => {
+  const params = useParams();
+  const type = params.type;
+  const pathname = usePathname();
+
   const getColors = () => {
     if (!deck.colors) return [];
 
@@ -31,11 +35,12 @@ export const DeckInfo = ({ deck }: Props) => {
     return [];
   };
 
-  const mainboardCount = deck.maindeck?.reduce((acc, card) => acc + card.quantity, 0) || 0;
-  const sideboardCount = deck.sideboard?.reduce((acc, card) => acc + card.quantity, 0) || 0;
+  const mainboardCount =
+    deck.maindeck?.reduce((acc, card) => acc + card.quantity, 0) || 0;
+  const sideboardCount =
+    deck.sideboard?.reduce((acc, card) => acc + card.quantity, 0) || 0;
 
   const colors = getColors();
-  const pathname = usePathname();
   return (
     <div className="bg-foreground/10 mb-4 flex items-center justify-between rounded-md p-4 shadow-md">
       <div className="flex items-center space-x-4">
@@ -49,37 +54,38 @@ export const DeckInfo = ({ deck }: Props) => {
         <div>
           <h2 className="text-2xl font-semibold">
             {deck.name}{' '}
-            <div className="flex items-center space-x-1 mt-1 mb-2">
-
-            {Array.isArray(colors) && colors.length > 0
-              ? colors.map((color) => (
-                <ManaSymbol key={color} symbol={color} size={20} />
-              ))
-              : 'None'}
-              </div>
+            <div className="mt-1 mb-2 flex items-center space-x-1">
+              {Array.isArray(colors) && colors.length > 0
+                ? colors.map((color) => (
+                    <ManaSymbol key={color} symbol={color} size={20} />
+                  ))
+                : 'None'}
+            </div>
           </h2>
           <div className="mt-1 flex items-center space-x-1"></div>
-          <p className="text-sm">
-            Main: {mainboardCount} cards
-          </p>
-          <p className="text-sm">
-            Side: {sideboardCount} cards
-          </p>
+          <p className="text-sm">Main: {mainboardCount} cards</p>
+          <p className="text-sm">Side: {sideboardCount} cards</p>
           <p className="text-sm">
             Total: {mainboardCount + sideboardCount} cards
           </p>
         </div>
       </div>
       <div className="flex flex-col items-end justify-between space-y-2">
-        <Link href={`/decks/${deck.id}/edit`}>
-          <Button className="w-30" variant="outline">
+        <Link href={`/decks/${type}/${deck.id}/edit`}>
+          <Button className="w-40">
             <Edit />
             Edit Deck
           </Button>
         </Link>
+        <Link href={`/decks/${type}/${deck.id}/missing-cards`}>
+          <Button className="w-40">
+            <Download />
+            Missing Cards
+          </Button>
+        </Link>
         {!pathname?.endsWith('/import') && (
-          <Link href={`/decks/${deck.id}/import`}>
-            <Button className="w-full" variant="outline">
+          <Link href={`/decks/${type}/${deck.id}/import`}>
+            <Button className="w-40">
               <Import />
               Import List
             </Button>

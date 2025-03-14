@@ -23,7 +23,7 @@ export default function NewDeckPage({}: NewDeckPageProps) {
       toast.success('Deck Created', {
         description: 'Your new deck has been created successfully.',
       });
-      router.push('/decks');
+      router.push(`/decks/${values.type}`);
       router.refresh();
     } catch (error: any) {
       console.error('Error creating deck:', error);

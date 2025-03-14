@@ -16,7 +16,7 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
     const result = await this.collection.insertOne(doc);
     return {
       ...item,
-      _id: result.insertedId,
+      _id: result.insertedId.toString(),
     } as T;
   }
 

@@ -14,3 +14,5 @@ feat: opzioni di ordinamento avanzate
 feat: accumulatore di rarità {cm:2025-03-10}
 
 feat: paper collection
+
+fix: edit deck
