@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import logger from '@/lib/logger';
 import { Import } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 const importSchema = z.object({
   decklist: z.string().trim().min(1, 'Decklist is required'),
@@ -37,6 +38,8 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { type } = useParams();
+  
 
   const form = useForm<ImportFormValues>({
     resolver: zodResolver(importSchema),
@@ -47,6 +50,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
 
   const onSubmit = async (data: ImportFormValues) => {
     const isValid = await form.trigger();
+
     if (!isValid) return;
 
     if (!window.confirm('Are you sure? This action cannot be undone.')) return;
@@ -65,7 +69,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
         }
         if (result.success) {
           toast.success('Decklist imported successfully');
-          router.push(`/decks/${deckId}`);
+          router.push(`/decks/${type}/${deckId}`);
         } else {
           setError(result.errors?.[0] || 'Import failed');
         }

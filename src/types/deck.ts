@@ -12,7 +12,7 @@ export type Deck = {
   name: string;
   imageUrl: string | null; // Keep as null if it doesn't exist
   colors: ManaColor[];
-  format?: string;
+  format: string;
   description?: string;
   type: 'paper' | 'arena';
   maindeck?: DeckCard[];
