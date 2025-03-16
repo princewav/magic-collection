@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { deckSchema } from '@/app/decks/new/validation';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { DeckForm } from '@/components/form/DeckForm';
 import { Deck } from '@/types/deck';
 import { updateDeck } from '@/actions/deck/update-deck';
@@ -57,16 +56,6 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
         isEdit={true}
         mainDeck={deck.maindeck}
       />
-      <div className="mt-4 flex justify-end gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-      </div>
     </main>
   );
 }

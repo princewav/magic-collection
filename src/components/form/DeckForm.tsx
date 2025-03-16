@@ -30,6 +30,7 @@ import { deckSchema } from '@/app/decks/new/validation';
 import { COLOR_OPTIONS } from '@/lib/constants';
 import { useState } from 'react';
 import { CardWithQuantity } from '@/types/card';
+import { useRouter } from 'next/navigation';
 
 interface DeckFormData {
   name: string;
@@ -55,6 +56,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   isEdit = false,
   mainDeck,
 }) => {
+  const router = useRouter();
   const [selectedColors, setSelectedColors] = useState<ManaColor[]>(
     initialData?.colors || [],
   );
@@ -184,36 +186,36 @@ export const DeckForm: React.FC<DeckFormProps> = ({
 
             <Separator className="my-6" />
 
-            <Tabs defaultValue="url" className="w-full">
-              <TabsList>
-                <TabsTrigger value="url">URL</TabsTrigger>
-                <TabsTrigger value="card">Select from Deck</TabsTrigger>
-              </TabsList>
-              <TabsContent value="url">
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cover Image URL</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://example.com/image.jpg"
-                          {...field}
-                          value={field.value || ''}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        URL for the deck cover image. Leave empty to use
-                        default.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </TabsContent>
-              <TabsContent value="card">
-                {mainDeck ? (
+            {mainDeck ? (
+              <Tabs defaultValue="url" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger className="cursor-pointer" value="url">URL</TabsTrigger>
+                  <TabsTrigger className="cursor-pointer" value="card">Select from Deck</TabsTrigger>
+                </TabsList>
+                <TabsContent value="url">
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cover Image URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://example.com/image.jpg"
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          URL for the deck cover image. Leave empty to use
+                          default.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                <TabsContent value="card">
                   <FormField
                     control={form.control}
                     name="imageUrl"
@@ -245,7 +247,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                                     <img
                                       src={card.image_uris.art_crop}
                                       alt={card.name}
-                                      className="h-6 w-6 object-cover"
+                                      className="h-6 w-6 rounded-sm object-cover"
                                     />
                                     <span>{card.name}</span>
                                   </div>
@@ -260,13 +262,33 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                       </FormItem>
                     )}
                   />
-                ) : (
-                  <div className="text-muted-foreground text-sm">
-                    No main deck available for selection
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image URL</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://example.com/image.jpg"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        URL for the deck cover image. Leave empty to use
+                        default.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
             <Separator className="my-6" />
 
@@ -305,6 +327,14 @@ export const DeckForm: React.FC<DeckFormProps> = ({
             <Separator className="my-6" />
 
             <div className="flex justify-end gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>

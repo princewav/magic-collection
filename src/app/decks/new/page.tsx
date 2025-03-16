@@ -2,7 +2,6 @@
 'use client';
 
 import { DeckForm } from '@/components/form/DeckForm';
-import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -39,16 +38,6 @@ export default function NewDeckPage({}: NewDeckPageProps) {
     <main className="mx-auto flex max-w-3xl flex-col p-4">
       <h1 className="mb-6 text-4xl font-bold">Create New Deck</h1>
       <DeckForm onSubmit={handleDeckCreation} isSubmitting={isSubmitting} />
-      <div className="mt-4 flex justify-end gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-      </div>
     </main>
   );
 }
