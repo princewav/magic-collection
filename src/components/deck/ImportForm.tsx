@@ -55,7 +55,6 @@ export const ImportForm: React.FC<ImportFormProps> = ({ deckId, onImport }) => {
 
     if (!window.confirm('Are you sure? This action cannot be undone.')) return;
 
-    console.log(data.decklist);
     setError(null);
     try {
       startTransition(async () => {

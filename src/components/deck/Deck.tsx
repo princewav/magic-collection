@@ -24,7 +24,6 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
   const isChecked = selectedDecks.includes(deck.id);
 
   const { type } = useParams();
-  console.log(type);
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
