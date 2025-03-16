@@ -13,31 +13,30 @@ interface Props {
   params: Promise<{ id: string; type: 'paper' | 'arena' }>;
 }
 
+async function getCollectedQuantities(cardList: any[] | undefined) {
+  const cardNames = cardList?.map((card) => card.name) || [];
+  const collectedCards = await loadCollectionCardsByName(cardNames);
+
+  return Object.values(
+    collectedCards.reduce<Record<string, { name: string; quantity: number }>>(
+      (acc, card) => {
+        acc[card.name] = acc[card.name] || { name: card.name, quantity: 0 };
+        acc[card.name].quantity += card.quantity;
+        return acc;
+      },
+      {},
+    ),
+  );
+}
 export default async function DeckDetailPage({ params }: Props) {
   const { id, type } = await params;
   const deck = await loadDeckById(id);
-  if (!deck) {  return notFound(); }
+  if (!deck) {
+    return notFound();
+  }
 
-  const maindeckCardNames = deck?.maindeck?.map((card) => card.name) || [];
-  const maindeckCollectedCards =
-    await loadCollectionCardsByName(maindeckCardNames);
-  const maindeckCollectedQuantities = Object.values(
-    maindeckCollectedCards.reduce<Record<string, { name: string; quantity: number }>>((acc, card) => {
-      acc[card.name] = acc[card.name] || { name: card.name, quantity: 0 };
-      acc[card.name].quantity += card.quantity;
-      return acc;
-    }, {}),
-  );
-  const sideboardCardNames = deck?.sideboard?.map((card) => card.name) || [];
-  const sideboardCollectedCards =
-    await loadCollectionCardsByName(sideboardCardNames);
-  const sideboardCollectedQuantities = Object.values(
-    sideboardCollectedCards.reduce<Record<string, { name: string; quantity: number }>>((acc, card) => {
-      acc[card.name] = acc[card.name] || { name: card.name, quantity: 0 };
-      acc[card.name].quantity += card.quantity;
-      return acc;
-    }, {}),
-  );
+  const maindeckOwned = await getCollectedQuantities(deck?.maindeck);
+  const sideboardOwned = await getCollectedQuantities(deck?.sideboard);
 
   return (
     <div className="container mx-auto p-4">
@@ -47,14 +46,14 @@ export default async function DeckDetailPage({ params }: Props) {
         <h2 className="text-2xl font-bold">Main Deck</h2>
         <DeckCardGrid
           decklist={deck.maindeck}
-          collectedCards={maindeckCollectedQuantities}
+          collectedCards={maindeckOwned}
           type={type}
         />
         <Separator className="my-10 h-2" />
         <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
         <DeckCardGrid
           decklist={deck.sideboard}
-          collectedCards={sideboardCollectedQuantities}
+          collectedCards={sideboardOwned}
           type={type}
         />
         <CardModal />
