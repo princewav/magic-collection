@@ -1,19 +1,17 @@
 import { loadCardsById } from '@/actions/load-cards';
-import { DeckCard } from '@/types/deck';
-import { Card } from '../Card';
-import { defaultSort } from '@/lib/deck/sorting';
 import { Card as CardType } from '@/types/card';
+import { defaultSort } from '@/lib/deck/sorting';
 import Image from 'next/image';
+import { Card } from '../Card';
+import { CardWithQuantity } from '@/types/card';
 
 interface Props {
-  decklist?: DeckCard[];
+  decklist?: (CardWithQuantity)[];
   collectedCards?: { name: string; quantity: number }[];
   type: 'paper' | 'arena';
 }
 
-interface CardWithQuantity extends CardType {
-  quantity: number;
-}
+
 
 export async function DeckCardGrid({ decklist, collectedCards }: Props) {
   const cardIds: string[] =

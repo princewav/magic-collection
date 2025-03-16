@@ -16,6 +16,8 @@ interface Props {
 export default async function DeckDetailPage({ params }: Props) {
   const { id, type } = await params;
   const deck = await loadDeckById(id);
+  if (!deck) {  return notFound(); }
+
   const maindeckCardNames = deck?.maindeck?.map((card) => card.name) || [];
   const maindeckCollectedCards =
     await loadCollectionCardsByName(maindeckCardNames);
@@ -36,9 +38,6 @@ export default async function DeckDetailPage({ params }: Props) {
       return acc;
     }, {}),
   );
-  if (!deck) {
-    return notFound();
-  }
 
   return (
     <div className="container mx-auto p-4">

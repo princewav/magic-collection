@@ -1,3 +1,5 @@
+import { CardWithQuantity } from '@/types/card';
+
 export type DeckCard = {
   quantity: number;
   name: string;
@@ -7,7 +9,7 @@ export type DeckCard = {
 };
 
 export type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G' | 'C';
-export type Deck = {
+export type DeckInfo = {
   id: string;
   name: string;
   imageUrl: string | null; // Keep as null if it doesn't exist
@@ -15,7 +17,15 @@ export type Deck = {
   format: string;
   description?: string;
   type: 'paper' | 'arena';
-  maindeck?: DeckCard[];
-  sideboard?: DeckCard[];
-  maybeboard?: DeckCard[];
+};
+export type Deck = DeckInfo & {
+  maindeck: DeckCard[];
+  sideboard: DeckCard[];
+  maybeboard: DeckCard[];
+};
+
+export type DeckWithCards = DeckInfo & {
+  maindeck: CardWithQuantity[];
+  sideboard: CardWithQuantity[];
+  maybeboard: CardWithQuantity[];
 };

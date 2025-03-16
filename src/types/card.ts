@@ -1,6 +1,6 @@
 export type Card = {
   id: string;
-  cardId: string
+  cardId: string;
   cardmarket_id: number | null;
   name: string;
   released_at: string;
@@ -145,6 +145,8 @@ export type CollectionCard = {
   tags?: string[];
   notes?: string;
   imageUri?: string;
-  collectionType: "paper" | "arena";
+  collectionType: 'paper' | 'arena';
   cardId: string;
-}
+};
+
+export type CardWithQuantity = Card & { quantity: number };
