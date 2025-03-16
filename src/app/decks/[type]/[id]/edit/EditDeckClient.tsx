@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { deckSchema } from '@/app/decks/new/validation';
@@ -17,6 +18,7 @@ interface EditDeckClientProps {
 
 export function EditDeckClient({ deck, id }: EditDeckClientProps) {
   const router = useRouter();
+  const {type} = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDeckUpdate = async (values: z.infer<typeof deckSchema>) => {
@@ -35,7 +37,7 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
     toast.success('Deck Updated', {
       description: 'Your deck has been updated successfully.',
     });
-    router.push(`/decks/${id}`);
+    router.push(`/decks/${type}/${id}`);
     router.refresh();
   };
 
@@ -53,6 +55,7 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
         isSubmitting={isSubmitting}
         initialData={deck}
         isEdit={true}
+        mainDeck={deck.maindeck}
       />
       <div className="mt-4 flex justify-end gap-4">
         <Button

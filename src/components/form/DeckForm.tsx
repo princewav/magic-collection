@@ -21,12 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckIcon, Loader2 } from 'lucide-react';
 import { ManaColor } from '@/types/deck';
 import { deckSchema } from '@/app/decks/new/validation';
 import { COLOR_OPTIONS } from '@/lib/constants';
 import { useState } from 'react';
+import { CardWithQuantity } from '@/types/card';
 
 interface DeckFormData {
   name: string;
@@ -42,6 +44,7 @@ interface DeckFormProps {
   isSubmitting: boolean;
   initialData?: DeckFormData;
   isEdit?: boolean;
+  mainDeck?: CardWithQuantity[];
 }
 
 export const DeckForm: React.FC<DeckFormProps> = ({
@@ -49,6 +52,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   isSubmitting,
   initialData,
   isEdit = false,
+  mainDeck,
 }) => {
   const [selectedColors, setSelectedColors] = useState<ManaColor[]>(
     initialData?.colors || [],
@@ -172,26 +176,90 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cover Image URL</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://example.com/image.jpg"
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    URL for the deck cover image. Leave empty to use default.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            <Tabs defaultValue="url" className="w-full">
+              <TabsList>
+                <TabsTrigger value="url">URL</TabsTrigger>
+                <TabsTrigger value="card">Select from Deck</TabsTrigger>
+              </TabsList>
+              <TabsContent value="url">
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cover Image URL</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://example.com/image.jpg"
+                          {...field}
+                          value={field.value || ''}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        URL for the deck cover image. Leave empty to use
+                        default.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+              <TabsContent value="card">
+                {mainDeck ? (
+                  <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Select Card</FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            const selectedCard = mainDeck.find(
+                              (card) => card.id === value,
+                            );
+                            field.onChange(
+                              selectedCard?.image_uris?.art_crop || '',
+                            );
+                          }}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a card" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {mainDeck
+                              .slice()
+                              .sort((a, b) => a.name.localeCompare(b.name))
+                              .map((card) => (
+                                <SelectItem key={card.id} value={card.id}>
+                                  <div className="flex items-center gap-2">
+                                    <img
+                                      src={card.image_uris.art_crop}
+                                      alt={card.name}
+                                      className="h-6 w-6 object-cover"
+                                    />
+                                    <span>{card.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Choose a card from your main deck to use its image
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <div className="text-muted-foreground text-sm">
+                    No main deck available for selection
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
 
             <FormField
               control={form.control}
