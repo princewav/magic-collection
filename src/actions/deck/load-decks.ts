@@ -1,10 +1,10 @@
-import { DeckWithCards, Deck } from '@/types/deck';
+import { Deck } from '@/types/deck';
 import { deckService } from '@/db/services/DeckService';
 import { collectionCardService } from '@/db/services/CardService';
 import { CollectionCard } from '@/types/card';
 import { loadCardsById } from '@/actions/load-cards';
 
-export async function loadDeckById(id: string): Promise<DeckWithCards | null> {
+export async function loadDeckById(id: string): Promise<Deck | null> {
   try {
     const decks = await deckService.repo.get([id]);
     const deck = decks?.[0];

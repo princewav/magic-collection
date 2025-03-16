@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { DeckWithCards } from '@/types/deck';
+import { Deck } from '@/types/deck';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Download, Edit, Import } from 'lucide-react';
@@ -9,7 +9,7 @@ import { ManaSymbol } from '@/components/ManaSymbol';
 import { useParams, usePathname } from 'next/navigation';
 
 interface Props {
-  deck: DeckWithCards;
+  deck: Deck;
 }
 
 export const DeckInfo = ({ deck }: Props) => {

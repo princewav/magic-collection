@@ -18,13 +18,13 @@ export type DeckInfo = {
   description?: string;
   type: 'paper' | 'arena';
 };
-export type Deck = DeckInfo & {
+export type DBDeck = DeckInfo & {
   maindeck: DeckCard[];
   sideboard: DeckCard[];
   maybeboard: DeckCard[];
 };
 
-export type DeckWithCards = DeckInfo & {
+export type Deck = DeckInfo & {
   maindeck: CardWithQuantity[];
   sideboard: CardWithQuantity[];
   maybeboard: CardWithQuantity[];
