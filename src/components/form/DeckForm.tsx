@@ -12,6 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -100,6 +101,8 @@ export const DeckForm: React.FC<DeckFormProps> = ({
               )}
             />
 
+            <Separator className="my-6" />
+
             <FormField
               control={form.control}
               name="description"
@@ -117,6 +120,8 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                 </FormItem>
               )}
             />
+
+            <Separator className="my-6" />
 
             <div className="flex items-center gap-20">
               <FormField
@@ -176,6 +181,8 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                 )}
               />
             </div>
+
+            <Separator className="my-6" />
 
             <Tabs defaultValue="url" className="w-full">
               <TabsList>
@@ -261,6 +268,8 @@ export const DeckForm: React.FC<DeckFormProps> = ({
               </TabsContent>
             </Tabs>
 
+            <Separator className="my-6" />
+
             <FormField
               control={form.control}
               name="colors"
@@ -292,6 +301,8 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                 </FormItem>
               )}
             />
+
+            <Separator className="my-6" />
 
             <div className="flex justify-end gap-4">
               <Button type="submit" disabled={isSubmitting}>
