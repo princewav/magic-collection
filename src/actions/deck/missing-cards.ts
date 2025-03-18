@@ -2,12 +2,9 @@
 
 import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
 import { deckService } from '@/db/services/DeckService';
-import { Card, CardWithQuantity } from '@/types/card';
+import { CardWithQuantity } from '@/types/card';
 import { CollectionCard } from '@/types/card';
-import { Deck } from '@/types/deck';
 import { loadCardsById } from '../load-cards';
-
-// fare una funzione che aggrega i risultati di loadCollectionCardsByName in modo da accomunare le stesse carte nelle varie foilature, quindi accumulare le quantità delle carte che hanno lo stesso cardId
 
 function aggregateCards(cards: CollectionCard[]): CollectionCard[] {
   return cards.reduce((acc, card) => {
@@ -21,7 +18,6 @@ function aggregateCards(cards: CollectionCard[]): CollectionCard[] {
   }, [] as CollectionCard[]);
 }
 
-// Helper function to process cards for a deck section
 export async function getMissingCards(
   deckId: string,
 ): Promise<CardWithQuantity[]> {
@@ -68,9 +64,15 @@ function formatCardsToText(cards: { name: string; quantity: number }[]) {
   return cards.map((card) => `${card.name} x${card.quantity}`).join('\n');
 }
 
-export async function downloadMissingCards(deck: Deck) {
+export async function downloadMissingCards(deckId: string) {
   try {
-    const missingCards = await getMissingCards(deck.id);
+    const missingCards = await getMissingCards(deckId);
+    const decks = await deckService.repo.get([deckId]);
+    const deck = decks?.[0];
+
+    if (!deck) {
+      throw new Error('Deck not found');
+    }
 
     return {
       content: formatCardsToText(missingCards),
@@ -81,9 +83,9 @@ export async function downloadMissingCards(deck: Deck) {
   }
 }
 
-export async function getMissingCardsText(deck: Deck) {
+export async function getMissingCardsText(deckId: string) {
   try {
-    const missingCards = await getMissingCards(deck.id);
+    const missingCards = await getMissingCards(deckId);
     return formatCardsToText(missingCards);
   } catch (error) {
     throw new Error('Failed to get missing cards text');

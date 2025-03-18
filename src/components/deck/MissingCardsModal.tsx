@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -6,21 +8,39 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Copy, Download as DownloadIcon } from 'lucide-react';
-import { downloadMissingCards, getMissingCardsText } from '@/actions/deck/missing-cards';
-import { getMissingCards } from '@/actions/deck/missing-cards';
+import {
+  downloadMissingCards,
+  getMissingCardsText,
+} from '@/actions/deck/missing-cards';
 import { CardWithQuantity } from '@/types/card';
+import { useMissingCardsModal } from '@/context/MissingCardsModalContext';
+import { useEffect, useState } from 'react';
+import { getMissingCards } from '@/actions/deck/missing-cards';
 
-interface MissingCardsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  deckId: string;
-  cards: CardWithQuantity[];
-}
+export function MissingCardsModal() {
+  const { isOpen, closeModal, deckId } = useMissingCardsModal();
+  const [cards, setCards] = useState<CardWithQuantity[]>([]);
+  const [loading, setLoading] = useState(false);
 
-export function MissingCardsModal({ isOpen, onClose, deckId, cards }: MissingCardsModalProps) {
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen && deckId) {
+      setLoading(true);
+      getMissingCards(deckId)
+        .then((missingCards) => {
+          setCards(missingCards);
+        })
+        .catch((error) => {
+          console.error('Failed to load missing cards:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [isOpen, deckId]);
 
   const handleCopy = async () => {
+    if (!deckId) return;
+
     try {
       const text = await getMissingCardsText(deckId);
       await navigator.clipboard.writeText(text);
@@ -30,6 +50,8 @@ export function MissingCardsModal({ isOpen, onClose, deckId, cards }: MissingCar
   };
 
   const handleDownload = async () => {
+    if (!deckId) return;
+
     try {
       const { content, filename } = await downloadMissingCards(deckId);
       const blob = new Blob([content], { type: 'text/plain' });
@@ -45,27 +67,41 @@ export function MissingCardsModal({ isOpen, onClose, deckId, cards }: MissingCar
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-md'>
+    <Dialog open={isOpen} onOpenChange={closeModal}>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Missing Cards</DialogTitle>
         </DialogHeader>
-        <div className='space-y-2 max-h-96 overflow-y-auto'>
-          {cards.map((card, index) => (
-            <div key={index} className='flex items-center gap-2'>
-              <img src={card.image_uris.art_crop} alt={card.name} className='w-10 h-10 object-cover' />
-              <span>{card.quantity}x {card.name}</span>
-            </div>
-          ))}
+        <div className="max-h-96 space-y-2 overflow-y-auto">
+          {loading ? (
+            <p>Caricamento in corso...</p>
+          ) : (
+            cards.map((card, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <img
+                  src={card.image_uris.art_crop}
+                  alt={card.name}
+                  className="h-10 w-10 object-cover"
+                />
+                <span>
+                  {card.quantity}x {card.name}
+                </span>
+              </div>
+            ))
+          )}
         </div>
-        <div className='flex gap-2 mt-4 justify-around'>
-          <Button onClick={handleCopy} className='flex-1'>
-            <Copy className='mr-2 h-4 w-4' />
-            Copy
+        <div className="mt-4 flex justify-around gap-2">
+          <Button onClick={handleCopy} className="flex-1" disabled={loading}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copia
           </Button>
-          <Button onClick={handleDownload} className='flex-1'>
-            <DownloadIcon className='mr-2 h-4 w-4' />
-            Download
+          <Button
+            onClick={handleDownload}
+            className="flex-1"
+            disabled={loading}
+          >
+            <DownloadIcon className="mr-2 h-4 w-4" />
+            Scarica
           </Button>
         </div>
       </DialogContent>

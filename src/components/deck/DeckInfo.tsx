@@ -8,7 +8,7 @@ import { Download, Edit, Import } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
 import { useParams, usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { MissingCardsModal } from './MissingCardsModal';
+import { useMissingCardsModal } from '@/context/MissingCardsModalContext';
 
 interface Props {
   deck: Deck;
@@ -18,6 +18,7 @@ export const DeckInfo = ({ deck }: Props) => {
   const params = useParams();
   const type = params.type;
   const pathname = usePathname();
+  const { openModal } = useMissingCardsModal();
 
   const getColors = () => {
     if (!deck.colors) return [];
@@ -43,7 +44,6 @@ export const DeckInfo = ({ deck }: Props) => {
     deck.sideboard?.reduce((acc, card) => acc + card.quantity, 0) || 0;
 
   const colors = getColors();
-  const [isMissingCardsModalOpen, setIsMissingCardsModalOpen] = useState(false);
 
   return (
     <div className="bg-foreground/10 mb-4 flex items-center justify-between rounded-md p-4 shadow-md">
@@ -81,7 +81,7 @@ export const DeckInfo = ({ deck }: Props) => {
             Edit Deck
           </Button>
         </Link>
-        <Button className="w-40" onClick={() => setIsMissingCardsModalOpen(true)}>
+        <Button className="w-40" onClick={() => openModal(deck.id)}>
           <Download />
           Missing Cards
         </Button>
@@ -94,7 +94,6 @@ export const DeckInfo = ({ deck }: Props) => {
           </Link>
         )}
       </div>
-      
     </div>
   );
 };

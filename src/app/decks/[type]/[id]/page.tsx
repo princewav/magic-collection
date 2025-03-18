@@ -8,8 +8,8 @@ import { CardModalProvider } from '@/context/CardModalContext';
 import CardModal from '@/components/CardModal';
 import { Separator } from '@/components/ui/separator';
 import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
-import { getMissingCards } from '@/actions/deck/missing-cards';
 import { MissingCardsModal } from '@/components/deck/MissingCardsModal';
+import { MissingCardsModalProvider } from '@/context/MissingCardsModalContext';
 
 interface Props {
   params: Promise<{ id: string; type: 'paper' | 'arena' }>;
@@ -37,33 +37,32 @@ export default async function DeckDetailPage({ params }: Props) {
     return notFound();
   }
 
-  const missingCards = await getMissingCards(id);
-  // console.log(missingCards.map((card) => ({ name: card.name, quantity: card.quantity })));
-
   const maindeckOwned = await getCollectedQuantities(deck?.maindeck);
   const sideboardOwned = await getCollectedQuantities(deck?.sideboard);
 
   return (
     <div className="container mx-auto p-4">
-      <DeckInfo deck={deck} />
-      <MissingCardsModal isOpen={false} onClose={() => {}} deckId={id} cards={missingCards} />
-      <CardModalProvider>
-        <Filters />
-        <h2 className="text-2xl font-bold">Main Deck</h2>
-        <DeckCardGrid
-          decklist={deck.maindeck}
-          collectedCards={maindeckOwned}
-          type={type}
-        />
-        <Separator className="my-10 h-2" />
-        <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
-        <DeckCardGrid
-          decklist={deck.sideboard}
-          collectedCards={sideboardOwned}
-          type={type}
-        />
-        <CardModal />
-      </CardModalProvider>
+      <MissingCardsModalProvider>
+        <DeckInfo deck={deck} />
+        <MissingCardsModal />
+        <CardModalProvider>
+          <Filters />
+          <h2 className="text-2xl font-bold">Main Deck</h2>
+          <DeckCardGrid
+            decklist={deck.maindeck}
+            collectedCards={maindeckOwned}
+            type={type}
+          />
+          <Separator className="my-10 h-2" />
+          <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
+          <DeckCardGrid
+            decklist={deck.sideboard}
+            collectedCards={sideboardOwned}
+            type={type}
+          />
+          <CardModal />
+        </CardModalProvider>
+      </MissingCardsModalProvider>
     </div>
   );
 }
