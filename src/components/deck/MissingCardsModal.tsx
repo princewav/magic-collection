@@ -20,8 +20,6 @@ interface MissingCardsModalProps {
 export function MissingCardsModal({ isOpen, onClose, deckId, cards }: MissingCardsModalProps) {
   if (!isOpen) return null;
 
-  console.log(cards);
-
   const handleCopy = async () => {
     try {
       const text = await getMissingCardsText(deckId);

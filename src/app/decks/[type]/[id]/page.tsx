@@ -40,12 +40,12 @@ export default async function DeckDetailPage({ params }: Props) {
   const missingCards = await getMissingCards(id);
   // console.log(missingCards.map((card) => ({ name: card.name, quantity: card.quantity })));
 
-  // const maindeckOwned = await getCollectedQuantities(deck?.maindeck);
-  // const sideboardOwned = await getCollectedQuantities(deck?.sideboard);
+  const maindeckOwned = await getCollectedQuantities(deck?.maindeck);
+  const sideboardOwned = await getCollectedQuantities(deck?.sideboard);
 
   return (
     <div className="container mx-auto p-4">
-      {/* <DeckInfo deck={deck} />
+      <DeckInfo deck={deck} />
       <MissingCardsModal isOpen={false} onClose={() => {}} deckId={id} cards={missingCards} />
       <CardModalProvider>
         <Filters />
@@ -63,7 +63,7 @@ export default async function DeckDetailPage({ params }: Props) {
           type={type}
         />
         <CardModal />
-      </CardModalProvider> */}
+      </CardModalProvider>
     </div>
   );
 }

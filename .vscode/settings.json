@@ -9,6 +9,4 @@
     "node_modules": true,
     "next-env.d.ts": true
   },
-  "hide-files.files": [],
-  "todo-tree.tree.showBadges": true
 }
