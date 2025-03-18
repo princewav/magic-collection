@@ -3,6 +3,34 @@ import { deckService } from '@/db/services/DeckService';
 import { collectionCardService } from '@/db/services/CardService';
 import { CollectionCard } from '@/types/card';
 import { loadCardsById } from '@/actions/load-cards';
+import { DBDeck } from '@/types/deck';
+
+async function loadDeckCards(deck: DBDeck): Promise<Deck> {
+  const processCardSection = async (
+    section: Array<{
+      cardId: string;
+      quantity?: number;
+      setNumber?: number;
+    }> = [],
+  ) => {
+    const cardIds = section.map((card) => card.cardId);
+    const cards = await loadCardsById(cardIds);
+
+    return cards.map((card) => ({
+      ...card,
+      quantity: section.find((c) => c.cardId === card.cardId)?.quantity || 0,
+      setNumber: section.find((c) => c.cardId === card.cardId)?.setNumber || 0,
+    }));
+  };
+
+  const [maindeck, sideboard, maybeboard] = await Promise.all([
+    processCardSection(deck.maindeck),
+    processCardSection(deck.sideboard),
+    processCardSection(deck.maybeboard),
+  ]);
+
+  return { ...deck, maindeck, sideboard, maybeboard };
+}
 
 export async function loadDeckById(id: string): Promise<Deck | null> {
   try {
@@ -12,31 +40,7 @@ export async function loadDeckById(id: string): Promise<Deck | null> {
       return null;
     }
 
-    const processCardSection = async (
-      section: Array<{
-        cardId: string;
-        quantity?: number;
-        setNumber?: number;
-      }> = [],
-    ) => {
-      const cardIds = section.map((card) => card.cardId);
-      const cards = await loadCardsById(cardIds);
-
-      return cards.map((card) => ({
-        ...card,
-        quantity: section.find((c) => c.cardId === card.cardId)?.quantity || 0,
-        setNumber:
-          section.find((c) => c.cardId === card.cardId)?.setNumber || 0,
-      }));
-    };
-
-    const [maindeck, sideboard, maybeboard] = await Promise.all([
-      processCardSection(deck.maindeck),
-      processCardSection(deck.sideboard),
-      processCardSection(deck.maybeboard),
-    ]);
-
-    return { ...deck, maindeck, sideboard, maybeboard };
+    return await loadDeckCards(deck);
   } catch (e) {
     console.error(e);
     throw new Error('Failed to load deck');
@@ -70,9 +74,11 @@ export async function loadCollectionCardsByName(
 export async function loadDecks(type?: 'paper' | 'arena'): Promise<Deck[]> {
   try {
     if (type) {
-      return await deckService.findByType(type);
+      const decks = await deckService.findByType(type); 
+      return await Promise.all(decks.map(loadDeckCards));
     }
-    return await deckService.repo.getAll();
+    const decks = await deckService.repo.getAll();
+    return await Promise.all(decks.map(loadDeckCards));
   } catch (e) {
     console.error(e);
     throw new Error('Failed to load decks');

@@ -1,10 +1,10 @@
-import { Deck } from '@/types/deck';
 import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
+import { DBDeck } from '@/types/deck';
 
-export class DeckService extends BaseService<Deck> {
-  public repo = new RepoCls<Deck>(DB, 'decks');
+export class DeckService extends BaseService<DBDeck> {
+  public repo = new RepoCls<DBDeck>(DB, 'decks');
 
   async duplicateMany(ids: string[]) {
     try {

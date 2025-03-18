@@ -2,99 +2,98 @@
 
 import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
 import { deckService } from '@/db/services/DeckService';
-
-// Define types to improve readability
-type Card = { name: string; quantity: number };
-type CollectionMap = Record<string, { name: string; quantity: number }>;
-type MissingCardMap = Record<string, { name: string; missing: number }>;
+import { Card, CardWithQuantity } from '@/types/card';
+import { CollectionCard } from '@/types/card';
+import { Deck } from '@/types/deck';
+import { loadCardsById } from '../load-cards';
 
 // Helper function to process cards for a deck section
-async function processCardSection(
-  deckCards: Card[] | undefined,
-): Promise<{ collectedQuantities: Card[] }> {
-  const cardNames = deckCards?.map((card) => card.name) || [];
-  const collectedCards = await loadCollectionCardsByName(cardNames);
-
-  // Aggregate collected quantities
-  const collectedQuantities = Object.values(
-    collectedCards.reduce<CollectionMap>((acc, card) => {
-      acc[card.name] = acc[card.name] || { name: card.name, quantity: 0 };
-      acc[card.name].quantity += card.quantity;
-      return acc;
-    }, {}),
-  );
-
-  return { collectedQuantities };
-}
-
-// Calculate missing cards from a section
-function calculateMissingFromSection(
-  deckCards: Card[] | undefined,
-  collectedMap: Map<string, number>,
-): { name: string; missing: number }[] {
-  return (deckCards || []).map((card) => ({
-    name: card.name,
-    missing: Math.max(0, card.quantity - (collectedMap.get(card.name) || 0)),
-  }));
-}
-
-export async function getMissingCards(deckId: string) {
+export async function getMissingCards(deckId: string): Promise<CardWithQuantity[]> {
   // Get deck data
   const decks = await deckService.repo.get([deckId]);
-  const deck = decks?.[0] || null;
+  const deck = decks?.[0];
 
   if (!deck) {
     throw new Error('Deck not found');
   }
 
-  // Process maindeck and sideboard
-  const { collectedQuantities: maindeckCollectedQuantities } =
-    await processCardSection(deck.maindeck);
-  const { collectedQuantities: sideboardCollectedQuantities } =
-    await processCardSection(deck.sideboard);
+  // Combine maindeck and sideboard for collection checking
+  const allDeckCards = [...(deck.maindeck || []), ...(deck.sideboard || [])];
 
-  // Create a map of collected quantities for quick lookup
-  const collectedMap = new Map<string, number>([
-    ...maindeckCollectedQuantities.map(
-      (c) => [c.name, c.quantity] as [string, number],
-    ),
-    ...sideboardCollectedQuantities.map(
-      (c) => [c.name, c.quantity] as [string, number],
-    ),
-  ]);
+  // Get all unique card names
+  const cardNames = allDeckCards.map((card) => card.name);
 
-  // Calculate missing cards for both sections
-  const missingCardsList = [
-    ...calculateMissingFromSection(deck.maindeck, collectedMap),
-    ...calculateMissingFromSection(deck.sideboard, collectedMap),
-  ];
+  // Load collection data in a single call
+  const collectionCards = await loadCollectionCardsByName(cardNames);
+  console.log(collectionCards.map((card) => ({ name: card.name, quantity: card.quantity })));
+  const collectionCardIds = collectionCards.map((card) => card.cardId);
+  const collectionCardsWithDetailsAndQuantity = await Promise.all(
+    collectionCardIds.map(async (cardId) => {
+      const cards = await loadCardsById([cardId]);
+      const card = cards?.[0];
+      return {
+        ...card,
+        quantity: collectionCards.find((c) => c.name === card.name)?.quantity || 0,
+      };
+    }),
+  );
 
-  // Aggregate missing cards by name
-  const missingCards = Object.values(
-    missingCardsList.reduce<MissingCardMap>((acc, card) => {
-      acc[card.name] = acc[card.name] || { ...card, missing: 0 };
-      acc[card.name].missing += card.missing;
-      return acc;
-    }, {}),
-  ).filter((card) => card.missing > 0);
+  const collectionMap = collectionCardsWithDetailsAndQuantity.reduce((map, card) => {
+    const current = map.get(card.name) || card;
+    console.log(current);
+    map.set(card.name, { ...current, quantity: current.quantity + card.quantity });
+    return map;
+  }, new Map<string, CardWithQuantity>());
+  
+ 
 
-  return missingCards;
+  // // Create a map to store card details by name for later reference
+  // const cardDetailsMap = new Map<string, Card>();
+
+  // // Populate card details map with full card information
+  // allDeckCards.forEach((card) => {
+  //   if (!cardDetailsMap.has(card.name)) {
+  //     // Store all properties except quantity
+  //     const { quantity, ...cardDetails } = card;
+  //     cardDetailsMap.set(card.name, cardDetails);
+  //   }
+  // });
+
+  // // Calculate missing cards with full card details
+  // const missingCardsMap = allDeckCards.reduce((map, card) => {
+  //   const collected = collectionMap.get(card.name) || 0;
+  //   const missing = Math.max(0, card.quantity - collected);
+
+  //   if (missing > 0) {
+  //     const current = map.get(card.name) || 0;
+  //     map.set(card.name, current + missing);
+  //   }
+
+  //   return map;
+  // }, new Map<string, number>());
+
+  // // Convert to array result with full card details
+  // return Array.from(missingCardsMap.entries()).map(([name, quantity]) => {
+  //   // Get the card details and add the missing quantity
+  //   const cardDetails = cardDetailsMap.get(name);
+  //   return {
+  //     ...cardDetails,
+  //     name,
+  //     quantity,
+  //   } as CardWithQuantity;
+  // });
 }
 
-function formatMissingCardsText(
-  missingCards: { name: string; missing: number }[],
-) {
-  return missingCards.map((card) => `${card.name} x${card.missing}`).join('\n');
+function formatCardsToText(cards: { name: string; quantity: number }[]) {
+  return cards.map((card) => `${card.name} x${card.quantity}`).join('\n');
 }
 
-export async function downloadMissingCards(deckId: string) {
+export async function downloadMissingCards(deck: Deck) {
   try {
-    const missingCards = await getMissingCards(deckId);
-    const decks = await deckService.repo.get([deckId]);
-    const deck = decks?.[0] || null;
+    const missingCards = await getMissingCards(deck.id);
 
     return {
-      content: formatMissingCardsText(missingCards),
+      content: formatCardsToText(missingCards),
       filename: `Missing_${deck?.name.replace(' ', '_')}.txt`,
     };
   } catch (error) {
@@ -102,10 +101,10 @@ export async function downloadMissingCards(deckId: string) {
   }
 }
 
-export async function getMissingCardsText(deckId: string) {
+export async function getMissingCardsText(deck: Deck) {
   try {
-    const missingCards = await getMissingCards(deckId);
-    return formatMissingCardsText(missingCards);
+    const missingCards = await getMissingCards(deck.id);
+    return formatCardsToText(missingCards);
   } catch (error) {
     throw new Error('Failed to get missing cards text');
   }

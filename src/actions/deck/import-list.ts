@@ -40,13 +40,15 @@ export async function importDeckList(
       importDeckSchema.parse({ cardList }).cardList,
     );
 
+    const convertDeckCards = async (deck: ParsedCard[]) => {
+      return Promise.all(deck.map(convertNameToId)).then(
+        (cards) => cards.filter(Boolean) as DeckCard[],
+      );
+    };
+
     const [mainDeckCards, sideboardCards] = await Promise.all([
-      Promise.all(mainDeck.map(convertNameToId)).then(
-        (cards) => cards.filter(Boolean) as DeckCard[],
-      ),
-      Promise.all(sideboard.map(convertNameToId)).then(
-        (cards) => cards.filter(Boolean) as DeckCard[],
-      ),
+      convertDeckCards(mainDeck),
+      convertDeckCards(sideboard),
     ]);
 
     await deckService.repo.update(deckId, {
