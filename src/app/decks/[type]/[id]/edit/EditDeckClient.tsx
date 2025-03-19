@@ -47,7 +47,7 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
   };
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col p-4">
+    <main className="mx-auto flex max-w-7xl flex-col p-4">
       <h1 className="mb-6 text-4xl font-bold">Edit Deck</h1>
       <DeckForm
         onSubmit={handleDeckUpdate}

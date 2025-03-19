@@ -24,8 +24,8 @@ export default function NewDeckPage({}: NewDeckPageProps) {
       toast.success('Deck Created', {
         description: 'Your new deck has been created successfully.',
       });
-      router.push(`/decks/${values.type}`);
-      router.refresh();
+      // router.push(`/decks/${values.type}`);
+      // router.refresh();
     } catch (error: any) {
       console.error('Error creating deck:', error);
       toast.error('Error', {
@@ -40,7 +40,7 @@ export default function NewDeckPage({}: NewDeckPageProps) {
   return (
     <main className="mx-auto flex max-w-7xl flex-col p-4">
       <h1 className="mb-6 text-4xl font-bold">Create New Deck</h1>
-          <DeckForm onSubmit={handleDeckCreation} isSubmitting={isSubmitting} />
+      <DeckForm onSubmit={handleDeckCreation} isSubmitting={isSubmitting} />
     </main>
   );
 }

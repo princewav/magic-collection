@@ -344,7 +344,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
               </div>
               <div className="col-span-1">
                 <p className="text-muted-foreground mb-1 text-sm">
-                  Optional: You can also import a decklist later.
+                  Optional: You can also import a deck list later.
                 </p>
                 <FormField
                   control={form.control}
