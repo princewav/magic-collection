@@ -71,8 +71,6 @@ export default function CardModal() {
   const powerToughness =
     card.power && card.toughness ? `${card.power} / ${card.toughness}` : null;
 
-  console.log(JSON.stringify(card.oracle_text));
-
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
@@ -148,7 +146,7 @@ export default function CardModal() {
                   {card.type_line}
                 </p>
                 {card.oracle_text && (
-                  <p className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">
+                  <div className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">
                     {card.oracle_text.split('\n').map((line, index) => (
                       <React.Fragment key={index}>
                         <span className="flex flex-row flex-wrap items-center space-x-1">
@@ -181,7 +179,7 @@ export default function CardModal() {
                         )}
                       </React.Fragment>
                     ))}
-                  </p>
+                  </div>
                 )}
                 <div className="bg-background/20 flex items-center justify-center gap-2 rounded-2xl p-4">
                   <Button
