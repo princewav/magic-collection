@@ -1,92 +1,187 @@
+'use client';
+
 import { loadCardsById } from '@/actions/load-cards';
 import { Card as CardType } from '@/types/card';
 import { defaultSort } from '@/lib/deck/sorting';
 import Image from 'next/image';
 import { Card } from '../Card';
 import { CardWithQuantity } from '@/types/card';
+import { cn } from '@/lib/utils';
+import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useState, useTransition } from 'react';
+import { updateCardQuantity } from '@/actions/deck/update-card-quantity';
+import { toast } from 'sonner';
 
 interface Props {
-  decklist?: (CardWithQuantity)[];
+  decklist?: CardWithQuantity[];
   collectedCards?: { name: string; quantity: number }[];
   type: 'paper' | 'arena';
 }
 
+export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
+  const params = useParams();
+  const deckId = params.id as string;
+  const [isPending, startTransition] = useTransition();
+  const [cardsWithQuantity, setCardsWithQuantity] = useState<
+    CardWithQuantity[]
+  >([]);
+  const [rarityTotals, setRarityTotals] = useState<Record<string, number>>({});
 
+  console.log(cardsWithQuantity);
 
-export async function DeckCardGrid({ decklist, collectedCards }: Props) {
-  const cardIds: string[] =
-    decklist?.map((card) => card.cardId).filter(Boolean) || [];
-  const cards = await loadCardsById(cardIds);
-  const sortedCards = defaultSort(cards);
-  const cardsWithQuantity: CardWithQuantity[] = sortedCards.map(
-    (card: CardType) => ({
-      ...card,
-      quantity: decklist?.find((c) => c.cardId === card.cardId)?.quantity || 0,
-    }),
-  );
+  useEffect(() => {
+    const loadCards = async () => {
+      if (!decklist) return;
 
-  const rarityTotals = cardsWithQuantity.reduce(
-    (acc, card) => {
-      const rarity = card.rarity || 'Common';
-      if (!acc[rarity]) {
-        acc[rarity] = 0;
-      }
-      acc[rarity] += card.quantity || 1;
-      return acc;
+      const cardIds: string[] =
+        decklist.map((card) => card.cardId).filter(Boolean) || [];
+      const cards = await loadCardsById(cardIds);
+      const sortedCards = defaultSort(cards);
+      const withQuantity: CardWithQuantity[] = sortedCards.map(
+        (card: CardType) => ({
+          ...card,
+          quantity:
+            decklist?.find((c) => c.cardId === card.cardId)?.quantity || 0,
+        }),
+      );
+
+      setCardsWithQuantity(withQuantity);
+
+      // Calculate rarity totals
+      const totals = withQuantity.reduce(
+        (acc, card) => {
+          const rarity = card.rarity.toLowerCase() || 'common';
+          if (!acc[rarity]) {
+            acc[rarity] = 0;
+          }
+          acc[rarity] += card.quantity || 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      setRarityTotals(totals);
+    };
+
+    loadCards();
+  }, [decklist]);
+
+  const handleQuantityChange = useCallback(
+    (card: CardWithQuantity, change: 1 | -1) => {
+      startTransition(async () => {
+        try {
+          await updateCardQuantity(deckId, card.cardId, 'maindeck', change);
+
+          // Optimistically update the UI
+          setCardsWithQuantity((prev) =>
+            prev.map((c) => {
+              if (c.cardId === card.cardId) {
+                const newQuantity = Math.max(0, (c.quantity || 0) + change);
+                return { ...c, quantity: newQuantity };
+              }
+              return c;
+            }),
+          );
+
+          // Update rarity totals
+          setRarityTotals((prev) => {
+            const rarity = card.rarity.toLowerCase() || 'common';
+            const newTotal = Math.max(0, (prev[rarity] || 0) + change);
+            return { ...prev, [rarity]: newTotal };
+          });
+        } catch (error) {
+          toast.error('Failed to update card quantity', {
+            description:
+              error instanceof Error ? error.message : 'An error occurred',
+          });
+        }
+      });
     },
-    {} as Record<string, number>,
+    [deckId],
   );
+
+  function QuantityButton({
+    card,
+    sign,
+    className,
+  }: {
+    card: CardWithQuantity;
+    sign: string;
+    className?: string;
+  }) {
+    return (
+      <span
+        className={cn(
+          'text-foreground bg-background absolute top-2 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full text-3xl transition-all duration-300 hover:scale-110',
+          sign === '-' ? 'left-2' : 'right-2',
+          className,
+        )}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleQuantityChange(card, sign === '+' ? 1 : -1);
+        }}
+      >
+        {sign}
+      </span>
+    );
+  }
 
   return (
     <>
-        <div className="right-0 mb-2 flex items-center gap-3">
-          <p className="flex items-center gap-1">
-            <Image
-              src="/images/rarities/common.png"
-              alt="Common"
-              width={32}
-              height={32}
-            />
-            {rarityTotals.common || 0}
-          </p>
-          <p className="flex items-center gap-1">
-            <Image
-              src="/images/rarities/uncommon.png"
-              alt="Uncommon"
-              width={32}
-              height={32}
-            />
-            {rarityTotals.uncommon || 0}
-          </p>
-          <p className="flex items-center gap-1">
-            <Image
-              src="/images/rarities/rare.png"
-              alt="Rare"
-              width={32}
-              height={32}
-            />
-            {rarityTotals.rare || 0}
-          </p>
-          <p className="flex items-center gap-1">
-            <Image
-              src="/images/rarities/mythic.png"
-              alt="Mythic"
-              width={32}
-              height={32}
-            />
-            {rarityTotals.mythic || 0}
-          </p>
-        </div>
-
-      <div className="mx-auto flex flex-wrap gap-3 mt-2">
-        {cardsWithQuantity?.map((card: CardWithQuantity) => (
-          <Card
-            key={card.id}
-            card={card}
-            collectedQuantity={
-              collectedCards?.find((c) => c.name === card.name)?.quantity || 0
-            }
+      <div className="right-0 mb-2 flex items-center gap-3">
+        <p className="flex items-center gap-1">
+          <Image
+            src="/images/rarities/common.png"
+            alt="Common"
+            width={32}
+            height={32}
           />
+          {rarityTotals.common || 0}
+        </p>
+        <p className="flex items-center gap-1">
+          <Image
+            src="/images/rarities/uncommon.png"
+            alt="Uncommon"
+            width={32}
+            height={32}
+          />
+          {rarityTotals.uncommon || 0}
+        </p>
+        <p className="flex items-center gap-1">
+          <Image
+            src="/images/rarities/rare.png"
+            alt="Rare"
+            width={32}
+            height={32}
+          />
+          {rarityTotals.rare || 0}
+        </p>
+        <p className="flex items-center gap-1">
+          <Image
+            src="/images/rarities/mythic.png"
+            alt="Mythic"
+            width={32}
+            height={32}
+          />
+          {rarityTotals.mythic || 0}
+        </p>
+      </div>
+
+      <div className="mx-auto mt-2 flex flex-wrap gap-3">
+        {cardsWithQuantity?.map((card: CardWithQuantity) => (
+          <div key={card.id} className="group relative">
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <QuantityButton card={card} sign="+" />
+              <QuantityButton card={card} sign="-" />
+            </div>
+            <Card
+              card={card}
+              collectedQuantity={
+                collectedCards?.find((c) => c.name === card.name)?.quantity || 0
+              }
+            />
+          </div>
         ))}
       </div>
     </>
