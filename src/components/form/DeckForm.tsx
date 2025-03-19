@@ -31,9 +31,11 @@ import { COLOR_OPTIONS } from '@/lib/constants';
 import { useState } from 'react';
 import { CardWithQuantity } from '@/types/card';
 import { useRouter } from 'next/navigation';
+import { ImportForm } from '../deck/ImportForm';
 
 interface DeckFormData {
   name: string;
+  decklist?: string;
   description?: string;
   format: string;
   imageUrl?: string | null;
@@ -42,7 +44,7 @@ interface DeckFormData {
 }
 
 interface DeckFormProps {
-  onSubmit: (data: DeckFormData) => Promise<void>;
+  onSubmit: (data: DeckFormData) => Promise<void>; 
   isSubmitting: boolean;
   initialData?: DeckFormData;
   isEdit?: boolean;
@@ -69,6 +71,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
       imageUrl: null,
       colors: [],
       type: 'paper',
+      decklist: '',
     },
   });
 
@@ -84,249 +87,285 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Deck Details</CardTitle>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2">
+            <CardTitle>Deck Details</CardTitle>
+          </div>
+          <div className="col-span-1">
+            <CardTitle>Deck List</CardTitle>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Deck Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="My Awesome Deck" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Separator className="my-6" />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Describe your deck strategy..."
-                      {...field}
-                      value={field.value || ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Separator className="my-6" />
-
-            <div className="flex items-center gap-20">
-              <FormField
-                control={form.control}
-                name="format"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Format</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value || ''}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a format" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="standard">Standard</SelectItem>
-                        <SelectItem value="modern">Modern</SelectItem>
-                        <SelectItem value="commander">Commander</SelectItem>
-                        <SelectItem value="legacy">Legacy</SelectItem>
-                        <SelectItem value="vintage">Vintage</SelectItem>
-                        <SelectItem value="pauper">Pauper</SelectItem>
-                        <SelectItem value="pioneer">Pioneer</SelectItem>
-                        <SelectItem value="brawl">Brawl</SelectItem>
-                        <SelectItem value="historic">Historic</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value || ''}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a deck type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="paper">Paper</SelectItem>
-                        <SelectItem value="arena">Arena</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Separator className="my-6" />
-
-            {mainDeck ? (
-              <Tabs defaultValue="url" className="w-full">
-                <TabsList className="mb-4">
-                  <TabsTrigger className="cursor-pointer" value="url">URL</TabsTrigger>
-                  <TabsTrigger className="cursor-pointer" value="card">Select from Deck</TabsTrigger>
-                </TabsList>
-                <TabsContent value="url">
-                  <FormField
-                    control={form.control}
-                    name="imageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cover Image URL</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="https://example.com/image.jpg"
-                            {...field}
-                            value={field.value || ''}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          URL for the deck cover image. Leave empty to use
-                          default.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-                <TabsContent value="card">
-                  <FormField
-                    control={form.control}
-                    name="imageUrl"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Select Card</FormLabel>
-                        <Select
-                          onValueChange={(value) => {
-                            const selectedCard = mainDeck.find(
-                              (card) => card.id === value,
-                            );
-                            field.onChange(
-                              selectedCard?.image_uris?.art_crop || '',
-                            );
-                          }}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a card" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {mainDeck
-                              .slice()
-                              .sort((a, b) => a.name.localeCompare(b.name))
-                              .map((card) => (
-                                <SelectItem key={card.id} value={card.id}>
-                                  <div className="flex items-center gap-2">
-                                    <img
-                                      src={card.image_uris.art_crop}
-                                      alt={card.name}
-                                      className="h-6 w-6 rounded-sm object-cover"
-                                    />
-                                    <span>{card.name}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Choose a card from your main deck to use its image
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </TabsContent>
-              </Tabs>
-            ) : (
-              <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2">
                 <FormField
                   control={form.control}
-                  name="imageUrl"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cover Image URL</FormLabel>
+                      <FormLabel>Deck Name</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="https://example.com/image.jpg"
+                        <Input placeholder="My Awesome Deck" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator className="my-6" />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe your deck strategy..."
                           {...field}
                           value={field.value || ''}
                         />
                       </FormControl>
-                      <FormDescription>
-                        URL for the deck cover image. Leave empty to use
-                        default.
-                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Separator className="my-6" />
+
+                <div className="flex items-center gap-20">
+                  <FormField
+                    control={form.control}
+                    name="format"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Format</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value || ''}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a format" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="standard">Standard</SelectItem>
+                            <SelectItem value="modern">Modern</SelectItem>
+                            <SelectItem value="commander">Commander</SelectItem>
+                            <SelectItem value="legacy">Legacy</SelectItem>
+                            <SelectItem value="vintage">Vintage</SelectItem>
+                            <SelectItem value="pauper">Pauper</SelectItem>
+                            <SelectItem value="pioneer">Pioneer</SelectItem>
+                            <SelectItem value="brawl">Brawl</SelectItem>
+                            <SelectItem value="historic">Historic</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value || ''}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a deck type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="paper">Paper</SelectItem>
+                            <SelectItem value="arena">Arena</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Separator className="my-6" />
+
+                {mainDeck ? (
+                  <Tabs defaultValue="url" className="w-full">
+                    <TabsList className="mb-4">
+                      <TabsTrigger className="cursor-pointer" value="url">
+                        URL
+                      </TabsTrigger>
+                      <TabsTrigger className="cursor-pointer" value="card">
+                        Select from Deck
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="url">
+                      <FormField
+                        control={form.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Cover Image URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="https://example.com/image.jpg"
+                                {...field}
+                                value={field.value || ''}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              URL for the deck cover image. Leave empty to use
+                              default.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                    <TabsContent value="card">
+                      <FormField
+                        control={form.control}
+                        name="imageUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Select Card</FormLabel>
+                            <Select
+                              onValueChange={(value) => {
+                                const selectedCard = mainDeck.find(
+                                  (card) => card.id === value,
+                                );
+                                field.onChange(
+                                  selectedCard?.image_uris?.art_crop || '',
+                                );
+                              }}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a card" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {mainDeck
+                                  .slice()
+                                  .sort((a, b) => a.name.localeCompare(b.name))
+                                  .map((card) => (
+                                    <SelectItem key={card.id} value={card.id}>
+                                      <div className="flex items-center gap-2">
+                                        <img
+                                          src={card.image_uris.art_crop}
+                                          alt={card.name}
+                                          className="h-6 w-6 rounded-sm object-cover"
+                                        />
+                                        <span>{card.name}</span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                              Choose a card from your main deck to use its image
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                ) : (
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="imageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cover Image URL</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="https://example.com/image.jpg"
+                              {...field}
+                              value={field.value || ''}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            URL for the deck cover image. Leave empty to use
+                            default.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                <Separator className="my-6" />
+
+                <FormField
+                  control={form.control}
+                  name="colors"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Colors</FormLabel>
+                      <div className="flex flex-wrap gap-2">
+                        {COLOR_OPTIONS.map((color) => (
+                          <button
+                            type="button"
+                            key={color.value}
+                            onClick={() =>
+                              toggleColor(color.value as ManaColor)
+                            }
+                            className={`${color.bgClass} ${
+                              color.textClass
+                            } flex items-center gap-2 rounded-md border-2 px-4 py-2 ${
+                              selectedColors.includes(color.value as ManaColor)
+                                ? `${color.borderClass} border-2`
+                                : 'border-transparent'
+                            }`}
+                          >
+                            {selectedColors.includes(
+                              color.value as ManaColor,
+                            ) && <CheckIcon size={16} />}
+                            {color.name}
+                          </button>
+                        ))}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-            )}
-
+              <div className="col-span-1">
+                <p className="text-muted-foreground mb-1 text-sm">
+                  Optional: You can also import a decklist later.
+                </p>
+                <FormField
+                  control={form.control}
+                  name="decklist"
+                  render={({ field }) => (
+                    <FormItem className="mt-4 h-11/12">
+                      <FormControl>
+                        <Textarea
+                          placeholder="Paste your decklist here..."
+                          {...field}
+                          className="h-full w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
             <Separator className="my-6" />
-
-            <FormField
-              control={form.control}
-              name="colors"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Colors</FormLabel>
-                  <div className="flex flex-wrap gap-2">
-                    {COLOR_OPTIONS.map((color) => (
-                      <button
-                        type="button"
-                        key={color.value}
-                        onClick={() => toggleColor(color.value as ManaColor)}
-                        className={`${color.bgClass} ${
-                          color.textClass
-                        } flex items-center gap-2 rounded-md border-2 px-4 py-2 ${
-                          selectedColors.includes(color.value as ManaColor)
-                            ? `${color.borderClass} border-2`
-                            : 'border-transparent'
-                        }`}
-                      >
-                        {selectedColors.includes(color.value as ManaColor) && (
-                          <CheckIcon size={16} />
-                        )}
-                        {color.name}
-                      </button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Separator className="my-6" />
-
-            <div className="flex justify-end gap-4">
+            <div className="flex justify-center gap-4">
               <Button
                 type="button"
                 variant="outline"

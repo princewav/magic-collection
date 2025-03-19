@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { deckSchema } from './validation';
 import { z } from 'zod';
 import { createDeck } from '@/actions/deck/create-deck';
+import { ImportForm } from '@/components/deck/ImportForm';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface NewDeckPageProps {}
 
@@ -27,7 +29,8 @@ export default function NewDeckPage({}: NewDeckPageProps) {
     } catch (error: any) {
       console.error('Error creating deck:', error);
       toast.error('Error', {
-        description: error.message || 'Failed to create deck. Please try again.',
+        description:
+          error.message || 'Failed to create deck. Please try again.',
       });
     } finally {
       setIsSubmitting(false);
@@ -35,9 +38,9 @@ export default function NewDeckPage({}: NewDeckPageProps) {
   };
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col p-4">
+    <main className="mx-auto flex max-w-7xl flex-col p-4">
       <h1 className="mb-6 text-4xl font-bold">Create New Deck</h1>
-      <DeckForm onSubmit={handleDeckCreation} isSubmitting={isSubmitting} />
+          <DeckForm onSubmit={handleDeckCreation} isSubmitting={isSubmitting} />
     </main>
   );
 }

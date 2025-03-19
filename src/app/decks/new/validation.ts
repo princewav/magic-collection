@@ -18,4 +18,5 @@ export const deckSchema = z.object({
     .transform((val) => (val === '' ? null : val)),
   format: z.string().default('standard'),
   type: z.enum(['paper', 'arena']).default('paper'),
+  decklist: z.string().optional(),
 });
