@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { useCardModal } from '@/context/CardModalContext';
 import { X, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ManaSymbol } from './ManaSymbol';
+import { NumberSymbol } from './NumberSymbol';
+import React from 'react';
 
 interface CardData {
   name: string;
@@ -53,7 +56,7 @@ export default function CardModal() {
 
   if (!card) {
     return (
-      <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900">
+      <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center">
         <div className="rounded-md bg-gray-700 p-4 text-lg shadow-md">
           Card not found.
         </div>
@@ -68,48 +71,91 @@ export default function CardModal() {
   const powerToughness =
     card.power && card.toughness ? `${card.power} / ${card.toughness}` : null;
 
+  console.log(JSON.stringify(card.oracle_text )  );
+
   return (
-    <div className="bg-opacity-50 fixed top-0 left-0 flex h-full w-full items-center justify-center bg-gray-900 p-4">
+    <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
-        className="max-h-[90vh] w-full max-w-4xl rounded-md bg-gray-800 shadow-md"
+        className="bg-sidebar max-h-[90vh] w-full max-w-4xl overflow-auto rounded-md p-6 shadow-md"
         ref={modalRef}
       >
         <div className="relative p-4" id="modal-box">
           <button
             onClick={closeModal}
-            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-700 text-gray-500 hover:text-gray-300"
+            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background text-muted-foreground hover:text-foreground hover:scale-110 transition-all duration-300 cursor-pointer"
           >
-            <X size={20} />
+            <X size={20} strokeWidth={4} />
           </button>
-          <div className="flex h-full">
-            <div className="w-1/2 pr-4">
+          <div className="flex h-full flex-col md:flex-row">
+            <div className="justify-left flex items-center md:w-1/2 md:pr-4">
               {imageError ? (
-                <div className="flex aspect-[223/310] items-center justify-center rounded-t-md bg-gray-800">
+                <div className="flex aspect-[223/310] items-center justify-center rounded-md bg-gray-800">
                   <span className="text-lg text-white">
                     Image failed to load
                   </span>
                 </div>
               ) : (
-                <Image
-                  src={
-                    card.image_uris?.normal ||
-                    'https://via.placeholder.com/223x310'
-                  }
-                  alt={card.name}
-                  className="h-full w-full rounded-t-md object-contain"
-                  width={223}
-                  height={310}
-                  onError={handleImageError}
-                />
+                <div className="flex items-center justify-center rounded-3xl overflow-hidden">
+                  <div className="relative h-[500px] w-[360px] flex-shrink-0 ">
+                    <Image
+                      src={
+                        card.image_uris?.normal ||
+                        'https://via.placeholder.com/223x310'
+                      }
+                      alt={card.name}
+                      className="rounded-md"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 360px"
+                      priority
+                      style={{
+                        objectFit: 'contain',
+                        objectPosition: 'center center',
+                      }}
+                      onError={handleImageError}
+                    />
+                  </div>
+                </div>
               )}
             </div>
             <div className="flex w-1/2 flex-col justify-between">
-              <div className="flex flex-col space-y-4">
-                <h2 className="text-3xl font-bold text-white">{card.name}</h2>
-                <p className="text-xl text-gray-400">{card.mana_cost}</p>
-                <p className="text-xl text-gray-300">{card.type_line}</p>
-                <p className="text-xl text-gray-300">{card.oracle_text}</p>
-                <div className="flex gap-2">
+              <div className="flex flex-col space-y-2">
+                <h2 className="text-3xl font-bold text-white p-4 pb-0">{card.name}</h2>
+                {card.mana_cost && (
+                <p className="flex flex-row text-xl text-gray-400 p-4 p-b  rounded-2xl">
+                  {card.mana_cost?.split('//').map((part, index) => (
+                    <span key={index} className="flex flex-row space-x-0.5">
+                      {part.match(/{(.*?)}/g)?.map((match, idx) => {
+                        const symbol = match[1];
+                        if (isNaN(Number(symbol))) {
+                          return (
+                            <ManaSymbol key={idx} symbol={symbol} size={25} />
+                          );
+                        }
+                        return (
+                          <NumberSymbol key={idx} symbol={symbol} size={25} />
+                        );
+                      })}
+                      {index < card.mana_cost.split('//').length - 1 && (
+                        <span className="w-8 text-center">//</span>
+                      )}
+                    </span>
+                  ))}
+                </p>
+                )}
+                <p className="bg-background/20 rounded-2xl p-4 text-center text-xl text-gray-300">
+                  {card.type_line}
+                </p>
+                {card.oracle_text && (
+                  <p className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">
+                    {card.oracle_text.split('\n').map((line, index) => (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index < card.oracle_text.split('\n').length - 1 && <p className="my-3" />}
+                      </React.Fragment>
+                    ))}
+                  </p>
+                )}
+                <div className="flex gap-2 justify-center items-center p-4 bg-background/20 rounded-2xl">
                   <Button
                     variant="outline"
                     size="sm"
