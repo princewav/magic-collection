@@ -11,9 +11,11 @@ interface CardProps {
 
 export function Card({ card, collectedQuantity = 0 }: CardProps) {
   const { openModal } = useCardModal();
+
+  console.log(card.name, card.quantity, collectedQuantity);
   return (
     <div
-      className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform hover:scale-105"
+      className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform"
       onClick={() => {
         openModal(card);
       }}
@@ -21,7 +23,7 @@ export function Card({ card, collectedQuantity = 0 }: CardProps) {
       <div className="relative flex w-full flex-col justify-center p-2">
         <div className="mb-2 flex w-full justify-center">
           <div className="flex space-x-3">
-            {Array.from({ length: collectedQuantity }, (_, i) => (
+            {Array.from({ length: Math.min(collectedQuantity, card.quantity) }, (_, i) => (
               <div
                 key={i}
                 className="h-2 w-2 rotate-45 transform bg-yellow-500"

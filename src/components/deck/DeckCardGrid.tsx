@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { updateCardQuantity } from '@/actions/deck/update-card-quantity';
 import { toast } from 'sonner';
+import { Minus, Plus } from 'lucide-react';
 
 interface Props {
   decklist?: CardWithQuantity[];
@@ -26,8 +27,6 @@ export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
     CardWithQuantity[]
   >([]);
   const [rarityTotals, setRarityTotals] = useState<Record<string, number>>({});
-
-  console.log(cardsWithQuantity);
 
   useEffect(() => {
     const loadCards = async () => {
@@ -112,8 +111,8 @@ export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
     return (
       <span
         className={cn(
-          'text-foreground bg-background absolute top-2 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full text-3xl transition-all duration-300 hover:scale-110',
-          sign === '-' ? 'left-2' : 'right-2',
+          'absolute top-1 z-10 flex size-5 cursor-pointer items-center justify-center rounded-full bg-yellow-500 text-xl text-black opacity-0 transition-all duration-300 group-hover:opacity-100 hover:scale-110',
+          sign === '-' ? 'left-1' : 'right-1',
           className,
         )}
         onClick={(e) => {
@@ -122,7 +121,11 @@ export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
           handleQuantityChange(card, sign === '+' ? 1 : -1);
         }}
       >
-        {sign}
+        {sign === '-' ? (
+          <Minus className="size-4" strokeWidth={3} />
+        ) : (
+          <Plus className="size-4" strokeWidth={3} />
+        )}
       </span>
     );
   }
@@ -171,7 +174,7 @@ export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
       <div className="mx-auto mt-2 flex flex-wrap gap-3">
         {cardsWithQuantity?.map((card: CardWithQuantity) => (
           <div key={card.id} className="group relative">
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center ">
               <QuantityButton card={card} sign="+" />
               <QuantityButton card={card} sign="-" />
             </div>
