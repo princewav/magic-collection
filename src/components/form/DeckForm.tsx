@@ -31,7 +31,6 @@ import { COLOR_OPTIONS } from '@/lib/constants';
 import { useState } from 'react';
 import { CardWithQuantity } from '@/types/card';
 import { useRouter } from 'next/navigation';
-import { ImportForm } from '../deck/ImportForm';
 
 interface DeckFormData {
   name: string;
@@ -49,6 +48,7 @@ interface DeckFormProps {
   initialData?: DeckFormData;
   isEdit?: boolean;
   mainDeck?: CardWithQuantity[];
+  decklist?: string;
 }
 
 export const DeckForm: React.FC<DeckFormProps> = ({
@@ -57,6 +57,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   initialData,
   isEdit = false,
   mainDeck,
+  decklist,
 }) => {
   const router = useRouter();
   const [selectedColors, setSelectedColors] = useState<ManaColor[]>(
@@ -64,14 +65,15 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   );
   const form = useForm<DeckFormData>({
     resolver: zodResolver(deckSchema),
-    defaultValues: initialData || {
+    defaultValues:  {
       name: '',
       description: '',
       format: 'standard',
       imageUrl: null,
       colors: [],
       type: 'paper',
-      decklist: '',
+      decklist: decklist || '',
+      ...initialData,
     },
   });
 

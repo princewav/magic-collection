@@ -13,9 +13,10 @@ import { updateDeck } from '@/actions/deck/update-deck';
 interface EditDeckClientProps {
   deck: Deck;
   id: string;
+  decklist: string;
 }
 
-export function EditDeckClient({ deck, id }: EditDeckClientProps) {
+export function EditDeckClient({ deck, id, decklist }: EditDeckClientProps) {
   const router = useRouter();
   const {type} = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +56,7 @@ export function EditDeckClient({ deck, id }: EditDeckClientProps) {
         initialData={deck}
         isEdit={true}
         mainDeck={deck.maindeck}
+        decklist={decklist}
       />
     </main>
   );

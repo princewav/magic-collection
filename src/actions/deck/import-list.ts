@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { parseDeckList, ParsedCard } from '@/lib/deck/list-parser';
 import { cardService } from '@/db/services/CardService';
 import { deckService } from '@/db/services/DeckService';
-import { DeckCard } from '@/types/deck';
+import { Deck, DeckCard } from '@/types/deck';
+import { CardWithQuantity } from '@/types/card';
 
 type ImportDeckResult = {
   success: boolean;
@@ -63,4 +64,15 @@ export async function importDeckList(
       errors: [error instanceof Error ? error.message : 'Unknown error'],
     };
   }
+}
+
+export function generateDecklist(deck: Deck): string {
+  const formatCard = (card: CardWithQuantity) => {
+    return `${card.quantity} ${card.name} (${card.set.toUpperCase()})`;
+  };
+
+  const mainDeckList = deck.maindeck.map(formatCard).join('\n');
+  const sideboardList = deck.sideboard.map(formatCard).join('\n');
+
+  return `Deck\n${mainDeckList}\n\nSideboard\n${sideboardList}`;
 }

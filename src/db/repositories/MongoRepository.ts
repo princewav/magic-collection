@@ -67,10 +67,11 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
         { $set: item },
         { returnDocument: 'after' },
       );
-      if (!result || !result.value) {
+      if (!result) {
         return null;
       }
-      return result.value as unknown as T;
+      const { _id, ...rest } = result;
+      return { ...rest, id: _id.toString() } as unknown as T;
     } catch (error) {
       return null;
     }
