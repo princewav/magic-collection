@@ -71,7 +71,7 @@ export default function CardModal() {
   const powerToughness =
     card.power && card.toughness ? `${card.power} / ${card.toughness}` : null;
 
-  console.log(JSON.stringify(card.oracle_text )  );
+  console.log(JSON.stringify(card.oracle_text));
 
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
@@ -82,7 +82,7 @@ export default function CardModal() {
         <div className="relative p-4" id="modal-box">
           <button
             onClick={closeModal}
-            className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background text-muted-foreground hover:text-foreground hover:scale-110 transition-all duration-300 cursor-pointer"
+            className="bg-background text-muted-foreground hover:text-foreground absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
           >
             <X size={20} strokeWidth={4} />
           </button>
@@ -95,8 +95,8 @@ export default function CardModal() {
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center justify-center rounded-3xl overflow-hidden">
-                  <div className="relative h-[500px] w-[360px] flex-shrink-0 ">
+                <div className="flex items-center justify-center overflow-hidden rounded-3xl">
+                  <div className="relative h-[500px] w-[360px] flex-shrink-0">
                     <Image
                       src={
                         card.image_uris?.normal ||
@@ -119,28 +119,30 @@ export default function CardModal() {
             </div>
             <div className="flex w-1/2 flex-col justify-between">
               <div className="flex flex-col space-y-2">
-                <h2 className="text-3xl font-bold text-white p-4 pb-0">{card.name}</h2>
+                <h2 className="p-4 pb-0 text-3xl font-bold text-white">
+                  {card.name}
+                </h2>
                 {card.mana_cost && (
-                <p className="flex flex-row text-xl text-gray-400 p-4 p-b  rounded-2xl">
-                  {card.mana_cost?.split('//').map((part, index) => (
-                    <span key={index} className="flex flex-row space-x-0.5">
-                      {part.match(/{(.*?)}/g)?.map((match, idx) => {
-                        const symbol = match[1];
-                        if (isNaN(Number(symbol))) {
+                  <p className="p-b flex flex-row rounded-2xl p-4 text-xl text-gray-400">
+                    {card.mana_cost?.split('//').map((part, index) => (
+                      <span key={index} className="flex flex-row space-x-0.5">
+                        {part.match(/{(.*?)}/g)?.map((match, idx) => {
+                          const symbol = match[1];
+                          if (isNaN(Number(symbol))) {
+                            return (
+                              <ManaSymbol key={idx} symbol={symbol} size={25} />
+                            );
+                          }
                           return (
-                            <ManaSymbol key={idx} symbol={symbol} size={25} />
+                            <NumberSymbol key={idx} symbol={symbol} size={25} />
                           );
-                        }
-                        return (
-                          <NumberSymbol key={idx} symbol={symbol} size={25} />
-                        );
-                      })}
-                      {index < card.mana_cost.split('//').length - 1 && (
-                        <span className="w-8 text-center">//</span>
-                      )}
-                    </span>
-                  ))}
-                </p>
+                        })}
+                        {index < card.mana_cost.split('//').length - 1 && (
+                          <span className="w-8 text-center">//</span>
+                        )}
+                      </span>
+                    ))}
+                  </p>
                 )}
                 <p className="bg-background/20 rounded-2xl p-4 text-center text-xl text-gray-300">
                   {card.type_line}
@@ -149,13 +151,39 @@ export default function CardModal() {
                   <p className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">
                     {card.oracle_text.split('\n').map((line, index) => (
                       <React.Fragment key={index}>
-                        {line}
-                        {index < card.oracle_text.split('\n').length - 1 && <p className="my-3" />}
+                        <span className="flex flex-row flex-wrap items-center space-x-1">
+                          {line.split(/({[^}]+})/).map((part, idx) => {
+                            const match = part.match(/{([^}]+)}/);
+                            if (match) {
+                              const symbol = match[1];
+                              if (isNaN(Number(symbol))) {
+                                return (
+                                  <ManaSymbol
+                                    key={idx}
+                                    symbol={symbol}
+                                    size={20}
+                                  />
+                                );
+                              }
+                              return (
+                                <NumberSymbol
+                                  key={idx}
+                                  symbol={symbol}
+                                  size={20}
+                                />
+                              );
+                            }
+                            return <span key={idx}>{part}</span>;
+                          })}
+                        </span>
+                        {index < card.oracle_text.split('\n').length - 1 && (
+                          <p className="my-3" />
+                        )}
                       </React.Fragment>
                     ))}
                   </p>
                 )}
-                <div className="flex gap-2 justify-center items-center p-4 bg-background/20 rounded-2xl">
+                <div className="bg-background/20 flex items-center justify-center gap-2 rounded-2xl p-4">
                   <Button
                     variant="outline"
                     size="sm"
