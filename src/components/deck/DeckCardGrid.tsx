@@ -68,34 +68,42 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
 
   const handleQuantityChange = useCallback(
     (card: CardWithQuantity, change: 1 | -1) => {
-      startTransition(async () => {
-        try {
-          await updateCardQuantity(deckId, card.cardId, board, change);
+      const currentQuantity = card.quantity || 0;
+      const newQuantity = Math.min(4, Math.max(1, currentQuantity + change));
 
-          // Optimistically update the UI
-          setCardsWithQuantity((prev) =>
-            prev.map((c) => {
-              if (c.cardId === card.cardId) {
-                const newQuantity = Math.max(0, (c.quantity || 0) + change);
-                return { ...c, quantity: newQuantity };
-              }
-              return c;
-            }),
-          );
+      // Only start the transition if the new quantity is valid
+      if (newQuantity !== currentQuantity) {
+        startTransition(async () => {
+          try {
+            await updateCardQuantity(deckId, card.cardId, board, change);
 
-          // Update rarity totals
-          setRarityTotals((prev) => {
-            const rarity = card.rarity.toLowerCase() || 'common';
-            const newTotal = Math.max(0, (prev[rarity] || 0) + change);
-            return { ...prev, [rarity]: newTotal };
-          });
-        } catch (error) {
-          toast.error('Failed to update card quantity', {
-            description:
-              error instanceof Error ? error.message : 'An error occurred',
-          });
-        }
-      });
+            // Optimistically update the UI
+            setCardsWithQuantity((prev) =>
+              prev.map((c) => {
+                if (c.cardId === card.cardId) {
+                  return { ...c, quantity: newQuantity };
+                }
+                return c;
+              }),
+            );
+
+            // Update rarity totals
+            setRarityTotals((prev) => {
+              const rarity = card.rarity.toLowerCase() || 'common';
+              const newTotal = Math.min(
+                4,
+                Math.max(1, (prev[rarity] || 0) + change),
+              );
+              return { ...prev, [rarity]: newTotal };
+            });
+          } catch (error) {
+            toast.error('Failed to update card quantity', {
+              description:
+                error instanceof Error ? error.message : 'An error occurred',
+            });
+          }
+        });
+      }
     },
     [deckId],
   );
@@ -109,10 +117,18 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
     sign: string;
     className?: string;
   }) {
+    // Don't render minus button if quantity is 1, or plus button if quantity is 4
+    if (
+      (sign === '-' && card.quantity === 1) ||
+      (sign === '+' && card.quantity === 4)
+    ) {
+      return null;
+    }
+
     return (
       <span
         className={cn(
-          'absolute top-1 z-10 flex size-5 cursor-pointer items-center justify-center rounded-full bg-yellow-500 text-xl text-black opacity-0 transition-all duration-300 group-hover:opacity-100 hover:scale-110',
+          'absolute top-1 z-10 flex h-5 px-2 cursor-pointer items-center justify-center rounded-full bg-yellow-500/90 text-xl text-black opacity-0 transition-all duration-300 group-hover:opacity-100 hover:scale-110',
           sign === '-' ? 'left-1' : 'right-1',
           className,
         )}
@@ -123,9 +139,13 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
         }}
       >
         {sign === '-' ? (
-          <Minus className="size-4" strokeWidth={3} />
+          <p className="text-xs flex items-center">
+            <Minus className="size-3" strokeWidth={3} />1
+          </p>
         ) : (
-          <Plus className="size-4" strokeWidth={3} />
+          <p className="text-xs flex items-center">
+            <Plus className="size-3" strokeWidth={3} />1
+          </p>
         )}
       </span>
     );
@@ -175,7 +195,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
       <div className="mx-auto mt-2 flex flex-wrap gap-3">
         {cardsWithQuantity?.map((card: CardWithQuantity) => (
           <div key={card.id} className="group relative">
-            <div className="absolute inset-0 flex items-center justify-center ">
+            <div className="absolute inset-0 flex items-center justify-center">
               <QuantityButton card={card} sign="+" />
               <QuantityButton card={card} sign="-" />
             </div>
