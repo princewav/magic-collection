@@ -52,6 +52,7 @@ export default async function DeckDetailPage({ params }: Props) {
             decklist={deck.maindeck}
             collectedCards={maindeckOwned}
             type={type}
+            board="maindeck"
           />
           <Separator className="my-10 h-2" />
           <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
@@ -59,6 +60,7 @@ export default async function DeckDetailPage({ params }: Props) {
             decklist={deck.sideboard}
             collectedCards={sideboardOwned}
             type={type}
+            board="sideboard"
           />
           <CardModal />
         </CardModalProvider>

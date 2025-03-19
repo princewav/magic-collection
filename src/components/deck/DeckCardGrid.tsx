@@ -17,9 +17,10 @@ interface Props {
   decklist?: CardWithQuantity[];
   collectedCards?: { name: string; quantity: number }[];
   type: 'paper' | 'arena';
+  board: 'maindeck' | 'sideboard';
 }
 
-export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
+export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
   const params = useParams();
   const deckId = params.id as string;
   const [isPending, startTransition] = useTransition();
@@ -69,7 +70,7 @@ export function DeckCardGrid({ decklist, collectedCards, type }: Props) {
     (card: CardWithQuantity, change: 1 | -1) => {
       startTransition(async () => {
         try {
-          await updateCardQuantity(deckId, card.cardId, 'maindeck', change);
+          await updateCardQuantity(deckId, card.cardId, board, change);
 
           // Optimistically update the UI
           setCardsWithQuantity((prev) =>
