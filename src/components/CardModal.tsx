@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useCardModal } from '@/context/CardModalContext';
-import { X } from 'lucide-react';
+import { X, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface CardData {
   name: string;
@@ -104,12 +105,40 @@ export default function CardModal() {
             </div>
             <div className="flex w-1/2 flex-col justify-between">
               <div className="flex flex-col space-y-4">
-                <h2 className="text-3xl font-bold text-white">
-                  {card.name}
-                </h2>
+                <h2 className="text-3xl font-bold text-white">{card.name}</h2>
                 <p className="text-xl text-gray-400">{card.mana_cost}</p>
                 <p className="text-xl text-gray-300">{card.type_line}</p>
                 <p className="text-xl text-gray-300">{card.oracle_text}</p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-purple-400/50 text-white transition-all duration-300 hover:bg-purple-300/40"
+                    onClick={() =>
+                      window.open(
+                        `https://scryfall.com/search?q=!"${encodeURIComponent(card.name)}"`,
+                        '_blank',
+                      )
+                    }
+                  >
+                    <ExternalLink className="mr-1 h-4 w-4" />
+                    View on Scryfall
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-blue-600/50 text-white transition-all duration-300 hover:bg-blue-500/50"
+                    onClick={() =>
+                      window.open(
+                        `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(card.name)}`,
+                        '_blank',
+                      )
+                    }
+                  >
+                    <ExternalLink className="mr-1 h-4 w-4" />
+                    View on Cardmarket
+                  </Button>
+                </div>
               </div>
               {powerToughness && (
                 <div className="mt-2 flex items-center justify-end">
