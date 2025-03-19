@@ -8,8 +8,6 @@ import { toast } from 'sonner';
 import { deckSchema } from './validation';
 import { z } from 'zod';
 import { createDeck } from '@/actions/deck/create-deck';
-import { ImportForm } from '@/components/deck/ImportForm';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface NewDeckPageProps {}
 
@@ -24,8 +22,8 @@ export default function NewDeckPage({}: NewDeckPageProps) {
       toast.success('Deck Created', {
         description: 'Your new deck has been created successfully.',
       });
-      // router.push(`/decks/${values.type}`);
-      // router.refresh();
+      router.push(`/decks/${values.type}`);
+      router.refresh();
     } catch (error: any) {
       console.error('Error creating deck:', error);
       toast.error('Error', {

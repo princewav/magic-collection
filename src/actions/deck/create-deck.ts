@@ -8,9 +8,20 @@ import { importDeckList } from './import-list';
 
 export const createDeck = async (values: z.infer<typeof deckSchema>) => {
   try {
+    // Check for existing decks with the same name
+    let deckName = values.name;
+    let existingDecks = await deckService.repo.findBy({ name: deckName });
+    let count = 2;
+
+    while (existingDecks.length > 0) {
+      deckName = `${values.name} (${count})`;
+      existingDecks = await deckService.repo.findBy({ name: deckName });
+      count++;
+    }
+
     const deck = await deckService.repo.create({
       id: '',
-      name: values.name,
+      name: deckName, // Use the unique deck name
       type: values.type,
       imageUrl: values.imageUrl ?? null,
       format: values.format ?? undefined,
