@@ -6,8 +6,9 @@ import Navbar from '@/components/navbar/Navbar';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
-
+import React from 'react';
 const inter = Inter({ subsets: ['latin'] });
+import { ClickToComponent } from 'click-to-react-component'
 
 export const metadata: Metadata = {
   title: 'MTG Card Viewer',
@@ -27,11 +28,13 @@ export default function RootLayout({
           'bg-background text-foreground min-h-screen',
         )}
       >
-        <ThemeProvider>
-          <Navbar />
-          <CardModalProvider>{children}</CardModalProvider>
-          <Toaster />
-        </ThemeProvider>
+        <React.StrictMode>
+          <ThemeProvider>
+            <Navbar />
+            <CardModalProvider>{children}</CardModalProvider>
+            <Toaster />
+          </ThemeProvider>
+        </React.StrictMode>
       </body>
     </html>
   );

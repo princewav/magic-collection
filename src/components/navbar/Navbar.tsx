@@ -21,16 +21,19 @@ import { ThemeToggle } from '../theme/ThemeToggle';
 const NavItem = ({
   href,
   children,
+  ariaLabel,
 }: {
   href: string;
   children: React.ReactNode;
+  ariaLabel?: string;
 }) => {
   return (
     <NavigationMenuLink asChild>
       <Link
         href={href}
+        aria-label={ariaLabel}
         className={cn(
-          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50',
         )}
       >
         {children}
@@ -42,16 +45,21 @@ const NavItem = ({
 const NavDropdown = ({
   triggerContent,
   children,
+  label,
 }: {
   triggerContent: React.ReactNode;
   children: React.ReactNode;
+  label: string;
 }) => {
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger className="group">
+      <NavigationMenuTrigger className="group" aria-label={`${label} menu`}>
         {triggerContent}
       </NavigationMenuTrigger>
-      <NavigationMenuContent className="NavigationMenuContent absolute top-0 left-0 w-full">
+      <NavigationMenuContent
+        className="NavigationMenuContent absolute top-0 left-0 w-full"
+        aria-label={`${label} submenu`}
+      >
         {children}
       </NavigationMenuContent>
     </NavigationMenuItem>
@@ -126,22 +134,30 @@ ListItem.displayName = 'ListItem';
 
 const Navbar: React.FC<{}> = () => {
   return (
-    <nav className="px-4 py-2 shadow-md">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="mr-4 text-2xl font-bold">
-            <Link href="/">
+    <nav
+      className="fixed right-0 bottom-0 left-0 z-10 flex border-t bg-purple-800 px-4 text-sm shadow-md md:relative md:bottom-auto md:border-t-0 md:py-2"
+      role="navigation"
+      aria-label="Main navigation"
+    >
+        <div className="flex !w-full items-center md:w-auto">
+          <div className="mr-4 py-1 text-2xl font-bold md:block md:py-0">
+            <Link href="/" aria-label="Home">
               <Logo />
             </Link>
           </div>
           <NavigationMenu>
-            <NavigationMenuList className="relative">
+            <NavigationMenuList
+              className="relative flex w-full flex-auto justify-between md:justify-start"
+              role="menubar"
+              aria-label="Main menu"
+            >
               {/* Decks Menu */}
               <NavDropdown
+                label="Decks"
                 triggerContent={
-                  <div className="flex flex-row space-x-2">
-                    <Book className="h-5 w-5" />
-                    <span>Decks</span>
+                  <div className="flex flex-col items-center md:flex-row md:space-x-2">
+                    <Book className="h-5 w-5" aria-hidden="true" />
+                    <span className="text-xs md:text-base">Decks</span>
                   </div>
                 }
               >
@@ -171,10 +187,11 @@ const Navbar: React.FC<{}> = () => {
 
               {/* Collection Menu */}
               <NavDropdown
+                label="Collection"
                 triggerContent={
-                  <div className="flex flex-row space-x-2">
-                    <ListChecks className="h-5 w-5" />
-                    <span>Collection</span>
+                  <div className="flex flex-col items-center md:flex-row md:space-x-2">
+                    <ListChecks className="h-5 w-5" aria-hidden="true" />
+                    <span className="text-xs md:text-base">Collection</span>
                   </div>
                 }
               >
@@ -204,20 +221,27 @@ const Navbar: React.FC<{}> = () => {
 
               {/* Wishlist */}
               <NavigationMenuItem>
-                <NavItem href="/wishlists">
-                  <div className="flex flex-row items-center space-x-2">
-                    <Heart className="!h-5 !w-5"/>
-                    <span>Wishlists</span>
+                <NavItem href="/wishlists" ariaLabel="Wishlists">
+                  <div className="flex flex-col items-center md:flex-row md:space-x-2">
+                    <Heart
+                      className="text-foreground size-5"
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs md:text-base">Wishlists</span>
                   </div>
                 </NavItem>
               </NavigationMenuItem>
             </NavigationMenuList>
 
-            <NavigationMenuViewport className="NavigationMenuViewport" />
+            <NavigationMenuViewport
+              className="NavigationMenuViewport"
+              aria-label="Navigation menu viewport"
+            />
           </NavigationMenu>
         </div>
-        <ThemeToggle />
-      </div>
+        <div className="hidden md:block">
+          <ThemeToggle />
+        </div>
     </nav>
   );
 };

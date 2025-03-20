@@ -42,7 +42,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
     <div
       key={deck.id}
       className={cn(
-        'group bg-card hover:bg-card/90 border-muted relative w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
+        'group bg-card hover:bg-card/90 border-muted relative w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg isolate',
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
           : '',
