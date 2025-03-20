@@ -22,10 +22,12 @@ const NavItem = ({
   href,
   children,
   ariaLabel,
+  className,
 }: {
   href: string;
   children: React.ReactNode;
   ariaLabel?: string;
+  className?: string;
 }) => {
   return (
     <NavigationMenuLink asChild>
@@ -33,7 +35,8 @@ const NavItem = ({
         href={href}
         aria-label={ariaLabel}
         className={cn(
-          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+          className,
         )}
       >
         {children}
@@ -46,14 +49,19 @@ const NavDropdown = ({
   triggerContent,
   children,
   label,
+  className,
 }: {
   triggerContent: React.ReactNode;
   children: React.ReactNode;
   label: string;
+  className?: string;
 }) => {
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger className="group" aria-label={`${label} menu`}>
+      <NavigationMenuTrigger
+        className={cn('group', className)}
+        aria-label={`${label} menu`}
+      >
         {triggerContent}
       </NavigationMenuTrigger>
       <NavigationMenuContent
@@ -133,115 +141,118 @@ const ListItem = React.forwardRef<
 ListItem.displayName = 'ListItem';
 
 const Navbar: React.FC<{}> = () => {
+  const elementCLS =
+    'flex flex-col items-center !px-0 md:flex-row md:space-x-2';
   return (
     <nav
-      className="fixed right-0 bottom-0 left-0 z-10 flex border-t bg-purple-800 px-4 text-sm shadow-md md:relative md:bottom-auto md:border-t-0 md:py-2"
+      className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t px-4 py-1 text-sm shadow-md md:relative md:bottom-auto md:border-t-0 md:py-2"
       role="navigation"
       aria-label="Main navigation"
     >
-        <div className="flex !w-full items-center md:w-auto">
-          <div className="mr-4 py-1 text-2xl font-bold md:block md:py-0">
-            <Link href="/" aria-label="Home">
-              <Logo />
-            </Link>
-          </div>
-          <NavigationMenu>
-            <NavigationMenuList
-              className="relative flex w-full flex-auto justify-between md:justify-start"
-              role="menubar"
-              aria-label="Main menu"
+      <div className="mr-4 py-1 text-2xl font-bold md:block md:py-0">
+        <Link href="/" aria-label="Home">
+          <Logo />
+        </Link>
+      </div>
+      <NavigationMenu className="md:justify-start">
+        <NavigationMenuList
+          className="relative gap-2 md:justify-start"
+          role="menubar"
+          aria-label="Main menu"
+        >
+          {/* Decks Menu */}
+          <NavDropdown
+            label="Decks"
+            className="bg-sidebar"
+            triggerContent={
+              <div className={elementCLS}>
+                <Book className="h-5 w-5" aria-hidden="true" />
+                <span className="text-xs md:text-base">Decks</span>
+              </div>
+            }
+          >
+            <DropdownList>
+              <DropdownOverview
+                title="Decks"
+                description="Manage your Magic: The Gathering decks across formats"
+                href="/decks"
+                imageSrc="/images/deck-w.png"
+              />
+              <ListItem
+                href="/decks/paper"
+                title="Paper Decks"
+                imageSrc="/images/card-w.png"
+              >
+                Manage your physical Magic: The Gathering decks
+              </ListItem>
+              <ListItem
+                href="/decks/arena"
+                title="Arena Decks"
+                imageSrc="/images/arena-w.png"
+              >
+                Organize and track your MTG Arena decks
+              </ListItem>
+            </DropdownList>
+          </NavDropdown>
+
+          {/* Collection Menu */}
+          <NavDropdown
+            label="Collection"
+            className="bg-sidebar"
+            triggerContent={
+              <div className={elementCLS}>
+                <ListChecks className="h-5 w-5" aria-hidden="true" />
+                <span className="text-xs md:text-base">Collect</span>
+              </div>
+            }
+          >
+            <DropdownList>
+              <DropdownOverview
+                title="Collection"
+                description="Track your Magic cards across platforms"
+                href="/collection"
+                imageSrc="/images/card-w.png"
+              />
+              <ListItem
+                href="/collection/paper"
+                title="Paper Collection"
+                imageSrc="/images/card-w.png"
+              >
+                Catalog your physical Magic cards
+              </ListItem>
+              <ListItem
+                href="/collection/arena"
+                title="Arena Collection"
+                imageSrc="/images/arena-w.png"
+              >
+                Track your MTG Arena card collection
+              </ListItem>
+            </DropdownList>
+          </NavDropdown>
+
+          {/* Wishlist */}
+          <NavigationMenuItem>
+            <NavItem
+              href="/wishlists"
+              ariaLabel="Wishlists"
+              className="bg-sidebar"
             >
-              {/* Decks Menu */}
-              <NavDropdown
-                label="Decks"
-                triggerContent={
-                  <div className="flex flex-col items-center md:flex-row md:space-x-2">
-                    <Book className="h-5 w-5" aria-hidden="true" />
-                    <span className="text-xs md:text-base">Decks</span>
-                  </div>
-                }
-              >
-                <DropdownList>
-                  <DropdownOverview
-                    title="Decks"
-                    description="Manage your Magic: The Gathering decks across formats"
-                    href="/decks"
-                    imageSrc="/images/deck-w.png"
-                  />
-                  <ListItem
-                    href="/decks/paper"
-                    title="Paper Decks"
-                    imageSrc="/images/card-w.png"
-                  >
-                    Manage your physical Magic: The Gathering decks
-                  </ListItem>
-                  <ListItem
-                    href="/decks/arena"
-                    title="Arena Decks"
-                    imageSrc="/images/arena-w.png"
-                  >
-                    Organize and track your MTG Arena decks
-                  </ListItem>
-                </DropdownList>
-              </NavDropdown>
+              <div className={elementCLS}>
+                <Heart className="text-foreground size-5" aria-hidden="true" />
+                <span className="text-xs md:text-base">Wishlists</span>
+              </div>
+            </NavItem>
+          </NavigationMenuItem>
+        </NavigationMenuList>
 
-              {/* Collection Menu */}
-              <NavDropdown
-                label="Collection"
-                triggerContent={
-                  <div className="flex flex-col items-center md:flex-row md:space-x-2">
-                    <ListChecks className="h-5 w-5" aria-hidden="true" />
-                    <span className="text-xs md:text-base">Collection</span>
-                  </div>
-                }
-              >
-                <DropdownList>
-                  <DropdownOverview
-                    title="Collection"
-                    description="Track your Magic cards across platforms"
-                    href="/collection"
-                    imageSrc="/images/card-w.png"
-                  />
-                  <ListItem
-                    href="/collection/paper"
-                    title="Paper Collection"
-                    imageSrc="/images/card-w.png"
-                  >
-                    Catalog your physical Magic cards
-                  </ListItem>
-                  <ListItem
-                    href="/collection/arena"
-                    title="Arena Collection"
-                    imageSrc="/images/arena-w.png"
-                  >
-                    Track your MTG Arena card collection
-                  </ListItem>
-                </DropdownList>
-              </NavDropdown>
-
-              {/* Wishlist */}
-              <NavigationMenuItem>
-                <NavItem href="/wishlists" ariaLabel="Wishlists">
-                  <div className="flex flex-col items-center md:flex-row md:space-x-2">
-                    <Heart
-                      className="text-foreground size-5"
-                      aria-hidden="true"
-                    />
-                    <span className="text-xs md:text-base">Wishlists</span>
-                  </div>
-                </NavItem>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-
-            <NavigationMenuViewport
-              className="NavigationMenuViewport"
-              aria-label="Navigation menu viewport"
-            />
-          </NavigationMenu>
-        </div>
-        <div className="hidden md:block">
-          <ThemeToggle />
-        </div>
+        <NavigationMenuViewport
+          className="NavigationMenuViewport"
+          aria-label="Navigation menu viewport"
+        />
+      </NavigationMenu>
+      <div className="hidden md:block">
+        <ThemeToggle />
+      </div>
     </nav>
   );
 };
