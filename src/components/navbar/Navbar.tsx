@@ -35,7 +35,7 @@ const NavItem = ({
         href={href}
         aria-label={ariaLabel}
         className={cn(
-          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex w-max items-center justify-center rounded-md px-2 py-1 text-xs font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50 md:px-4 md:py-2 md:text-sm',
           className,
         )}
       >
@@ -76,7 +76,7 @@ const NavDropdown = ({
 
 const DropdownList = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+    <ul className="grid gap-2 p-2 md:w-[400px] md:gap-3 md:p-6 lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
       {children}
     </ul>
   );
@@ -96,11 +96,13 @@ const DropdownOverview = ({
     <li className="row-span-2">
       <NavigationMenuLink asChild>
         <a
-          className="from-muted/50 to-muted flex size-full flex-col justify-end rounded-md bg-gradient-to-b p-6 no-underline outline-none select-none focus:shadow-md"
+          className="from-muted/50 to-muted flex size-full flex-col justify-end rounded-md bg-gradient-to-b p-2 no-underline outline-none select-none focus:shadow-md md:p-6"
           href={href}
         >
-          <div className="mb-2 text-lg font-medium">{title}</div>
-          <p className="text-muted-foreground text-sm leading-tight">
+          <div className="mb-1 text-sm font-medium md:mb-2 md:text-lg">
+            {title}
+          </div>
+          <p className="text-muted-foreground text-xs leading-tight md:text-sm">
             {description}
           </p>
         </a>
@@ -121,17 +123,25 @@ const ListItem = React.forwardRef<
     <NavigationMenuLink asChild>
       <a
         className={cn(
-          'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none',
+          'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-0.5 rounded-md p-1.5 leading-none no-underline transition-colors outline-none select-none md:space-y-1 md:p-3',
           className,
         )}
         ref={ref}
         {...props}
       >
         <div className="flex flex-row items-center space-x-1">
-          <Image src={imageSrc} alt="" width={15} height={15} />
-          <div className="text-sm leading-none font-medium">{title}</div>
+          <Image
+            src={imageSrc}
+            alt=""
+            width={12}
+            height={12}
+            className="md:h-[15px] md:w-[15px]"
+          />
+          <div className="text-xs leading-none font-medium md:text-sm">
+            {title}
+          </div>
         </div>
-        <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
+        <p className="text-muted-foreground line-clamp-2 text-xs leading-snug md:text-sm">
           {children}
         </p>
       </a>
@@ -142,21 +152,21 @@ ListItem.displayName = 'ListItem';
 
 const Navbar: React.FC<{}> = () => {
   const elementCLS =
-    'flex flex-col items-center !px-0 md:flex-row md:space-x-2';
+    'flex flex-col items-center !px-0 gap-0.5 md:flex-row md:gap-2';
   return (
     <nav
-      className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t px-4 py-1 text-sm shadow-md md:relative md:bottom-auto md:border-t-0 md:py-2"
+      className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t p-1 px-4 text-xs shadow-md md:relative md:bottom-auto md:border-t-0 md:px-4 md:py-1  md:text-sm"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="mr-4 py-1 text-2xl font-bold md:block md:py-0">
+      <div className="mr-2 py-0.5 text-xl font-bold md:mr-4 md:block md:text-2xl flex items-center">
         <Link href="/" aria-label="Home">
-          <Logo />
+          <Logo className="w-20" />
         </Link>
       </div>
       <NavigationMenu className="md:justify-start">
         <NavigationMenuList
-          className="relative gap-2 md:justify-start"
+          className="relative gap-1 md:justify-start md:gap-2"
           role="menubar"
           aria-label="Main menu"
         >
@@ -245,10 +255,10 @@ const Navbar: React.FC<{}> = () => {
           </NavigationMenuItem>
         </NavigationMenuList>
 
-        <NavigationMenuViewport
+        {/* <NavigationMenuViewport
           className="NavigationMenuViewport"
           aria-label="Navigation menu viewport"
-        />
+        /> */}
       </NavigationMenu>
       <div className="hidden md:block">
         <ThemeToggle />

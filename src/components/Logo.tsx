@@ -2,18 +2,20 @@
 
 import React from 'react';
 import { useTheme } from 'next-themes';
+import { cn } from '@/lib/utils';
+interface Props {
+  className?: string;
+}
 
-interface Props {}
-
-export const Logo: React.FC<Props> = ({}) => {
+export const Logo: React.FC<Props> = ({ className }) => {
   const { theme } = useTheme();
   const fill = theme === 'light' ? '#000000' : '#ffffff';
   return (
     <svg
       width="396"
-      height="184.30097712324255"
-      viewBox="0 0 350 162.89227776044163"
-      className="h-10 w-15"
+      height="184"
+      viewBox="0 0 350 170"
+      className={cn('h-10 w-10', className)}
     >
       <defs id="SvgjsDefs1820"></defs>
       <g
