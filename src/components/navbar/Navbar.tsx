@@ -15,14 +15,8 @@ import {
 import { cn } from '@/lib/utils';
 import React from 'react';
 import './Navbar.css';
+import { Logo } from '../Logo';
 
-interface NavbarProps {}
-
-interface Props extends React.HTMLAttributes<HTMLElement> {
-  title: string;
-  children?: React.ReactNode;
-  href: string;
-}
 
 const NavItem = ({
   href,
@@ -76,7 +70,6 @@ const DropdownOverview = ({
   title,
   description,
   href,
-  imageSrc,
 }: {
   title: string;
   description: string;
@@ -131,23 +124,13 @@ const ListItem = React.forwardRef<
 ));
 ListItem.displayName = 'ListItem';
 
-const Navbar: React.FC<NavbarProps> = () => {
+const Navbar: React.FC<{}> = () => {
   return (
     <nav className="px-4 py-2 shadow-md">
       <div className="container flex items-center">
-        <div className="mr-4 text-2xl font-bold">Magic Collection</div>
+        <div className="mr-4 text-2xl font-bold"><Link href="/"><Logo/></Link></div>
         <NavigationMenu>
           <NavigationMenuList className="relative">
-            {/* Browse */}
-            <NavigationMenuItem>
-              <NavItem href="/">
-                <div className="flex flex-row items-center space-x-2">
-                  <Home className="!h-5 !w-5" color="white" />
-                  <span>Browse</span>
-                </div>
-              </NavItem>
-            </NavigationMenuItem>
-
             {/* Decks Menu */}
             <NavDropdown
               triggerContent={
