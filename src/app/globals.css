@@ -1,4 +1,14 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Industry';
+  src: url('/fonts/Industry/IndustryTest-Demi.otf') format('otf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind utilities;
 
 @plugin "tailwindcss-animate";
 
@@ -122,5 +132,10 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1{
+    font-family: 'Industry', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
   }
 }

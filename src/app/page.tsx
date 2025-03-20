@@ -4,7 +4,7 @@ import CardModal from '@/components/CardModal';
 import { CardModalProvider } from '@/context/CardModalContext';
 
 export const metadata: Metadata = {
-  title: 'My Awesome Cards',
+  title: 'MTG Collection',
 };
 
 const Page = async (props: {

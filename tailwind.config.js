@@ -7,7 +7,11 @@ export default {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'latin-946': ['946Latin', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };
