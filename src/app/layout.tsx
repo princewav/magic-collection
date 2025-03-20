@@ -5,6 +5,7 @@ import { CardModalProvider } from '@/context/CardModalContext';
 import Navbar from '@/components/navbar/Navbar';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,11 +20,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={cn(inter.className, 'dark')}>
-        <Navbar />
-        <CardModalProvider>{children}</CardModalProvider>
-        <Toaster />
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={cn(
+          inter.className,
+          'bg-background text-foreground min-h-screen',
+        )}
+      >
+        <ThemeProvider>
+          <Navbar />
+          <CardModalProvider>{children}</CardModalProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

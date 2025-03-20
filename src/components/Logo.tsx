@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useTheme } from 'next-themes';
 
@@ -5,7 +7,7 @@ interface Props {}
 
 export const Logo: React.FC<Props> = ({}) => {
   const { theme } = useTheme();
-  const fill = theme === 'dark' ? '#000000' : '#ffffff';
+  const fill = theme === 'light' ? '#000000' : '#ffffff';
   return (
     <svg
       width="396"
