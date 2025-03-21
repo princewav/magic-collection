@@ -58,9 +58,9 @@ export const WishlistInfo = ({ wishlist }: Props) => {
       </div>
       <div className="flex flex-col items-end justify-between space-y-2">
         <Link href={`/wishlists/${wishlist.id}/edit`}>
-          <Button className="w-40">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Wishlist
+          <Button className="">
+            <Edit className="md:mr-2 h-4 w-4" />
+            <span className="hidden md:block">Edit Wishlist</span>
           </Button>
         </Link>
       </div>

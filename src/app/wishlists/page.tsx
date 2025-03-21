@@ -16,7 +16,7 @@ export default async function WishlistPage() {
   return (
     <main className="flex flex-col p-6 container mx-auto">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-4xl font-bold">WISH LISTS</h1>
+        <h1 className="text-4xl font-bold">WISHLISTS</h1>
         <div className="flex gap-2">
           <Button asChild className="flex items-center gap-2">
             <Link href="/wishlists/new">
