@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { deleteWishlist } from '@/actions/wishlist/delete-wishlist';
 import { duplicateWishlist } from '@/actions/wishlist/duplicate-wishlist';
+import { Copy, Trash } from 'lucide-react';
 
 interface WishlistContextMenuProps {
   x: number;
@@ -82,14 +83,16 @@ export const WishlistContextMenu: React.FC<WishlistContextMenuProps> = ({
       <div className="flex flex-col">
         <button
           onClick={handleDuplicateClick}
-          className="hover:bg-card/90 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm"
+          className="hover:text-accent-foreground hover:bg-accent-foreground/10 flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-left text-sm"
         >
+          <Copy className="size-4" />
           <span>Duplicate</span>
         </button>
         <button
           onClick={handleDeleteClick}
-          className="text-destructive hover:bg-card/90 flex items-center gap-2 rounded px-2 py-1.5 text-left text-sm"
+          className="text-destructive hover:text-accent-foreground hover:bg-accent-foreground/10 flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-left text-sm"
         >
+          <Trash className="size-4" />
           <span>Delete</span>
         </button>
       </div>

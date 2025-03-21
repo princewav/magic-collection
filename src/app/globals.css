@@ -43,7 +43,7 @@
   --color-muted-foreground: var(--text-800);
   --color-muted: var(--background-100);
   --color-secondary-foreground: var(--text-900);
-  --color-secondary: var(--secondary-100);
+  --color-secondary: var(--secondary-200);
   --color-primary-foreground: var(--text-50);
   --color-primary: var(--primary-700);
   --color-popover-foreground: var(--text-900);

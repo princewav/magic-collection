@@ -7,7 +7,7 @@ import { useWishlistSelection } from '@/context/WishlistSelectionContext';
 import { deleteWishlists } from '@/actions/wishlist/delete-wishlists';
 import { mergeWishlists } from '@/actions/wishlist/merge-wishlists';
 import { Trash, Merge } from 'lucide-react';
-
+import { Button } from '../ui/button';
 interface WishlistSelectionActionsProps {
   wishlistCount: number;
 }
@@ -85,48 +85,50 @@ export const WishlistSelectionActions: React.FC<
   };
 
   return (
-    <div className="bg-card animate-in fade-in fixed bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-4 rounded-lg px-4 py-2 shadow-lg">
+    <div className="bg-card animate-in fade-in fixed bottom-20 left-1/2 z-10 flex -translate-x-1/2 items-center gap-4 rounded-lg p-2 pl-3 shadow-lg min-w-max border-secondary/6 *:0 border-1">
       <span className="font-medium">
-        {wishlistCount} wishlist{wishlistCount > 1 ? 's' : ''} selected
+        {wishlistCount} selected
       </span>
 
       <div className="flex items-center gap-2">
-        <button
+        <Button
           disabled={isMerging || isDeleting || selectedWishlists.length < 2}
           onClick={handleMerge}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground flex items-center gap-1 rounded-md px-3 py-1 text-sm disabled:opacity-50"
+          className="rounded-md px-3 py-1 text-sm"
         >
           {isMerging ? (
             'Merging...'
           ) : (
             <>
               <Merge className="h-4 w-4" />
-              Merge
+              <span className="hidden md:block">Merge</span>
             </>
           )}
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="destructive"
           disabled={isDeleting || isMerging}
           onClick={handleDelete}
-          className="bg-destructive hover:bg-destructive/90 text-destructive-foreground flex items-center gap-1 rounded-md px-3 py-1 text-sm disabled:opacity-50"
+          className="rounded-md px-3 py-1 text-sm"
         >
           {isDeleting ? (
             'Deleting...'
           ) : (
             <>
               <Trash className="h-4 w-4" />
-              Delete
+              <span className="hidden md:block">Delete</span>
             </>
           )}
-        </button>
+        </Button>
 
-        <button
+        <Button
+          variant="secondary"
           onClick={clearWishlistSelection}
-          className="bg-secondary hover:bg-secondary/80 rounded-md px-3 py-1 text-sm"
+          className="rounded-md px-3 py-1 text-sm border-primary/10 border-1"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

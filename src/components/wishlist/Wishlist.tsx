@@ -41,7 +41,7 @@ export const Wishlist: React.FC<WishlistProps> = ({
     <div
       key={wishlist.id}
       className={cn(
-        'group bg-card hover:bg-card/90 border-muted relative w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
+        'group bg-card hover:bg-card/90 border-muted relative isolate w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
           : '',
@@ -49,7 +49,7 @@ export const Wishlist: React.FC<WishlistProps> = ({
     >
       <Checkbox
         id={`wishlist-${wishlist.id}`}
-        className="border-primary/50 text-primary focus:border-primary focus:ring-primary absolute top-2 right-2 z-10 size-7 cursor-pointer rounded-full border-3 shadow-sm"
+        className="border-secondary/50 text-primary focus:border-secondary focus:ring-secondary bg-foreground/30 absolute top-2 left-2 z-10 size-7 cursor-pointer rounded-full border-3 shadow-sm"
         checked={isChecked}
         onCheckedChange={handleCheckboxChange}
         stroke={3}
