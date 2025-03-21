@@ -38,7 +38,7 @@ const NavItem = ({
         href={href}
         aria-label={ariaLabel}
         className={cn(
-          'inline-flex w-max items-center justify-center rounded-md px-2 py-1 text-xs font-medium disabled:pointer-events-none disabled:opacity-50 md:px-4 md:py-2 md:text-sm',
+          'inline-flex w-max items-center justify-center rounded-md px-4 py-2 text-xs font-medium disabled:pointer-events-none disabled:opacity-50 md:px-4 md:py-2 md:text-sm',
           className,
         )}
       >
