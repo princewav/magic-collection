@@ -258,9 +258,9 @@
   body {
     @apply bg-background text-foreground;
   }
-  h1 {
+  h1, h2 {
     font-family: 'Industry', sans-serif;
     text-transform: uppercase;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.00em;
   }
 }

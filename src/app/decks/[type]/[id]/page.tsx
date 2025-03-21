@@ -46,8 +46,8 @@ export default async function DeckDetailPage({ params }: Props) {
         <DeckInfo deck={deck} />
         <MissingCardsModal />
         <CardModalProvider>
-          <Filters />
-          <h2 className="text-2xl font-bold">Main Deck</h2>
+          {/* <Filters /> */}
+          <h2 className="mt-6 mb-3 text-xl md:text-2xl font-bold">Main Deck</h2>
           <DeckCardGrid
             decklist={deck.maindeck}
             collectedCards={maindeckOwned}

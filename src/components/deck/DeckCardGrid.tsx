@@ -153,40 +153,44 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
 
   return (
     <>
-      <div className="right-0 mb-2 flex items-center gap-3">
-        <p className="flex items-center gap-1">
+      <div className="right-0 mb-4 flex items-center gap-3">
+        <p className="flex items-center gap-1 text-sm md:text-base">
           <Image
             src="/images/rarities/common.png"
             alt="Common"
             width={32}
             height={32}
+            className="size-6 md:size-8"
           />
           {rarityTotals.common || 0}
         </p>
-        <p className="flex items-center gap-1">
+        <p className="flex items-center gap-1 text-xs md:text-base">
           <Image
             src="/images/rarities/uncommon.png"
             alt="Uncommon"
             width={32}
             height={32}
+            className="size-6 md:size-8"
           />
           {rarityTotals.uncommon || 0}
         </p>
-        <p className="flex items-center gap-1">
+        <p className="flex items-center gap-1 text-sm md:text-base">
           <Image
             src="/images/rarities/rare.png"
             alt="Rare"
             width={32}
             height={32}
+            className="size-6 md:size-8"
           />
           {rarityTotals.rare || 0}
         </p>
-        <p className="flex items-center gap-1">
+        <p className="flex items-center gap-1 text-sm md:text-base">
           <Image
             src="/images/rarities/mythic.png"
             alt="Mythic"
             width={32}
             height={32}
+            className="size-6 md:size-8"
           />
           {rarityTotals.mythic || 0}
         </p>
