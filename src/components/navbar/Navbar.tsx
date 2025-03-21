@@ -68,7 +68,7 @@ const NavDropdown = ({
         {triggerContent}
       </NavigationMenuTrigger>
       <NavigationMenuContent
-        className="NavigationMenuContent absolute top-0 left-0 w-full"
+        className="NavigationMenuContent absolute top-0 left-0 w-full md:relative"
         aria-label={`${label} submenu`}
       >
         {children}
@@ -128,6 +128,7 @@ const ListItem = React.forwardRef<
         className={cn(
           'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-0.5 rounded-md p-1.5 leading-none no-underline transition-colors outline-none select-none md:space-y-1 md:p-3',
           className,
+          "border-l-2 border-accent rounded-l-none"
         )}
         ref={ref}
         {...props}
@@ -138,7 +139,7 @@ const ListItem = React.forwardRef<
             alt=""
             width={12}
             height={12}
-            className="md:h-[15px] md:w-[15px]"
+            className="md:h-[15px] md:w-[15px] shadow shadow-accent/50"
           />
           <div className="text-xs leading-none font-medium md:text-sm">
             {title}
@@ -187,12 +188,12 @@ const Navbar: React.FC<{}> = () => {
             }
           >
             <DropdownList>
-              <DropdownOverview
+              {/* <DropdownOverview
                 title="Decks"
                 description="Manage your Magic: The Gathering decks across formats"
                 href="/decks"
                 imageSrc="/images/deck-w.png"
-              />
+              /> */}
               <ListItem
                 href="/decks/paper"
                 title="Paper Decks"
@@ -222,12 +223,12 @@ const Navbar: React.FC<{}> = () => {
             }
           >
             <DropdownList>
-              <DropdownOverview
+              {/* <DropdownOverview
                 title="Collection"
                 description="Track your Magic cards across platforms"
                 href="/collection"
                 imageSrc="/images/card-w.png"
-              />
+              /> */}
               <ListItem
                 href="/collection/paper"
                 title="Paper Collection"

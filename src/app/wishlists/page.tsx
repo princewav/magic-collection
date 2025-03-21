@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { WishlistGrid } from '@/components/wishlist/WishlistGrid';
 import { loadWishlists } from '@/actions/wishlist/load-wishlists';
+import { Plus } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Wishlists',
@@ -13,12 +14,13 @@ export default async function WishlistPage() {
   const wishlists = await loadWishlists();
 
   return (
-    <main className="flex flex-col p-4">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-4xl font-bold">My Wishlists</h1>
+    <main className="flex flex-col p-6 container mx-auto">
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-4xl font-bold">WISH LISTS</h1>
         <div className="flex gap-2">
           <Button asChild className="flex items-center gap-2">
             <Link href="/wishlists/new">
+              <Plus className="size-4" />
               <span>Create Wishlist</span>
             </Link>
           </Button>
