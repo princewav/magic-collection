@@ -139,7 +139,7 @@ const ListItem = React.forwardRef<
             alt=""
             width={12}
             height={12}
-            className="md:h-[15px] md:w-[15px] shadow shadow-accent/50"
+            className="md:h-[15px] md:w-[15px] invert-75 dark:invert-0"
           />
           <div className="text-xs leading-none font-medium md:text-sm">
             {title}
