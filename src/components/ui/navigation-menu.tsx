@@ -61,7 +61,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  'group inline-flex w-max items-center justify-center  bg-background px-4 py-2 text-sm font-medium rounded-sm hover:bg-accent/60   disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent/60  data-[state=open]:bg-accent/30 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 transition-all duration-200 focus-visible:ring-4 focus-visible:outline-1',
+  'group inline-flex w-max items-center justify-center  bg-background px-4 py-2 text-sm font-medium rounded-sm hover:bg-accent/30   disabled:pointer-events-none disabled:opacity-50 data-[state=open]:hover:bg-accent/30  data-[state=open]:bg-accent/30 ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 transition-all duration-200 focus-visible:ring-4 focus-visible:outline-1',
 );
 
 function NavigationMenuTrigger({
@@ -135,9 +135,9 @@ function NavigationMenuLink({
       data-slot="navigation-menu-link"
       data-active={props.active || false}
       className={cn(
-        'data-[active=true]:focus:bg-accent/40 data-[active=true]:hover:bg-accent/40',
-        'data-[active=true]:bg-accent/30 ',
-        'hover:bg-accent/40 hover:text-accent-foreground focus:bg-accent/40',
+        'data-[active=true]:focus:bg-accent/30 data-[active=true]:hover:bg-accent/30',
+        'data-[active=true]:bg-accent/20 ',
+        'hover:bg-accent/30 hover:text-accent-foreground focus:bg-accent/40',
         "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 [&_svg:not([class*='text-'])]:text-muted-foreground flex flex-col gap-0.5 rounded-sm p-1 text-xs transition-all duration-200 ease-in-out focus-visible:ring-4 focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
         'md:gap-1 md:p-2 md:text-sm',
         className,
