@@ -15,7 +15,7 @@ export function Card({ card, collectedQuantity = 0 }: CardProps) {
   console.log(card.name, card.quantity, collectedQuantity);
   return (
     <div
-      className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform"
+      className="bg-foreground/10 flex transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform max-w-60"
       onClick={() => {
         openModal(card);
       }}
@@ -26,7 +26,7 @@ export function Card({ card, collectedQuantity = 0 }: CardProps) {
             {Array.from({ length: Math.min(collectedQuantity, card.quantity) }, (_, i) => (
               <div
                 key={i}
-                className="h-2 w-2 rotate-45 transform bg-yellow-500"
+                className="h-2 w-2 rotate-45 transform bg-accent"
               />
             ))}
             {Array.from(

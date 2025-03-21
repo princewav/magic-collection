@@ -196,7 +196,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
         </p>
       </div>
 
-      <div className="mx-auto mt-2 flex flex-wrap gap-3">
+      <div className="mx-auto mt-2 gap-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {cardsWithQuantity?.map((card: CardWithQuantity) => (
           <div key={card.id} className="group relative">
             <div className="absolute inset-0 flex items-center justify-center">
