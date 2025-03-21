@@ -153,7 +153,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
 
   return (
     <>
-      <div className="right-0 mb-4 flex items-center gap-3">
+      <div className="right-0 mb-4 flex items-center gap-4">
         <p className="flex items-center gap-1 text-sm md:text-base">
           <Image
             src="/images/rarities/common.png"
