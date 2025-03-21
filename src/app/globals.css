@@ -19,12 +19,12 @@
   --color-foreground: var(--text-900);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--primary-500);
+  --color-sidebar-ring: var(--primary-700);
   --color-sidebar-border: var(--background-200);
   --color-sidebar-accent-foreground: var(--text-900);
-  --color-sidebar-accent: var(--accent-100);
+  --color-sidebar-accent: var(--accent-500);
   --color-sidebar-primary-foreground: var(--text-50);
-  --color-sidebar-primary: var(--primary-500);
+  --color-sidebar-primary: var(--primary-700);
   --color-sidebar-foreground: var(--text-900);
   --color-sidebar: var(--background-50);
   --color-chart-5: var(--chart-5);
@@ -32,19 +32,19 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
-  --color-ring: var(--primary-500);
+  --color-ring: var(--primary-700);
   --color-input: var(--background-200);
   --color-border: var(--background-200);
   --color-destructive-foreground: var(--text-50);
   --color-destructive: var(--accent-500);
   --color-accent-foreground: var(--text-900);
-  --color-accent: var(--accent-100);
-  --color-muted-foreground: var(--text-500);
+  --color-accent: var(--accent-500);
+  --color-muted-foreground: var(--text-800);
   --color-muted: var(--background-100);
   --color-secondary-foreground: var(--text-900);
   --color-secondary: var(--secondary-100);
   --color-primary-foreground: var(--text-50);
-  --color-primary: var(--primary-500);
+  --color-primary: var(--primary-700);
   --color-popover-foreground: var(--text-900);
   --color-popover: var(--background-50);
   --color-card-foreground: var(--text-900);
@@ -62,19 +62,19 @@
   --card-foreground: var(--text-900);
   --popover: var(--background-50);
   --popover-foreground: var(--text-900);
-  --primary: var(--primary-500);
+  --primary: var(--primary-700);
   --primary-foreground: var(--text-50);
   --secondary: var(--secondary-100);
   --secondary-foreground: var(--text-900);
   --muted: var(--background-100);
-  --muted-foreground: var(--text-500);
-  --accent: var(--accent-100);
+  --muted-foreground: var(--text-800);
+  --accent: var(--accent-500);
   --accent-foreground: var(--text-900);
   --destructive: var(--accent-500);
   --destructive-foreground: var(--text-50);
   --border: var(--background-200);
   --input: var(--background-200);
-  --ring: var(--primary-500);
+  --ring: var(--primary-700);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -83,12 +83,12 @@
   --radius: 0.625rem;
   --sidebar: var(--background-50);
   --sidebar-foreground: var(--text-900);
-  --sidebar-primary: var(--primary-500);
+  --sidebar-primary: var(--primary-700);
   --sidebar-primary-foreground: var(--text-50);
-  --sidebar-accent: var(--accent-100);
+  --sidebar-accent: var(--accent-500);
   --sidebar-accent-foreground: var(--text-900);
   --sidebar-border: var(--background-200);
-  --sidebar-ring: var(--primary-500);
+  --sidebar-ring: var(--primary-700);
 
   /* Light theme color variables */
   --text-50: #edf2f7;
@@ -159,7 +159,7 @@
   --card-foreground: var(--text-50);
   --popover: var(--background-950);
   --popover-foreground: var(--text-50);
-  --primary: var(--primary-500);
+  --primary: var(--primary-700);
   --primary-foreground: var(--text-50);
   --secondary: var(--secondary-800);
   --secondary-foreground: var(--text-50);
@@ -171,7 +171,7 @@
   --destructive-foreground: var(--text-50);
   --border: var(--background-800);
   --input: var(--background-800);
-  --ring: var(--primary-500);
+  --ring: var(--primary-700);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -179,12 +179,12 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: var(--background-950);
   --sidebar-foreground: var(--text-50);
-  --sidebar-primary: var(--primary-500);
+  --sidebar-primary: var(--primary-700);
   --sidebar-primary-foreground: var(--text-50);
   --sidebar-accent: var(--accent-800);
   --sidebar-accent-foreground: var(--text-50);
   --sidebar-border: var(--background-800);
-  --sidebar-ring: var(--primary-500);
+  --sidebar-ring: var(--primary-700);
 
   /* Dark theme color variables */
   --text-50: #080c12;

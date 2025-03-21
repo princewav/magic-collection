@@ -161,7 +161,7 @@ const Navbar: React.FC<{}> = () => {
     >
       <div className="mr-2 py-0.5 text-xl font-bold md:mr-4 md:block md:text-2xl flex items-center">
         <Link href="/" aria-label="Home">
-          <Logo className="w-20" />
+          <Logo className="w-15" />
         </Link>
       </div>
       <NavigationMenu className="md:justify-start">
@@ -260,7 +260,7 @@ const Navbar: React.FC<{}> = () => {
           aria-label="Navigation menu viewport"
         /> */}
       </NavigationMenu>
-      <div className="hidden md:block">
+      <div className="hidden md:flex items-center">
         <ThemeToggle />
       </div>
     </nav>

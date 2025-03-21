@@ -42,7 +42,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
     <div
       key={deck.id}
       className={cn(
-        'group bg-card hover:bg-card/90 border-muted relative w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg isolate',
+        'group bg-card hover:bg-card/90 border-muted relative min-w-45 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg isolate',
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
           : '',
@@ -50,10 +50,11 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
     >
       <Checkbox
         id={`deck-${deck.id}`}
-        className="border-primary/50 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-7 cursor-pointer rounded-full border-3 shadow-sm"
+        className="border-white/30 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-7 cursor-pointer rounded-full border-3 shadow-sm "
         checked={isChecked}
         onCheckedChange={handleCheckboxChange}
         stroke={3}
+        color="white"
       />
       <Link href={`/decks/${type}/${deck.id}`} onContextMenu={handleContextMenu}>
         <div className="relative h-30 overflow-hidden">

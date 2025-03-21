@@ -32,7 +32,7 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
   };
 
   return (
-    <div className="relative flex flex-wrap gap-6">
+    <div className="relative flex flex-wrap gap-6 justify-center md:justify-start">
       {selectedDecks.length > 0 && (
         <DeleteDecksButton deckCount={selectedDecks.length} />
       )}

@@ -23,7 +23,7 @@ export default async function DecksPage({ params }: Props) {
   return (
       <div className="container mx-auto px-4 py-8">
         <div className="re mb-4 flex items-center justify-between">
-          <h1 className="flex items-center text-3xl font-bold">{type} decks</h1>
+          <h1 className="flex items-center text-2xl font-bold">{type} decks</h1>
           <div>
             <Button asChild>
               <Link href="/decks/new">Add Deck</Link>
