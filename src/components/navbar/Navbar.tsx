@@ -17,25 +17,28 @@ import React from 'react';
 import './Navbar.css';
 import { Logo } from '../Logo';
 import { ThemeToggle } from '../theme/ThemeToggle';
+import { usePathname } from 'next/navigation';
 
 const NavItem = ({
   href,
   children,
   ariaLabel,
-  className,
+  className,  
+  active,
 }: {
   href: string;
   children: React.ReactNode;
   ariaLabel?: string;
   className?: string;
+  active?: boolean;
 }) => {
   return (
-    <NavigationMenuLink asChild>
+    <NavigationMenuLink active={active} asChild>
       <Link
         href={href}
         aria-label={ariaLabel}
         className={cn(
-          'bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex w-max items-center justify-center rounded-md px-2 py-1 text-xs font-medium transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50 md:px-4 md:py-2 md:text-sm',
+          'inline-flex w-max items-center justify-center rounded-md px-2 py-1 text-xs font-medium disabled:pointer-events-none disabled:opacity-50 md:px-4 md:py-2 md:text-sm',
           className,
         )}
       >
@@ -151,15 +154,17 @@ const ListItem = React.forwardRef<
 ListItem.displayName = 'ListItem';
 
 const Navbar: React.FC<{}> = () => {
+  const pathname = usePathname();
+  
   const elementCLS =
     'flex flex-col items-center !px-0 gap-0.5 md:flex-row md:gap-2';
   return (
     <nav
-      className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t p-1 px-4 text-xs shadow-md md:relative md:bottom-auto md:border-t-0 md:px-4 md:py-1  md:text-sm"
+      className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t p-1 px-4 text-xs shadow-md md:relative md:bottom-auto md:border-t-0 md:px-4 md:py-1 md:text-sm"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="mr-2 py-0.5 text-xl font-bold md:mr-4 md:block md:text-2xl flex items-center">
+      <div className="mr-2 flex items-center py-0.5 text-xl font-bold md:mr-4 md:block md:text-2xl">
         <Link href="/" aria-label="Home">
           <Logo className="w-15" />
         </Link>
@@ -243,6 +248,7 @@ const Navbar: React.FC<{}> = () => {
           {/* Wishlist */}
           <NavigationMenuItem>
             <NavItem
+              active={pathname.includes('wishlists')}
               href="/wishlists"
               ariaLabel="Wishlists"
               className="bg-sidebar"
@@ -260,7 +266,7 @@ const Navbar: React.FC<{}> = () => {
           aria-label="Navigation menu viewport"
         /> */}
       </NavigationMenu>
-      <div className="hidden md:flex items-center">
+      <div className="hidden items-center md:flex">
         <ThemeToggle />
       </div>
     </nav>
