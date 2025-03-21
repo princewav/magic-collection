@@ -29,6 +29,8 @@
 ## Commit Message Conventions
 - Use **lowercase** for commit messages.
 - Do **not** include descriptions.
+- use conventional commits
+- keep the commit message concise
 - Example: `fix: button alignment`
 
 ## Shadcn Installation Commands
