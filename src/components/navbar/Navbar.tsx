@@ -182,7 +182,7 @@ const Navbar: React.FC<{}> = () => {
             className="bg-sidebar"
             triggerContent={
               <div className={elementCLS}>
-                <Book className="h-5 w-5" aria-hidden="true" />
+                <Book className="h-5 w-5 text-accent" aria-hidden="true" />
                 <span className="text-xs md:text-base">Decks</span>
               </div>
             }
@@ -217,7 +217,7 @@ const Navbar: React.FC<{}> = () => {
             className="bg-sidebar"
             triggerContent={
               <div className={elementCLS}>
-                <ListChecks className="h-5 w-5" aria-hidden="true" />
+                <ListChecks className="h-5 w-5 text-accent" aria-hidden="true" />
                 <span className="text-xs md:text-base">Collect</span>
               </div>
             }
@@ -255,7 +255,7 @@ const Navbar: React.FC<{}> = () => {
               className="bg-sidebar"
             >
               <div className={elementCLS}>
-                <Heart className="text-foreground size-5" aria-hidden="true" />
+                <Heart className=" size-5 text-accent" aria-hidden="true" />
                 <span className="text-xs md:text-base">Wishlists</span>
               </div>
             </NavItem>
