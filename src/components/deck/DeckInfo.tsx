@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Deck } from '@/types/deck';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Download, Edit, Import } from 'lucide-react';
+import { BookDashed, Download, Edit, Import } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
 import { useParams, usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -76,20 +76,20 @@ export const DeckInfo = ({ deck }: Props) => {
       </div>
       <div className="flex flex-col items-end justify-between space-y-2">
         <Link href={`/decks/${type}/${deck.id}/edit`}>
-          <Button className="w-40">
+          <Button className="md:w-40">
             <Edit />
-            Edit Deck
+            <span className="hidden md:block">Edit Deck</span>
           </Button>
         </Link>
-        <Button className="w-40" onClick={() => openModal(deck.id)}>
-          <Download />
-          Missing Cards
+        <Button className="md:w-40" onClick={() => openModal(deck.id)}>
+          <BookDashed />
+          <span className="hidden md:block">Missing Cards</span>
         </Button>
         {!pathname?.endsWith('/import') && (
           <Link href={`/decks/${type}/${deck.id}/import`}>
-            <Button className="w-40">
+            <Button className="md:w-40">
               <Import />
-              Import List
+              <span className="hidden md:block">Import List</span>
             </Button>
           </Link>
         )}
