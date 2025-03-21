@@ -46,17 +46,24 @@ export const DeckInfo = ({ deck }: Props) => {
   const colors = getColors();
 
   return (
-    <div className="bg-foreground/10 mb-4 flex items-center justify-between rounded-md p-4 shadow-md">
+    <div className="bg-foreground/10 mb-4 flex items-center justify-between rounded-md p-4 shadow-md relative overflow-hidden">
+      <Image
+        src={deck.imageUrl || '/placeholder-deck.jpg'}
+        alt={deck.name}
+        width={1500}
+        height={1000}
+        className="absolute inset-0 object-center object-cover rounded-md -z-10 opacity-30 md:hidden"
+      />
       <div className="flex items-center space-x-4">
         <Image
           src={deck.imageUrl || '/placeholder-deck.jpg'}
           alt={deck.name}
           width={150}
           height={100}
-          className="rounded-md"
+          className="hidden rounded-md md:block"
         />
         <div>
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-2xl font-semibold drop-shadow-xl drop-shadow-black">
             {deck.name}{' '}
             <div className="mt-1 mb-2 flex items-center space-x-1">
               {Array.isArray(colors) && colors.length > 0
