@@ -135,9 +135,9 @@ function NavigationMenuLink({
       data-slot="navigation-menu-link"
       data-active={props.active || false}
       className={cn(
-        'data-[active=true]:focus:bg-accent/50 data-[active=true]:hover:bg-accent/40',
+        'data-[active=true]:focus:bg-accent/40 data-[active=true]:hover:bg-accent/40',
         'data-[active=true]:bg-accent/30 ',
-        'hover:bg-accent/40 hover:text-accent-foreground focus:bg-accent',
+        'hover:bg-accent/40 hover:text-accent-foreground focus:bg-accent/40',
         "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 [&_svg:not([class*='text-'])]:text-muted-foreground flex flex-col gap-0.5 rounded-sm p-1 text-xs transition-all duration-200 ease-in-out focus-visible:ring-4 focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
         'md:gap-1 md:p-2 md:text-sm',
         className,

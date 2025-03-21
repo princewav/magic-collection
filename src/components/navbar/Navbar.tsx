@@ -249,7 +249,7 @@ const Navbar: React.FC<{}> = () => {
           {/* Wishlist */}
           <NavigationMenuItem>
             <NavItem
-              active={pathname.includes('wishlists')}
+              active={pathname.endsWith('wishlists')}
               href="/wishlists"
               ariaLabel="Wishlists"
               className="bg-sidebar"
