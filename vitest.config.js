@@ -1,15 +1,15 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    globals: true,  // Add this line
+    globals: true,
     typecheck: {
-      enabled: true
+      enabled: true,
     },
   },
   resolve: {
@@ -17,4 +17,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-})
+});
