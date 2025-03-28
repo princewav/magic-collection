@@ -69,7 +69,9 @@ export default function CardModal() {
   };
 
   const powerToughness =
-    card.power && card.toughness ? `${card.power} / ${card.toughness}` : null;
+    card.power !== null && card.toughness !== null
+      ? `${card.power} / ${card.toughness}`
+      : null;
 
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
@@ -143,7 +145,8 @@ export default function CardModal() {
                   </p>
                 )}
                 <p className="bg-background/20 rounded-2xl p-4 text-center text-xl text-gray-300">
-                  {card.type_line} - {card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}
+                  {card.type_line} -{' '}
+                  {card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}
                 </p>
                 {card.oracle_text && (
                   <div className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">
@@ -212,11 +215,14 @@ export default function CardModal() {
                   </Button>
                 </div>
               </div>
-              {powerToughness && (
-                <div className="mt-2 flex items-center justify-end">
-                  <p className="text-3xl text-white">{powerToughness}</p>
-                </div>
-              )}
+              <div className="flex flex-row items-center justify-between">
+                <p className="text-white">{card.set_name}</p>
+                {powerToughness && (
+                  <div className="mt-2 flex items-center justify-end">
+                    <p className="text-3xl text-white">{powerToughness}</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
