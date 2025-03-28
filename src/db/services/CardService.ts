@@ -2,6 +2,7 @@ import { Card, CollectionCard } from '@/types/card';
 import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
+import { Document } from 'mongodb';
 
 interface FilterOptions {
   colors?: string[];
@@ -13,6 +14,8 @@ interface FilterOptions {
   }>;
   sets?: string[];
 }
+
+const rarityOrder = ['common', 'uncommon', 'rare', 'mythic', 'bonus', 'special'];
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
@@ -107,10 +110,21 @@ export class CardService extends BaseService<Card> {
     }
 
     // Create sort object for MongoDB
-    const sortOptions: Record<string, 1 | -1> = {};
+    const sortOptions: Record<string, any> = {};
     if (filters.sortFields && filters.sortFields.length > 0) {
       filters.sortFields.forEach(({ field, order }) => {
-        sortOptions[field] = order === 'asc' ? 1 : -1;
+        if (field === 'rarity') {
+          // Custom rarity sorting
+          sortOptions[field] = {
+            $indexOfArray: [rarityOrder, '$rarity'],
+          };
+          // Invert the order if descending is requested
+          if (order === 'desc') {
+            sortOptions[field] = { $multiply: [-1, sortOptions[field]] };
+          }
+        } else {
+          sortOptions[field] = order === 'asc' ? 1 : -1;
+        }
       });
     }
 
@@ -154,24 +168,47 @@ export class CardService extends BaseService<Card> {
       query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
     }
 
-    // Create sort object for MongoDB
-    const sortOptions: Record<string, 1 | -1> = {};
-    if (filters.sortFields && filters.sortFields.length > 0) {
-      filters.sortFields.forEach(({ field, order }) => {
-        sortOptions[field] = order === 'asc' ? 1 : -1;
-      });
-    }
-
     const skip = (page - 1) * pageSize;
 
     // Execute queries in parallel
     const [total, docs] = await Promise.all([
       this.repo.collection.countDocuments(query),
       this.repo.collection
-        .find(query)
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(pageSize)
+        .aggregate([
+          { $match: query },
+          ...(filters.sortFields && filters.sortFields.length > 0
+            ? [
+                ...filters.sortFields.map(({ field, order }): Document => {
+                  if (field === 'rarity') {
+                    return {
+                      $addFields: {
+                        rarityOrder: {
+                          $indexOfArray: [rarityOrder, '$rarity'],
+                        },
+                      },
+                    };
+                  }
+                  return { $addFields: {} };
+                }),
+                {
+                  $sort: filters.sortFields.reduce(
+                    (acc, { field, order }) => {
+                      if (field === 'rarity') {
+                        acc.rarityOrder = order === 'asc' ? 1 : -1;
+                      } else {
+                        acc[field] = order === 'asc' ? 1 : -1;
+                      }
+                      return acc;
+                    },
+                    {} as Record<string, 1 | -1>,
+                  ),
+                },
+                { $project: { rarityOrder: 0 } },
+              ]
+            : []),
+          { $skip: skip },
+          { $limit: pageSize },
+        ])
         .toArray(),
     ]);
 

@@ -58,6 +58,7 @@ export function CardsProvider({
         );
 
         if (page === 1) {
+          setCards([]);
           setCards(newCards);
         } else {
           setCards((prev) => [...prev, ...newCards]);

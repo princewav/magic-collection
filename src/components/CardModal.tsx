@@ -143,7 +143,7 @@ export default function CardModal() {
                   </p>
                 )}
                 <p className="bg-background/20 rounded-2xl p-4 text-center text-xl text-gray-300">
-                  {card.type_line}
+                  {card.type_line} - {card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}
                 </p>
                 {card.oracle_text && (
                   <div className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">

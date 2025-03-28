@@ -156,6 +156,51 @@ describe('CardService', () => {
       expect(page1.total).toBe(page2.total);
       expect(page1.cards[0].name).not.toBe(page2.cards[0].name);
     });
+
+    it('should sort cards by rarity in correct order', async () => {
+      const filters = {
+        sortFields: [{ field: 'rarity', order: 'asc' as const }],
+      };
+
+      const { cards } = await cardService.getFilteredCardsWithPagination(
+        filters,
+        1,
+        100,
+      );
+
+      // Get unique rarities in order
+      const rarities = [...new Set(cards.map((card) => card.rarity))];
+
+      // Verify the order
+      expect(rarities).toEqual([
+        'common',
+        'uncommon',
+        'rare',
+        'mythic',
+        'bonus',
+        'special',
+      ]);
+
+      // Test descending order
+      const descFilters = {
+        sortFields: [{ field: 'rarity', order: 'desc' as const }],
+      };
+
+      const { cards: descCards } =
+        await cardService.getFilteredCardsWithPagination(descFilters, 1, 100);
+
+      // Get unique rarities in order for descending
+      const descRarities = [...new Set(descCards.map((card) => card.rarity))];
+
+      // Verify the descending order
+      expect(descRarities).toEqual([
+        'mythic',
+        'rare',
+        'uncommon',
+        'common',
+        'bonus',
+      ]);
+    });
   });
 
   describe('getByName', () => {
