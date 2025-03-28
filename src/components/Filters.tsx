@@ -52,10 +52,10 @@ export function Filters({ className }: { className?: string }) {
 
   // Rarity options
   const rarityOptions = [
-    { symbol: 'C', name: 'Common' },
-    { symbol: 'U', name: 'Uncommon' },
-    { symbol: 'R', name: 'Rare' },
-    { symbol: 'M', name: 'Mythic Rare' },
+    { symbol: 'C', name: 'Common', value: 'common' },
+    { symbol: 'U', name: 'Uncommon', value: 'uncommon' },
+    { symbol: 'R', name: 'Rare', value: 'rare' },
+    { symbol: 'M', name: 'Mythic Rare', value: 'mythic' },
   ];
 
   // Sort options
@@ -80,10 +80,10 @@ export function Filters({ className }: { className?: string }) {
   };
 
   // Toggle rarity selection
-  const toggleRarity = (symbol: string) => {
-    const newRarities = selectedRarities.includes(symbol)
-      ? selectedRarities.filter((r) => r !== symbol)
-      : [...selectedRarities, symbol];
+  const toggleRarity = (value: string) => {
+    const newRarities = selectedRarities.includes(value)
+      ? selectedRarities.filter((r) => r !== value)
+      : [...selectedRarities, value];
     setSelectedRarities(newRarities);
     updateFilters({
       colors: selectedColors,
@@ -91,6 +91,7 @@ export function Filters({ className }: { className?: string }) {
       rarities: newRarities,
       sortFields,
     });
+    console.log(newRarities);
   };
 
   // Handle sort field change
@@ -221,9 +222,9 @@ export function Filters({ className }: { className?: string }) {
                 {rarityOptions.map((option) => (
                   <button
                     key={option.symbol}
-                    onClick={() => toggleRarity(option.symbol)}
+                    onClick={() => toggleRarity(option.value)}
                     className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
-                      selectedRarities.includes(option.symbol)
+                      selectedRarities.includes(option.value)
                         ? 'ring-2 ring-offset-2 ' +
                           (option.symbol === 'C'
                             ? 'ring-gray-400'
