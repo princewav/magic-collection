@@ -3,18 +3,22 @@
 import { useCardModal } from '@/context/CardModalContext';
 import Image from 'next/image';
 import { Card as CardType } from '@/types/card';
-
+import { cn } from '@/lib/utils';
 interface CardProps {
   card: CardType & { quantity: number };
   collectedQuantity?: number;
+  className?: string;
 }
 
-export function Card({ card, collectedQuantity = 0 }: CardProps) {
+export function Card({ card, collectedQuantity = 0, className }: CardProps) {
   const { openModal } = useCardModal();
 
   return (
     <div
-      className="bg-foreground/10 flex w-[223px] transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform"
+      className={cn(
+        'bg-foreground/10 flex w-full transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform',
+        className,
+      )}
       onClick={() => {
         openModal(card);
       }}
@@ -46,9 +50,10 @@ export function Card({ card, collectedQuantity = 0 }: CardProps) {
           <Image
             src={card.image_uris.normal}
             alt={`Card ${card.name}`}
-            className="rounded-xl rounded-t-md"
-            width={223}
-            height={310}
+            className="h-auto w-full rounded-xl rounded-t-md"
+            width={400}
+            height={550}
+            style={{ aspectRatio: '0.72', width: '100%', height: 'auto' }}
           />
         ) : (
           <div className="flex h-32 w-full flex-col items-center justify-center rounded-t-md bg-transparent">

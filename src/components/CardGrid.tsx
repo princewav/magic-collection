@@ -51,9 +51,14 @@ export function CardGrid() {
 
   return (
     <div className="relative">
-      <div className="mx-auto grid grid-cols-1 place-items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+      <div className="flex flex-wrap justify-center gap-4">
         {cards.map((card: CardType, index: number) => (
-          <Card key={`${card.id}-${index}`} card={{ ...card, quantity: 0 }} />
+          <div
+            key={`${card.id}-${index}`}
+            className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]"
+          >
+            <Card card={{ ...card, quantity: 0 }} />
+          </div>
         ))}
       </div>
       <div ref={loadingRef} className="h-10 w-full">
