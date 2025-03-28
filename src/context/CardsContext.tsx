@@ -1,8 +1,15 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 import { Card } from '@/types/card';
 import { loadFilteredCards, FilterOptions } from '@/actions/card/load-cards';
+import { getFiltersFromUrl } from '@/lib/url-params';
 
 interface CardsContextType {
   cards: Card[];
@@ -48,6 +55,27 @@ export function CardsProvider({
     rarities: [],
     sortFields: [],
   });
+
+  // Initialize filters from URL if available (client-side only)
+  useEffect(() => {
+    const { filters: urlFilters, deduplicate: urlDeduplicate } =
+      getFiltersFromUrl();
+
+    if (Object.keys(urlFilters).length > 0) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        ...urlFilters,
+      }));
+
+      if (urlDeduplicate !== deduplicate) {
+        setDeduplicate(urlDeduplicate);
+      }
+
+      // Load cards with the URL filters
+      loadCards(1, urlFilters);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadCards = useCallback(
     async (page: number, newFilters?: FilterOptions) => {

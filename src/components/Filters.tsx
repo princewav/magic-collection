@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ManaSymbol } from './ManaSymbol';
 import { Slider } from '@/components/ui/slider';
 import { SetFilter } from './SetFilter';
@@ -22,6 +22,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
+import { updateUrlWithFilters, getFiltersFromUrl } from '@/lib/url-params';
 
 export function Filters({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -44,6 +45,61 @@ export function Filters({ className }: { className?: string }) {
   const [exactColorMatch, setExactColorMatch] = useState<boolean>(
     filters.exactColorMatch || false,
   );
+
+  // Sync with URL parameters on initial load
+  useEffect(() => {
+    const { filters: urlFilters, deduplicate: urlDeduplicate } =
+      getFiltersFromUrl();
+
+    // Only update if we have URL parameters
+    if (Object.keys(urlFilters).length > 0) {
+      const newFilters = {
+        ...filters,
+        ...urlFilters,
+      };
+
+      // Update local state
+      if (urlFilters.colors) setSelectedColors(urlFilters.colors);
+      if (urlFilters.cmcRange) setCmcRange(urlFilters.cmcRange);
+      if (urlFilters.rarities) setSelectedRarities(urlFilters.rarities);
+      if (urlFilters.sets) setSelectedSets(urlFilters.sets);
+      if (urlFilters.sortFields) setSortFields(urlFilters.sortFields);
+      if (urlFilters.exactColorMatch !== undefined)
+        setExactColorMatch(urlFilters.exactColorMatch);
+
+      // Update filters in context
+      updateFilters(newFilters);
+
+      // Update deduplicate if it's in the URL
+      if (urlDeduplicate !== deduplicate) {
+        toggleDeduplicate();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update URL when filters change
+  useEffect(() => {
+    updateUrlWithFilters(
+      {
+        colors: selectedColors,
+        cmcRange,
+        rarities: selectedRarities,
+        sets: selectedSets,
+        sortFields,
+        exactColorMatch,
+      },
+      deduplicate,
+    );
+  }, [
+    selectedColors,
+    cmcRange,
+    selectedRarities,
+    selectedSets,
+    sortFields,
+    exactColorMatch,
+    deduplicate,
+  ]);
 
   // Color filter options
   const colorFilters = [
