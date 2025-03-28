@@ -103,7 +103,7 @@ export class CardService extends BaseService<Card> {
 
     // Apply set filter
     if (filters.sets && filters.sets.length > 0) {
-      query.set = { $in: filters.sets };
+      query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
     }
 
     // Create sort object for MongoDB
@@ -151,7 +151,7 @@ export class CardService extends BaseService<Card> {
 
     // Apply set filter
     if (filters.sets && filters.sets.length > 0) {
-      query.set = { $in: filters.sets };
+      query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
     }
 
     // Create sort object for MongoDB
