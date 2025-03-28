@@ -9,10 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useCards } from '@/context/CardsContext';
 import { cn } from '@/lib/utils';
 import {
@@ -21,10 +18,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
 
 export function Filters({ className }: { className?: string }) {
@@ -200,7 +194,7 @@ export function Filters({ className }: { className?: string }) {
         className,
       )}
     >
-      {!isOpen && <h2 className="text-base font-medium md:text-lg">Filters</h2>}
+      {!isOpen && <h2 className="text-xs font-medium md:text-sm">Filters</h2>}
       <CollapsibleTrigger asChild>
         <div className="absolute top-5 right-3 flex cursor-pointer items-center justify-between">
           {isOpen ? (
@@ -214,14 +208,14 @@ export function Filters({ className }: { className?: string }) {
         <div className="">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
             {/* Color Filter */}
-            <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-base font-medium md:text-lg">Colors</h3>
-              <div className="flex flex-wrap justify-start gap-2">
+            <div className="grid grid-rows-[auto_1fr] gap-2">
+              <h3 className="text-xs font-medium md:text-sm">Colors</h3>
+              <div className="flex flex-wrap justify-start gap-2 px-1">
                 {colorFilters.map((filter) => (
                   <button
                     key={filter.symbol}
                     onClick={() => toggleColor(filter.symbol)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-full p-1 transition-all sm:h-10 sm:w-10 ${
+                    className={`flex h-7 w-7 items-center justify-center rounded-full p-1 transition-all md:h-8 md:w-8 ${
                       selectedColors.includes(filter.symbol)
                         ? 'bg-primary/20 ring-primary ring-2'
                         : 'hover:bg-muted'
@@ -245,7 +239,7 @@ export function Filters({ className }: { className?: string }) {
 
             {/* CMC Filter */}
             <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-base font-medium md:text-lg">
+              <h3 className="text-xs font-medium md:text-sm">
                 CMC: {cmcRange[0]} - {cmcRange[1]}
               </h3>
               <Slider
@@ -266,16 +260,16 @@ export function Filters({ className }: { className?: string }) {
             />
 
             {/* Rarity Filter */}
-            <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-base font-medium md:text-lg">Rarity</h3>
-              <div className="flex justify-start gap-2">
+            <div className="grid grid-rows-[auto_1fr] gap-2">
+              <h3 className="text-xs font-medium md:text-sm">Rarity</h3>
+              <div className="flex justify-start gap-3 px-1">
                 {rarityOptions.map((option) => (
                   <button
                     key={option.symbol}
                     onClick={() => toggleRarity(option.value)}
-                    className={`flex h-6 w-6 items-center justify-center rounded-full transition-all md:h-10 md:w-10 ${
+                    className={`flex h-7 w-7 items-center justify-center rounded-full transition-all md:h-8 md:w-8 ${
                       selectedRarities.includes(option.value)
-                        ? 'ring-2 ring-offset-2 ' +
+                        ? 'ring-2 ring-offset-1 ' +
                           (option.symbol === 'C'
                             ? 'ring-gray-400'
                             : option.symbol === 'U'
@@ -288,7 +282,7 @@ export function Filters({ className }: { className?: string }) {
                     title={option.name}
                   >
                     <span
-                      className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:h-7 md:w-7 md:text-base ${
+                      className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:text-base ${
                         option.symbol === 'C'
                           ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700'
                           : option.symbol === 'U'

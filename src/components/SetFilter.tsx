@@ -25,8 +25,8 @@ export function SetFilter({ selectedSets, onSetChange }: SetFilterProps) {
   };
 
   return (
-    <div className="grid grid-rows-[auto_1fr] gap-3">
-      <h3 className="text-base font-medium md:text-lg">Sets</h3>
+    <div className="grid grid-rows-[auto_1fr] gap-2">
+      <h3 className="text-xs md:text-sm font-medium">Sets</h3>
       <div className="flex flex-wrap gap-2">
         {selectedSets.map((set) => (
           <div
@@ -49,7 +49,7 @@ export function SetFilter({ selectedSets, onSetChange }: SetFilterProps) {
           onKeyDown={handleKeyDown}
           maxLength={3}
           placeholder="Enter set code (e.g. LTR)"
-          className="focus:ring-primary h-8 w-24 rounded-md border px-2 text-sm focus:ring-2 focus:outline-none"
+          className="focus:ring-primary h-8 rounded-md border px-2 text-sm focus:ring-2 focus:outline-none"
         />
       </div>
     </div>

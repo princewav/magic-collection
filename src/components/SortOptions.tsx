@@ -126,9 +126,9 @@ export function SortOptions({
   );
 
   return (
-    <div className="grid grid-rows-[auto_1fr] gap-3">
-      <h3 className="text-base font-medium md:text-lg">Sort By</h3>
-      <div className="grid grid-rows-[auto_auto] gap-3">
+    <div className="grid grid-rows-[auto_1fr] gap-2">
+      <h3 className="text-sm font-medium">Sort By</h3>
+      <div className="grid grid-rows-[auto_auto]">
         {/* Active sort fields */}
         <DndContext
           sensors={sensors}
@@ -139,7 +139,7 @@ export function SortOptions({
             items={sortFields.map((f) => f.field)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-2">
+            <div className={cn('space-y-2', sortFields.length > 0 && 'mb-2')}>
               {sortFields.map((field, index) => (
                 <SortableSortField
                   key={field.field}
