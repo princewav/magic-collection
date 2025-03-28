@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react';
 import { updateCardQuantity } from '@/actions/deck/update-card-quantity';
 import { toast } from 'sonner';
 import { Minus, Plus } from 'lucide-react';
+import { useCardModal } from '@/context/CardModalContext';
 
 interface Props {
   decklist?: CardWithQuantity[];
@@ -28,6 +29,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
     CardWithQuantity[]
   >([]);
   const [rarityTotals, setRarityTotals] = useState<Record<string, number>>({});
+  const { openModal } = useCardModal();
 
   useEffect(() => {
     const loadCards = async () => {
@@ -128,7 +130,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
     return (
       <span
         className={cn(
-          'absolute top-1 z-10 flex h-5 px-2 cursor-pointer items-center justify-center rounded-full bg-yellow-500/90 text-xl text-black opacity-0 transition-all duration-300 group-hover:opacity-100 hover:scale-110',
+          'absolute top-1 z-10 flex h-5 cursor-pointer items-center justify-center rounded-full bg-yellow-500/90 px-2 text-xl text-black opacity-0 transition-all duration-300 group-hover:opacity-100 hover:scale-110',
           sign === '-' ? 'left-1' : 'right-1',
           className,
         )}
@@ -139,11 +141,11 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
         }}
       >
         {sign === '-' ? (
-          <p className="text-xs flex items-center">
+          <p className="flex items-center text-xs">
             <Minus className="size-3" strokeWidth={3} />1
           </p>
         ) : (
-          <p className="text-xs flex items-center">
+          <p className="flex items-center text-xs">
             <Plus className="size-3" strokeWidth={3} />1
           </p>
         )}
@@ -196,10 +198,17 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
         </p>
       </div>
 
-      <div className="mx-auto mt-2 gap-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+      <div className="mx-auto mt-2 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {cardsWithQuantity?.map((card: CardWithQuantity) => (
-          <div key={card.id} className="group relative">
-            <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            key={card.id}
+            className="group relative"
+            onClick={() => openModal(card, cardsWithQuantity)}
+          >
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
               <QuantityButton card={card} sign="+" />
               <QuantityButton card={card} sign="-" />
             </div>

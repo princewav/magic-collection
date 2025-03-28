@@ -11,17 +11,12 @@ interface CardProps {
 }
 
 export function Card({ card, collectedQuantity = 0, className }: CardProps) {
-  const { openModal } = useCardModal();
-
   return (
     <div
       className={cn(
         'bg-foreground/10 flex w-full transform cursor-pointer flex-col items-center rounded-md shadow-md transition-transform',
         className,
       )}
-      onClick={() => {
-        openModal(card);
-      }}
     >
       <div className="relative flex w-full flex-col justify-center p-2">
         <div className="mb-2 flex w-full justify-center">

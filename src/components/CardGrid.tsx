@@ -5,9 +5,11 @@ import { Card as CardType } from '@/types/card';
 import { Card } from './Card';
 import { useEffect, useRef, useCallback } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
+import { useCardModal } from '@/context/CardModalContext';
 
 export function CardGrid() {
   const { cards, isLoading, loadNextPage, total } = useCards();
+  const { openModal } = useCardModal();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
@@ -57,7 +59,9 @@ export function CardGrid() {
             key={`${card.id}-${index}`}
             className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]"
           >
-            <Card card={{ ...card, quantity: 0 }} />
+            <div onClick={() => openModal(card, cards)}>
+              <Card card={{ ...card, quantity: 0 }} />
+            </div>
           </div>
         ))}
       </div>

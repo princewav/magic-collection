@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useCardModal } from '@/context/CardModalContext';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ManaSymbol } from './ManaSymbol';
 import { NumberSymbol } from './NumberSymbol';
@@ -27,9 +27,42 @@ interface CardData {
 }
 
 export default function CardModal() {
-  const { isOpen, card, closeModal } = useCardModal();
+  const {
+    isOpen,
+    card,
+    closeModal,
+    goToNextCard,
+    goToPrevCard,
+    hasNextCard,
+    hasPrevCard,
+  } = useCardModal();
   const [imageError, setImageError] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      switch (event.key) {
+        case 'ArrowRight':
+          if (hasNextCard) {
+            goToNextCard();
+          }
+          break;
+        case 'ArrowLeft':
+          if (hasPrevCard) {
+            goToPrevCard();
+          }
+          break;
+        case 'Escape':
+          closeModal();
+          break;
+        default:
+          break;
+      }
+    },
+    [isOpen, hasNextCard, hasPrevCard, goToNextCard, goToPrevCard, closeModal],
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,12 +76,14 @@ export default function CardModal() {
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, closeModal]);
+  }, [isOpen, closeModal, handleKeyDown]);
 
   if (!isOpen) {
     return null;
@@ -76,9 +111,29 @@ export default function CardModal() {
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
-        className="bg-sidebar max-h-[90vh] w-full max-w-4xl overflow-auto rounded-md p-6 shadow-md"
+        className="bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-md p-6 shadow-md"
         ref={modalRef}
       >
+        {hasPrevCard && (
+          <button
+            onClick={goToPrevCard}
+            className="bg-background/70 text-muted-foreground hover:text-foreground hover:bg-background/90 absolute top-1/2 left-4 z-10 flex h-10 w-10 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full transition-all duration-300"
+            aria-label="Previous card"
+          >
+            <ChevronLeft size={24} />
+          </button>
+        )}
+
+        {hasNextCard && (
+          <button
+            onClick={goToNextCard}
+            className="bg-background/70 text-muted-foreground hover:text-foreground hover:bg-background/90 absolute top-1/2 right-4 z-10 flex h-10 w-10 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full transition-all duration-300"
+            aria-label="Next card"
+          >
+            <ChevronRight size={24} />
+          </button>
+        )}
+
         <div className="relative p-4" id="modal-box">
           <button
             onClick={closeModal}

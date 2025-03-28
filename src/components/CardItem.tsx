@@ -6,15 +6,16 @@ import { useCardModal } from '@/context/CardModalContext';
 
 interface CardItemProps {
   card: Card;
+  cardsList?: Card[];
 }
 
-export function CardItem({ card }: CardItemProps) {
+export function CardItem({ card, cardsList }: CardItemProps) {
   const { openModal } = useCardModal();
 
   return (
     <div
       className="group relative aspect-[745/1040] w-full cursor-pointer overflow-hidden rounded-lg transition-transform duration-200 hover:scale-105"
-      onClick={() => openModal(card)}
+      onClick={() => openModal(card, cardsList)}
     >
       <Image
         src={card.image_uris?.normal || '/card-back.jpg'}
