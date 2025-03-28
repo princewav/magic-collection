@@ -13,7 +13,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
@@ -137,9 +137,14 @@ export function SortOptions({
         >
           <SortableContext
             items={sortFields.map((f) => f.field)}
-            strategy={verticalListSortingStrategy}
+            strategy={horizontalListSortingStrategy}
           >
-            <div className={cn('space-y-2', sortFields.length > 0 && 'mb-2')}>
+            <div
+              className={cn(
+                'flex flex-wrap gap-2',
+                sortFields.length > 0 && 'mb-2',
+              )}
+            >
               {sortFields.map((field, index) => (
                 <SortableSortField
                   key={field.field}

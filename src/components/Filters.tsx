@@ -205,17 +205,17 @@ export function Filters({ className }: { className?: string }) {
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
-        <div className="">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+        <div>
+          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row flex-wrap">
             {/* Color Filter */}
-            <div className="grid grid-rows-[auto_1fr] gap-2">
+            <div className="flex min-w-fit flex-col gap-2">
               <h3 className="text-xs font-medium md:text-sm">Colors</h3>
               <div className="flex flex-wrap justify-start gap-2 px-1">
                 {colorFilters.map((filter) => (
                   <button
                     key={filter.symbol}
                     onClick={() => toggleColor(filter.symbol)}
-                    className={`flex h-7 w-7 items-center justify-center rounded-full p-1 transition-all md:h-8 md:w-8 ${
+                    className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
                       selectedColors.includes(filter.symbol)
                         ? 'bg-primary/20 ring-primary ring-2'
                         : 'hover:bg-muted'
@@ -238,7 +238,7 @@ export function Filters({ className }: { className?: string }) {
             </div>
 
             {/* CMC Filter */}
-            <div className="grid grid-rows-[auto_1fr] gap-3">
+            <div className="flex min-w-[200px] flex-col gap-2">
               <h3 className="text-xs font-medium md:text-sm">
                 CMC: {cmcRange[0]} - {cmcRange[1]}
               </h3>
@@ -260,14 +260,14 @@ export function Filters({ className }: { className?: string }) {
             />
 
             {/* Rarity Filter */}
-            <div className="grid grid-rows-[auto_1fr] gap-2">
+            <div className="flex min-w-fit flex-col gap-2">
               <h3 className="text-xs font-medium md:text-sm">Rarity</h3>
               <div className="flex justify-start gap-3 px-1">
                 {rarityOptions.map((option) => (
                   <button
                     key={option.symbol}
                     onClick={() => toggleRarity(option.value)}
-                    className={`flex h-7 w-7 items-center justify-center rounded-full transition-all md:h-8 md:w-8 ${
+                    className={`flex size-6 items-center justify-center rounded-full transition-all md:size-7 ${
                       selectedRarities.includes(option.value)
                         ? 'ring-2 ring-offset-1 ' +
                           (option.symbol === 'C'
