@@ -7,6 +7,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -15,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { cn } from '@/lib/utils';
 
 export interface SortField {
   field: string;
@@ -45,19 +47,29 @@ function SortableSortField({
   onOrderChange,
   onRemove,
 }: SortableSortFieldProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: field.field });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: field.field });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    opacity: isDragging ? 0.5 : 1,
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 rounded-md border p-2"
+      className={cn(
+        'flex items-center gap-2 rounded-md border p-2',
+        isDragging && 'shadow-lg',
+      )}
     >
       <button
         className="text-muted-foreground hover:text-foreground cursor-move"
@@ -93,7 +105,7 @@ interface SortOptionsProps {
   sortFields: SortField[];
   onSortFieldChange: (field: string) => void;
   onRemoveSortField: (field: string) => void;
-  onDragEnd: (event: any) => void;
+  onDragEnd: (event: DragEndEvent) => void;
 }
 
 export function SortOptions({
@@ -103,7 +115,11 @@ export function SortOptions({
   onDragEnd,
 }: SortOptionsProps) {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
