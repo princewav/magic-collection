@@ -331,7 +331,7 @@ export function Filters({ className }: { className?: string }) {
             </div>
 
             {/* CMC Filter */}
-            <div className="flex min-w-[200px] flex-col gap-2">
+            <div className="flex min-w-[200px] flex-col gap-5">
               <h3 className="text-xs font-medium md:text-sm">
                 CMC: {cmcRange[0]} - {cmcRange[1]}
               </h3>
@@ -393,7 +393,7 @@ export function Filters({ className }: { className?: string }) {
             </div>
 
             {/* Deduplicate Toggle */}
-            <div className="flex min-w-fit flex-col gap-2">
+            <div className="flex min-w-fit flex-col gap-2.5">
               <h3 className="text-xs font-medium md:text-sm">Options</h3>
               <div className="flex items-center space-x-2">
                 <Switch
