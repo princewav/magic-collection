@@ -16,13 +16,15 @@ interface FilterOptions {
 }
 
 const rarityOrder = [
+  'bonus',
   'common',
   'uncommon',
   'rare',
   'mythic',
-  'bonus',
   'special',
 ];
+
+const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
@@ -95,52 +97,37 @@ export class CardService extends BaseService<Card> {
   async getFilteredCards(filters: FilterOptions): Promise<Card[]> {
     const query: Record<string, any> = {};
 
-    // Apply color filter
-    if (filters.colors && filters.colors.length > 0) {
-      query.colors = { $in: filters.colors };
+    // Apply filters
+    this.applyFilters(query, filters);
+
+    const needsCustomSorting = this.needsCustomSorting(filters);
+    const sortStage = this.buildSortStage(filters);
+
+    let pipeline = [];
+
+    if (needsCustomSorting) {
+      // Use aggregation with custom sort fields
+      pipeline = [
+        { $match: query },
+        ...this.buildCustomSortStages(filters),
+        { $sort: sortStage },
+        // Project out temporary fields
+        {
+          $project: {
+            _rarityIndex: 0,
+            _colorIndex: 0,
+            _colorCategory: 0,
+            _colorsArray: 0,
+          },
+        },
+      ];
+    } else {
+      // Use simple find with standard sort
+      pipeline = [{ $match: query }, { $sort: sortStage }];
     }
 
-    // Apply CMC range filter
-    if (filters.cmcRange) {
-      const [min, max] = filters.cmcRange;
-      query.cmc = { $gte: min, $lte: max };
-    }
+    const docs = await this.repo.collection.aggregate(pipeline).toArray();
 
-    // Apply rarity filter
-    if (filters.rarities && filters.rarities.length > 0) {
-      query.rarity = { $in: filters.rarities };
-    }
-
-    // Apply set filter
-    if (filters.sets && filters.sets.length > 0) {
-      query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
-    }
-
-    // Create sort object for MongoDB
-    const sortOptions: Record<string, any> = {};
-    if (filters.sortFields && filters.sortFields.length > 0) {
-      filters.sortFields.forEach(({ field, order }) => {
-        if (field === 'rarity') {
-          // Custom rarity sorting
-          sortOptions[field] = {
-            $indexOfArray: [rarityOrder, '$rarity'],
-          };
-          // Invert the order if descending is requested
-          if (order === 'desc') {
-            sortOptions[field] = { $multiply: [-1, sortOptions[field]] };
-          }
-        } else {
-          sortOptions[field] = order === 'asc' ? 1 : -1;
-        }
-      });
-    }
-
-    const cursor = this.repo.collection.find(query);
-    if (Object.keys(sortOptions).length > 0) {
-      cursor.sort(sortOptions);
-    }
-
-    const docs = await cursor.toArray();
     return docs.map(({ _id, ...doc }) => ({
       id: _id.toString(),
       ...doc,
@@ -154,6 +141,65 @@ export class CardService extends BaseService<Card> {
   ): Promise<{ cards: Card[]; total: number }> {
     const query: Record<string, any> = {};
 
+    // Apply filters
+    this.applyFilters(query, filters);
+
+    const skip = (page - 1) * pageSize;
+    const needsCustomSorting = this.needsCustomSorting(filters);
+    const sortStage = this.buildSortStage(filters);
+
+    let pipeline = [];
+
+    if (needsCustomSorting) {
+      // Use aggregation with custom sort fields
+      pipeline = [
+        { $match: query },
+        ...this.buildCustomSortStages(filters),
+        { $sort: sortStage },
+        // Project out temporary fields
+        {
+          $project: {
+            _rarityIndex: 0,
+            _colorIndex: 0,
+            _colorCategory: 0,
+            _colorsArray: 0,
+          },
+        },
+        { $skip: skip },
+        { $limit: pageSize },
+      ];
+    } else {
+      // Use simple find with standard sort
+      pipeline = [
+        { $match: query },
+        { $sort: sortStage },
+        { $skip: skip },
+        { $limit: pageSize },
+      ];
+    }
+
+    // Execute queries in parallel
+    const [total, docs] = await Promise.all([
+      this.repo.collection.countDocuments(query),
+      this.repo.collection.aggregate(pipeline).toArray(),
+    ]);
+
+    const cards = docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as Card[];
+
+    return {
+      cards,
+      total,
+    };
+  }
+
+  // Helper method to apply filters
+  private applyFilters(
+    query: Record<string, any>,
+    filters: FilterOptions,
+  ): void {
     // Apply color filter
     if (filters.colors && filters.colors.length > 0) {
       query.colors = { $in: filters.colors };
@@ -174,63 +220,103 @@ export class CardService extends BaseService<Card> {
     if (filters.sets && filters.sets.length > 0) {
       query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
     }
+  }
 
-    const skip = (page - 1) * pageSize;
+  // Helper to check if custom sorting is needed
+  private needsCustomSorting(filters: FilterOptions): boolean {
+    return (
+      filters.sortFields?.some(
+        (f) => f.field === 'colors' || f.field === 'rarity',
+      ) ?? false
+    );
+  }
 
-    // Execute queries in parallel
-    const [total, docs] = await Promise.all([
-      this.repo.collection.countDocuments(query),
-      this.repo.collection
-        .aggregate([
-          { $match: query },
-          ...(filters.sortFields && filters.sortFields.length > 0
-            ? [
-                ...filters.sortFields.map(({ field, order }): Document => {
-                  if (field === 'rarity') {
-                    return {
-                      $addFields: {
-                        rarityOrder: {
-                          $indexOfArray: [rarityOrder, '$rarity'],
-                        },
-                      },
-                    };
-                  }
-                  return { $addFields: {} };
-                }),
-                {
-                  $sort: {
-                    ...filters.sortFields.reduce(
-                      (acc, { field, order }) => {
-                        if (field === 'rarity') {
-                          acc.rarityOrder = order === 'asc' ? 1 : -1;
-                        } else {
-                          acc[field] = order === 'asc' ? 1 : -1;
-                        }
-                        return acc;
-                      },
-                      {} as Record<string, 1 | -1>,
-                    ),
-                    name: 1, // Always sort by name ascending as secondary sort
-                  },
+  // Helper to build the custom sort stages
+  private buildCustomSortStages(filters: FilterOptions): Document[] {
+    const stages: Document[] = [];
+
+    // Add field for rarity order if needed
+    if (filters.sortFields?.some((f) => f.field === 'rarity')) {
+      stages.push({
+        $addFields: {
+          _rarityIndex: {
+            $indexOfArray: [rarityOrder, '$rarity'],
+          },
+        },
+      });
+    }
+
+    // Add field for color order if needed
+    if (filters.sortFields?.some((f) => f.field === 'colors')) {
+      // First add a field to ensure colors is an array
+      stages.push({
+        $addFields: {
+          _colorsArray: {
+            $cond: {
+              if: { $eq: [{ $type: '$colors' }, 'array'] },
+              then: '$colors',
+              else: [],
+            },
+          },
+        },
+      });
+
+      // Now add the color category
+      stages.push({
+        $addFields: {
+          _colorCategory: {
+            $cond: {
+              if: { $eq: [{ $size: '$_colorsArray' }, 0] },
+              then: 'C',
+              else: {
+                $cond: {
+                  if: { $gt: [{ $size: '$_colorsArray' }, 1] },
+                  then: 'M',
+                  else: { $arrayElemAt: ['$_colorsArray', 0] },
                 },
-                { $project: { rarityOrder: 0 } },
-              ]
-            : []),
-          { $skip: skip },
-          { $limit: pageSize },
-        ])
-        .toArray(),
-    ]);
+              },
+            },
+          },
+        },
+      });
 
-    const cards = docs.map(({ _id, ...doc }) => ({
-      id: _id.toString(),
-      ...doc,
-    })) as unknown as Card[];
+      // Now add the index based on the category
+      stages.push({
+        $addFields: {
+          _colorIndex: {
+            $indexOfArray: [colorOrder, '$_colorCategory'],
+          },
+        },
+      });
+    }
 
-    return {
-      cards,
-      total,
-    };
+    return stages;
+  }
+
+  // Helper to build sort stage
+  private buildSortStage(filters: FilterOptions): Record<string, 1 | -1> {
+    const sortStage: Record<string, 1 | -1> = {};
+
+    if (filters.sortFields && filters.sortFields.length > 0) {
+      for (const { field, order } of filters.sortFields) {
+        const sortDirection = order === 'asc' ? 1 : -1;
+
+        if (field === 'rarity') {
+          sortStage._rarityIndex = sortDirection;
+        } else if (field === 'colors') {
+          sortStage._colorIndex = sortDirection;
+        } else {
+          sortStage[field] = sortDirection;
+        }
+      }
+    }
+
+    // Always add name as secondary sort criteria
+    if (!sortStage.name) {
+      sortStage.name = 1;
+    }
+
+    return sortStage;
   }
 }
 

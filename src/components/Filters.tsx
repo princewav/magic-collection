@@ -130,6 +130,7 @@ export function Filters({ className }: { className?: string }) {
       sets: selectedSets,
       sortFields: newFields,
     });
+    console.log('sortFields', newFields);
   };
 
   // Remove sort field

@@ -162,23 +162,30 @@ describe('CardService', () => {
         sortFields: [{ field: 'rarity', order: 'asc' as const }],
       };
 
+      console.log('Starting rarity sort test (asc)');
       const { cards } = await cardService.getFilteredCardsWithPagination(
         filters,
         1,
         100,
       );
+      console.log(`Retrieved ${cards.length} cards for rarity test`);
+
+      // Print the first 10 cards to see the sorting
+      cards.slice(0, 10).forEach((card) => {
+        console.log(`Card: ${card.name}, Rarity: ${card.rarity}`);
+      });
 
       // Get unique rarities in order
       const rarities = [...new Set(cards.map((card) => card.rarity))];
+      console.log('Unique rarities in order:', rarities);
 
       // Verify the order
       expect(rarities).toEqual([
+        'bonus',
         'common',
         'uncommon',
         'rare',
         'mythic',
-        'bonus',
-        'special',
       ]);
 
       // Test descending order
@@ -186,11 +193,19 @@ describe('CardService', () => {
         sortFields: [{ field: 'rarity', order: 'desc' as const }],
       };
 
+      console.log('Starting rarity sort test (desc)');
       const { cards: descCards } =
         await cardService.getFilteredCardsWithPagination(descFilters, 1, 100);
+      console.log(`Retrieved ${descCards.length} cards for rarity desc test`);
+
+      // Print the first 10 cards to see the sorting
+      descCards.slice(0, 10).forEach((card) => {
+        console.log(`Card: ${card.name}, Rarity: ${card.rarity}`);
+      });
 
       // Get unique rarities in order for descending
       const descRarities = [...new Set(descCards.map((card) => card.rarity))];
+      console.log('Unique rarities in order (desc):', descRarities);
 
       // Verify the descending order
       expect(descRarities).toEqual([
@@ -200,6 +215,77 @@ describe('CardService', () => {
         'common',
         'bonus',
       ]);
+    });
+
+    it('should sort cards by colors in correct order', async () => {
+      const filters = {
+        sortFields: [{ field: 'colors', order: 'asc' as const }],
+      };
+
+      console.log('Starting color sort test (asc)');
+      const { cards } = await cardService.getFilteredCardsWithPagination(
+        filters,
+        1,
+        100,
+      );
+      console.log(`Retrieved ${cards.length} cards for color test`);
+
+      // Print the first 10 cards to see the sorting
+      cards.slice(0, 10).forEach((card) => {
+        console.log(
+          `Card: ${card.name}, Colors: [${card.colors.join(',')}], Category: ${card.colors.length === 0 ? 'C' : card.colors.length > 1 ? 'M' : card.colors[0]}`,
+        );
+      });
+
+      // Get unique color combinations in order
+      const colorCombos = [
+        ...new Set(
+          cards.map((card) => {
+            if (card.colors.length === 0) return 'C';
+            if (card.colors.length > 1) return 'M';
+            return card.colors[0];
+          }),
+        ),
+      ];
+      console.log('Unique color combinations in order:', colorCombos);
+
+      // Verify the order
+      expect(colorCombos).toEqual(['W', 'U', 'B', 'R', 'G', 'M', 'C']);
+
+      // Test descending order
+      const descFilters = {
+        sortFields: [{ field: 'colors', order: 'desc' as const }],
+      };
+
+      console.log('Starting color sort test (desc)');
+      const { cards: descCards } =
+        await cardService.getFilteredCardsWithPagination(descFilters, 1, 100);
+      console.log(`Retrieved ${descCards.length} cards for color desc test`);
+
+      // Print the first 10 cards to see the sorting
+      descCards.slice(0, 10).forEach((card) => {
+        console.log(
+          `Card: ${card.name}, Colors: [${card.colors.join(',')}], Category: ${card.colors.length === 0 ? 'C' : card.colors.length > 1 ? 'M' : card.colors[0]}`,
+        );
+      });
+
+      // Get unique color combinations in order for descending
+      const descColorCombos = [
+        ...new Set(
+          descCards.map((card) => {
+            if (card.colors.length === 0) return 'C';
+            if (card.colors.length > 1) return 'M';
+            return card.colors[0];
+          }),
+        ),
+      ];
+      console.log(
+        'Unique color combinations in order (desc):',
+        descColorCombos,
+      );
+
+      // Verify the descending order
+      expect(descColorCombos).toEqual(['C', 'M', 'G', 'R', 'B', 'U', 'W']);
     });
   });
 

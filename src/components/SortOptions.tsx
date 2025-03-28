@@ -31,7 +31,7 @@ export interface SortOption {
 export const sortOptions: SortOption[] = [
   { value: 'cmc', label: 'CMC' },
   { value: 'rarity', label: 'Rarity' },
-  { value: 'color', label: 'Color' },
+  { value: 'colors', label: 'Color' },
 ];
 
 interface SortableSortFieldProps {
