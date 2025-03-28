@@ -11,6 +11,7 @@ interface FilterOptions {
     field: string;
     order: 'asc' | 'desc';
   }>;
+  sets?: string[];
 }
 
 export class CardService extends BaseService<Card> {
@@ -141,6 +142,11 @@ export class CardService extends BaseService<Card> {
     // Apply rarity filter
     if (filters.rarities && filters.rarities.length > 0) {
       query.rarity = { $in: filters.rarities };
+    }
+
+    // Apply set filter
+    if (filters.sets && filters.sets.length > 0) {
+      query.set = { $in: filters.sets };
     }
 
     // Create sort object for MongoDB

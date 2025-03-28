@@ -6,6 +6,7 @@ export interface FilterOptions {
   colors?: string[];
   cmcRange?: [number, number];
   rarities?: string[];
+  sets?: string[];
   sortFields?: Array<{
     field: string;
     order: 'asc' | 'desc';

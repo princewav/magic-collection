@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ManaSymbol } from './ManaSymbol';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { SetFilter } from './SetFilter';
 import {
   Collapsible,
   CollapsibleContent,
@@ -35,6 +36,9 @@ export function Filters({ className }: { className?: string }) {
   );
   const [selectedRarities, setSelectedRarities] = useState<string[]>(
     filters.rarities || [],
+  );
+  const [selectedSets, setSelectedSets] = useState<string[]>(
+    filters.sets || [],
   );
   const [sortFields, setSortFields] = useState<SortField[]>(
     filters.sortFields || [],
@@ -75,6 +79,7 @@ export function Filters({ className }: { className?: string }) {
       colors: newColors,
       cmcRange,
       rarities: selectedRarities,
+      sets: selectedSets,
       sortFields,
     });
   };
@@ -89,9 +94,21 @@ export function Filters({ className }: { className?: string }) {
       colors: selectedColors,
       cmcRange,
       rarities: newRarities,
+      sets: selectedSets,
       sortFields,
     });
-    console.log(newRarities);
+  };
+
+  // Handle set change
+  const handleSetChange = (newSets: string[]) => {
+    setSelectedSets(newSets);
+    updateFilters({
+      colors: selectedColors,
+      cmcRange,
+      rarities: selectedRarities,
+      sets: newSets,
+      sortFields,
+    });
   };
 
   // Handle sort field change
@@ -114,6 +131,7 @@ export function Filters({ className }: { className?: string }) {
       colors: selectedColors,
       cmcRange,
       rarities: selectedRarities,
+      sets: selectedSets,
       sortFields: newFields,
     });
   };
@@ -126,6 +144,7 @@ export function Filters({ className }: { className?: string }) {
       colors: selectedColors,
       cmcRange,
       rarities: selectedRarities,
+      sets: selectedSets,
       sortFields: newFields,
     });
   };
@@ -140,6 +159,7 @@ export function Filters({ className }: { className?: string }) {
       colors: selectedColors,
       cmcRange,
       rarities: selectedRarities,
+      sets: selectedSets,
       sortFields: newFields,
     });
   };
@@ -152,6 +172,7 @@ export function Filters({ className }: { className?: string }) {
       colors: selectedColors,
       cmcRange: newRange,
       rarities: selectedRarities,
+      sets: selectedSets,
       sortFields,
     });
   };
@@ -223,6 +244,12 @@ export function Filters({ className }: { className?: string }) {
                 className="w-full self-center"
               />
             </div>
+
+            {/* Set Filter */}
+            <SetFilter
+              selectedSets={selectedSets}
+              onSetChange={handleSetChange}
+            />
 
             {/* Rarity Filter */}
             <div className="grid grid-rows-[auto_1fr] gap-3">
