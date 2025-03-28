@@ -15,7 +15,14 @@ interface FilterOptions {
   sets?: string[];
 }
 
-const rarityOrder = ['common', 'uncommon', 'rare', 'mythic', 'bonus', 'special'];
+const rarityOrder = [
+  'common',
+  'uncommon',
+  'rare',
+  'mythic',
+  'bonus',
+  'special',
+];
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
@@ -191,17 +198,20 @@ export class CardService extends BaseService<Card> {
                   return { $addFields: {} };
                 }),
                 {
-                  $sort: filters.sortFields.reduce(
-                    (acc, { field, order }) => {
-                      if (field === 'rarity') {
-                        acc.rarityOrder = order === 'asc' ? 1 : -1;
-                      } else {
-                        acc[field] = order === 'asc' ? 1 : -1;
-                      }
-                      return acc;
-                    },
-                    {} as Record<string, 1 | -1>,
-                  ),
+                  $sort: {
+                    ...filters.sortFields.reduce(
+                      (acc, { field, order }) => {
+                        if (field === 'rarity') {
+                          acc.rarityOrder = order === 'asc' ? 1 : -1;
+                        } else {
+                          acc[field] = order === 'asc' ? 1 : -1;
+                        }
+                        return acc;
+                      },
+                      {} as Record<string, 1 | -1>,
+                    ),
+                    name: 1, // Always sort by name ascending as secondary sort
+                  },
                 },
                 { $project: { rarityOrder: 0 } },
               ]
