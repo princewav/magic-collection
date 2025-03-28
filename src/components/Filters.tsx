@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { ManaSymbol } from './ManaSymbol';
 import { Slider } from '@/components/ui/slider';
 import { SetFilter } from './SetFilter';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,7 +25,7 @@ import { SortOptions, type SortField } from './SortOptions';
 
 export function Filters({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(true);
-  const { filters, updateFilters } = useCards();
+  const { filters, updateFilters, deduplicate, toggleDeduplicate } = useCards();
   const [selectedColors, setSelectedColors] = useState<string[]>(
     filters.colors || [],
   );
@@ -207,7 +209,7 @@ export function Filters({ className }: { className?: string }) {
       </CollapsibleTrigger>
       <CollapsibleContent className="data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
         <div>
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row flex-wrap">
+          <div className="flex flex-col flex-wrap items-start justify-between gap-6 sm:flex-row">
             {/* Color Filter */}
             <div className="flex min-w-fit flex-col gap-2">
               <h3 className="text-xs font-medium md:text-sm">Colors</h3>
@@ -297,6 +299,19 @@ export function Filters({ className }: { className?: string }) {
                     </span>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Deduplicate Toggle */}
+            <div className="flex min-w-fit flex-col gap-2">
+              <h3 className="text-xs font-medium md:text-sm">Options</h3>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="deduplicate"
+                  checked={deduplicate}
+                  onCheckedChange={toggleDeduplicate}
+                />
+                <Label htmlFor="deduplicate">One card per name</Label>
               </div>
             </div>
 

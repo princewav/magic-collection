@@ -10,8 +10,10 @@ interface CardsContextType {
   currentPage: number;
   filters: FilterOptions;
   isLoading: boolean;
+  deduplicate: boolean;
   updateFilters: (newFilters: FilterOptions) => Promise<void>;
   loadNextPage: () => Promise<void>;
+  toggleDeduplicate: () => Promise<void>;
 }
 
 const CardsContext = createContext<CardsContextType | undefined>(undefined);
@@ -39,6 +41,7 @@ export function CardsProvider({
   const [total, setTotal] = useState(initialTotal);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [deduplicate, setDeduplicate] = useState(true);
   const [filters, setFilters] = useState<FilterOptions>({
     colors: [],
     cmcRange: [0, 10],
@@ -54,23 +57,23 @@ export function CardsProvider({
         const { cards: newCards, total: newTotal } = await loadFilteredCards(
           filtersToUse,
           page,
-          20, // pageSize
+          70, // pageSize
+          deduplicate,
         );
 
         if (page === 1) {
-          setCards([]);
           setCards(newCards);
+          setTotal(newTotal);
         } else {
           setCards((prev) => [...prev, ...newCards]);
         }
-        setTotal(newTotal);
       } catch (error) {
         console.error('Error loading cards:', error);
       } finally {
         setIsLoading(false);
       }
     },
-    [filters],
+    [filters, deduplicate],
   );
 
   const updateFilters = useCallback(
@@ -88,6 +91,14 @@ export function CardsProvider({
     await loadCards(nextPage);
   }, [currentPage, loadCards]);
 
+  const toggleDeduplicate = useCallback(async () => {
+    const newValue = !deduplicate;
+    setDeduplicate(newValue);
+    // Reload first page with new deduplicate value
+    setCurrentPage(1);
+    await loadCards(1);
+  }, [deduplicate, loadCards]);
+
   return (
     <CardsContext.Provider
       value={{
@@ -96,8 +107,10 @@ export function CardsProvider({
         currentPage,
         filters,
         isLoading,
+        deduplicate,
         updateFilters,
         loadNextPage,
+        toggleDeduplicate,
       }}
     >
       {children}

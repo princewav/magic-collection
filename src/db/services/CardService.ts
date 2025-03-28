@@ -94,7 +94,10 @@ export class CardService extends BaseService<Card> {
     })) as unknown as Card[];
   }
 
-  async getFilteredCards(filters: FilterOptions): Promise<Card[]> {
+  async getFilteredCards(
+    filters: FilterOptions,
+    deduplicate: boolean = true,
+  ): Promise<Card[]> {
     const query: Record<string, any> = {};
 
     // Apply filters
@@ -128,23 +131,35 @@ export class CardService extends BaseService<Card> {
 
     const docs = await this.repo.collection.aggregate(pipeline).toArray();
 
-    return docs.map(({ _id, ...doc }) => ({
+    let cards = docs.map(({ _id, ...doc }) => ({
       id: _id.toString(),
       ...doc,
     })) as unknown as Card[];
+
+    // Apply deduplication if requested
+    if (deduplicate) {
+      cards = this.deduplicateCardsByName(cards);
+    }
+
+    return cards;
   }
 
   async getFilteredCardsWithPagination(
     filters: FilterOptions,
     page: number = 1,
-    pageSize: number = 20,
+    pageSize: number = 50,
+    deduplicate: boolean = true,
   ): Promise<{ cards: Card[]; total: number }> {
     const query: Record<string, any> = {};
 
     // Apply filters
     this.applyFilters(query, filters);
 
+    // When deduplicating, fetch more cards than needed to ensure we have enough after deduplication
+    const fetchMultiplier = deduplicate ? 3 : 1;
     const skip = (page - 1) * pageSize;
+    const limit = pageSize * fetchMultiplier;
+
     const needsCustomSorting = this.needsCustomSorting(filters);
     const sortStage = this.buildSortStage(filters);
 
@@ -166,7 +181,7 @@ export class CardService extends BaseService<Card> {
           },
         },
         { $skip: skip },
-        { $limit: pageSize },
+        { $limit: limit },
       ];
     } else {
       // Use simple find with standard sort
@@ -174,7 +189,7 @@ export class CardService extends BaseService<Card> {
         { $match: query },
         { $sort: sortStage },
         { $skip: skip },
-        { $limit: pageSize },
+        { $limit: limit },
       ];
     }
 
@@ -184,15 +199,114 @@ export class CardService extends BaseService<Card> {
       this.repo.collection.aggregate(pipeline).toArray(),
     ]);
 
-    const cards = docs.map(({ _id, ...doc }) => ({
+    let cards = docs.map(({ _id, ...doc }) => ({
       id: _id.toString(),
       ...doc,
     })) as unknown as Card[];
+
+    // Apply deduplication if requested
+    if (deduplicate) {
+      const originalLength = cards.length;
+      cards = this.deduplicateCardsByName(cards);
+
+      // Limit to pageSize
+      cards = cards.slice(0, pageSize);
+
+      // If this is the first page, estimate total unique cards
+      if (page === 1 && originalLength > 0) {
+        // Calculate ratio of unique cards after deduplication
+        const deduplicationRatio = cards.length / originalLength;
+        // Estimate total unique cards in the collection
+        const estimatedTotal = Math.max(
+          Math.ceil(total * deduplicationRatio),
+          cards.length,
+        );
+
+        return {
+          cards,
+          total: estimatedTotal,
+        };
+      }
+    }
 
     return {
       cards,
       total,
     };
+  }
+
+  /**
+   * Deduplicates a list of cards, keeping only one card with each unique name.
+   * Prioritizes the most "normal" version of each card according to:
+   * 1. Non-special sets (avoid promotional/special versions)
+   * 2. Lower rarity (prefer common over uncommon, etc.)
+   * 3. Standard layout (avoid split, transform cards, etc.)
+   * 4. Lowest collector number (original printing in a set)
+   * 5. Most recent set (for newer artwork/templating)
+   */
+  deduplicateCardsByName(cards: Card[]): Card[] {
+    const uniqueCards = new Map<string, Card>();
+
+    // Score function for determining which version of a card to keep
+    const getCardNormalityScore = (card: Card): number => {
+      let score = 0;
+
+      // Prefer non-special rarities (avoid promotional/special versions)
+      if (['common', 'uncommon', 'rare', 'mythic'].includes(card.rarity)) {
+        score += 100;
+      }
+
+      // Prefer lower rarities
+      const rarityValues: Record<string, number> = {
+        common: 50,
+        uncommon: 40,
+        rare: 30,
+        mythic: 20,
+        bonus: 10,
+        special: 0,
+      };
+      score += rarityValues[card.rarity] || 0;
+
+      // Prefer normal layouts
+      if (card.layout === 'normal') {
+        score += 30;
+      } else if (
+        ['split', 'flip', 'transform', 'modal_dfc'].includes(card.layout)
+      ) {
+        score += 10;
+      }
+
+      // Prefer lowest collector number (original printing in a set)
+      // Parse collector number to get numeric value (ignoring letters)
+      const collectorNumber = card.collector_number || '';
+      const numericPart = parseInt(
+        collectorNumber.match(/^\d+/)?.[0] || '9999',
+      );
+      // Invert the value so lower numbers score higher
+      score += (10000 - numericPart) / 100;
+
+      // Prefer more recent sets (better artwork/templating)
+      const releaseDate = new Date(card.released_at).getTime();
+      score += releaseDate / 10000000000; // Normalize to a reasonable value
+
+      return score;
+    };
+
+    // Process each card
+    for (const card of cards) {
+      const currentBestCard = uniqueCards.get(card.name);
+
+      // If we haven't seen this card name yet, or this version is better, keep it
+      if (
+        !currentBestCard ||
+        getCardNormalityScore(card) > getCardNormalityScore(currentBestCard)
+      ) {
+        uniqueCards.set(card.name, card);
+      }
+    }
+
+    // Return the deduplicated list
+    return Array.from(uniqueCards.values());
   }
 
   // Helper method to apply filters

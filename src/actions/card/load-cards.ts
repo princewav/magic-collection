@@ -16,13 +16,15 @@ export interface FilterOptions {
 export async function loadFilteredCards(
   filters: FilterOptions,
   page: number = 1,
-  pageSize: number = 20,
+  pageSize: number = 50,
+  deduplicate: boolean = true,
 ) {
   try {
     const { cards, total } = await cardService.getFilteredCardsWithPagination(
       filters,
       page,
       pageSize,
+      deduplicate,
     );
     return { cards, total };
   } catch (error) {
