@@ -43,6 +43,15 @@ export class CardService extends BaseService<Card> {
     return [];
   }
 
+  async getAll(limit: number): Promise<Card[]> {
+    const cursor = this.repo.collection.find().limit(limit);
+    const docs = await cursor.toArray();
+    return docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as Card[];
+  }
+
   async getByName(name: string) {
     const exactMatch = await this.repo.findBy({ name });
     if (exactMatch.length > 0) {

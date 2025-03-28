@@ -8,7 +8,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import React from 'react';
 const inter = Inter({ subsets: ['latin'] });
-import { ClickToComponent } from 'click-to-react-component'
 
 export const metadata: Metadata = {
   title: 'MTG Card Viewer',

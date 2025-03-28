@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { ManaSymbol } from './ManaSymbol';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import {
   Collapsible,
   CollapsibleContent,
@@ -14,11 +12,6 @@ import {
 import {
   ChevronDown,
   ChevronUp,
-  Sun,
-  Droplet,
-  Skull,
-  Flame,
-  Trees,
   ArrowUp,
   ArrowDown,
   GripVertical,
