@@ -16,27 +16,29 @@ import {
   ArrowDown,
   GripVertical,
 } from 'lucide-react';
+import { useCards } from '@/context/CardsContext';
+import { cn } from '@/lib/utils';
 
 interface SortField {
   field: string;
   order: 'asc' | 'desc';
 }
 
-interface FiltersProps {
-  onFilterChange?: (filters: {
-    colors: string[];
-    cmcRange: [number, number];
-    rarities: string[];
-    sortFields: SortField[];
-  }) => void;
-}
-
-export function Filters({ onFilterChange = () => {} }: FiltersProps) {
+export function Filters({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [cmcRange, setCmcRange] = useState<[number, number]>([0, 10]);
-  const [selectedRarities, setSelectedRarities] = useState<string[]>([]);
-  const [sortFields, setSortFields] = useState<SortField[]>([]);
+  const { filters, updateFilters } = useCards();
+  const [selectedColors, setSelectedColors] = useState<string[]>(
+    filters.colors || [],
+  );
+  const [cmcRange, setCmcRange] = useState<[number, number]>(
+    filters.cmcRange || [0, 10],
+  );
+  const [selectedRarities, setSelectedRarities] = useState<string[]>(
+    filters.rarities || [],
+  );
+  const [sortFields, setSortFields] = useState<SortField[]>(
+    filters.sortFields || [],
+  );
 
   // Color filter options
   const colorFilters = [
@@ -69,7 +71,7 @@ export function Filters({ onFilterChange = () => {} }: FiltersProps) {
       ? selectedColors.filter((c) => c !== symbol)
       : [...selectedColors, symbol];
     setSelectedColors(newColors);
-    onFilterChange({
+    updateFilters({
       colors: newColors,
       cmcRange,
       rarities: selectedRarities,
@@ -83,7 +85,7 @@ export function Filters({ onFilterChange = () => {} }: FiltersProps) {
       ? selectedRarities.filter((r) => r !== symbol)
       : [...selectedRarities, symbol];
     setSelectedRarities(newRarities);
-    onFilterChange({
+    updateFilters({
       colors: selectedColors,
       cmcRange,
       rarities: newRarities,
@@ -94,38 +96,32 @@ export function Filters({ onFilterChange = () => {} }: FiltersProps) {
   // Handle sort field change
   const handleSortFieldChange = (field: string) => {
     const existingField = sortFields.find((f) => f.field === field);
+    let newFields: SortField[];
+
     if (existingField) {
-      // Toggle order if field exists
-      const newFields: SortField[] = sortFields.map((f) =>
+      newFields = sortFields.map((f) =>
         f.field === field
           ? { ...f, order: f.order === 'asc' ? 'desc' : 'asc' }
           : f,
       );
-      setSortFields(newFields);
-      onFilterChange({
-        colors: selectedColors,
-        cmcRange,
-        rarities: selectedRarities,
-        sortFields: newFields,
-      });
     } else {
-      // Add new field
-      const newFields: SortField[] = [...sortFields, { field, order: 'asc' }];
-      setSortFields(newFields);
-      onFilterChange({
-        colors: selectedColors,
-        cmcRange,
-        rarities: selectedRarities,
-        sortFields: newFields,
-      });
+      newFields = [...sortFields, { field, order: 'asc' }];
     }
+
+    setSortFields(newFields);
+    updateFilters({
+      colors: selectedColors,
+      cmcRange,
+      rarities: selectedRarities,
+      sortFields: newFields,
+    });
   };
 
   // Remove sort field
   const removeSortField = (field: string) => {
-    const newFields: SortField[] = sortFields.filter((f) => f.field !== field);
+    const newFields = sortFields.filter((f) => f.field !== field);
     setSortFields(newFields);
-    onFilterChange({
+    updateFilters({
       colors: selectedColors,
       cmcRange,
       rarities: selectedRarities,
@@ -139,7 +135,7 @@ export function Filters({ onFilterChange = () => {} }: FiltersProps) {
     const [movedField] = newFields.splice(fromIndex, 1);
     newFields.splice(toIndex, 0, movedField);
     setSortFields(newFields);
-    onFilterChange({
+    updateFilters({
       colors: selectedColors,
       cmcRange,
       rarities: selectedRarities,
@@ -151,7 +147,7 @@ export function Filters({ onFilterChange = () => {} }: FiltersProps) {
   const handleCmcRangeChange = (value: number[]) => {
     const newRange: [number, number] = [value[0], value[1]];
     setCmcRange(newRange);
-    onFilterChange({
+    updateFilters({
       colors: selectedColors,
       cmcRange: newRange,
       rarities: selectedRarities,
@@ -163,13 +159,14 @@ export function Filters({ onFilterChange = () => {} }: FiltersProps) {
     <Collapsible
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="rounded-lg border p-4 transition-all duration-300 ease-in-out relative min-h-9"
-    >
-      {!isOpen && (
-        <h2 className="text-lg font-medium">Filters</h2>
+      className={cn(
+        'relative min-h-9 rounded-lg border p-4 transition-all duration-300 ease-in-out',
+        className,
       )}
+    >
+      {!isOpen && <h2 className="text-lg font-medium">Filters</h2>}
       <CollapsibleTrigger asChild>
-        <div className="flex cursor-pointer items-center justify-between absolute top-5 right-3">
+        <div className="absolute top-5 right-3 flex cursor-pointer items-center justify-between">
           {isOpen ? (
             <ChevronUp className="h-5 w-5 transition-transform duration-300" />
           ) : (

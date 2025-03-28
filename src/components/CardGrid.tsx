@@ -1,16 +1,67 @@
+'use client';
+
+import { useCards } from '@/context/CardsContext';
 import { Card as CardType } from '@/types/card';
 import { Card } from './Card';
+import { useEffect, useRef, useCallback } from 'react';
+import { LoadingSpinner } from './LoadingSpinner';
 
-interface Props {
-  cards?: (CardType & {quantity: number})[];
-}
-export async function CardGrid({ cards }: Props) {
+export function CardGrid() {
+  const { cards, isLoading, loadNextPage, total } = useCards();
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
+
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && !isLoading && cards.length < total) {
+        loadNextPage();
+      }
+    },
+    [isLoading, loadNextPage, cards.length, total],
+  );
+
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: '20px',
+      threshold: 0,
+    };
+
+    observerRef.current = new IntersectionObserver(handleObserver, options);
+
+    if (loadingRef.current) {
+      observerRef.current.observe(loadingRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [handleObserver]);
+
+  if (!cards.length && !isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <p className="text-lg text-gray-500">No cards found</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex flex-wrap gap-4">
-          {cards?.map((card) => (
-            <Card key={card.id} card={card} collectedQuantity={card.quantity} />
-          ))}
+    <div className="relative">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+        {cards.map((card: CardType) => (
+          <Card key={card.id} card={{ ...card, quantity: 0 }} />
+        ))}
+      </div>
+      <div ref={loadingRef} className="h-10 w-full">
+        {isLoading && (
+          <div className="flex justify-center py-4">
+            <LoadingSpinner />
+          </div>
+        )}
       </div>
     </div>
   );

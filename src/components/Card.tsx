@@ -40,13 +40,22 @@ export function Card({ card, collectedQuantity = 0 }: CardProps) {
             )}
           </div>
         </div>
-        <Image
-          src={card.image_uris.normal}
-          alt={`Card ${card.name}`}
-          className="rounded-xl rounded-t-md"
-          width={223}
-          height={310}
-        />
+        {card.image_uris?.normal ? (
+          <Image
+            src={card.image_uris.normal}
+            alt={`Card ${card.name}`}
+            className="rounded-xl rounded-t-md"
+            width={223}
+            height={310}
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-32 w-full rounded-t-md bg-transparent">
+            <p className="text-lg font-semibold text-center">{card.name}</p>
+            <p className="text-sm text-gray-600">No image available</p>
+            <p className="text-sm text-gray-600">Oracle: {card.oracle_text || 'N/A'}</p>
+            <p className="text-sm text-gray-600">Power/Toughness: {card.power}/{card.toughness}</p>
+          </div>
+        )}
       </div>
     </div>
   );
