@@ -165,7 +165,7 @@ export function Filters({ className }: { className?: string }) {
         className,
       )}
     >
-      {!isOpen && <h2 className="text-lg font-medium">Filters</h2>}
+      {!isOpen && <h2 className="text-base font-medium md:text-lg">Filters</h2>}
       <CollapsibleTrigger asChild>
         <div className="absolute top-5 right-3 flex cursor-pointer items-center justify-between">
           {isOpen ? (
@@ -180,20 +180,29 @@ export function Filters({ className }: { className?: string }) {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
             {/* Color Filter */}
             <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-lg font-medium">Colors</h3>
+              <h3 className="text-base font-medium md:text-lg">Colors</h3>
               <div className="flex flex-wrap justify-start gap-2">
                 {colorFilters.map((filter) => (
                   <button
                     key={filter.symbol}
                     onClick={() => toggleColor(filter.symbol)}
-                    className={`flex h-10 w-10 items-center justify-center rounded-full p-1 transition-all ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-full p-1 transition-all sm:h-10 sm:w-10 ${
                       selectedColors.includes(filter.symbol)
                         ? 'bg-primary/20 ring-primary ring-2'
                         : 'hover:bg-muted'
                     }`}
                     title={filter.name}
                   >
-                    <ManaSymbol symbol={filter.symbol} size={27} />
+                    <ManaSymbol
+                      symbol={filter.symbol}
+                      size={20}
+                      className="md:hidden"
+                    />
+                    <ManaSymbol
+                      symbol={filter.symbol}
+                      size={27}
+                      className="hidden md:block"
+                    />
                   </button>
                 ))}
               </div>
@@ -201,7 +210,7 @@ export function Filters({ className }: { className?: string }) {
 
             {/* CMC Filter */}
             <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-lg font-medium">
+              <h3 className="text-base font-medium md:text-lg">
                 CMC: {cmcRange[0]} - {cmcRange[1]}
               </h3>
               <Slider
@@ -217,13 +226,13 @@ export function Filters({ className }: { className?: string }) {
 
             {/* Rarity Filter */}
             <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-lg font-medium">Rarity</h3>
+              <h3 className="text-base font-medium md:text-lg">Rarity</h3>
               <div className="flex justify-start gap-2">
                 {rarityOptions.map((option) => (
                   <button
                     key={option.symbol}
                     onClick={() => toggleRarity(option.value)}
-                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+                    className={`flex h-6 w-6 items-center justify-center rounded-full transition-all md:h-10 md:w-10 ${
                       selectedRarities.includes(option.value)
                         ? 'ring-2 ring-offset-2 ' +
                           (option.symbol === 'C'
@@ -238,7 +247,7 @@ export function Filters({ className }: { className?: string }) {
                     title={option.name}
                   >
                     <span
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-base font-bold shadow-sm ${
+                      className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:h-7 md:w-7 md:text-base ${
                         option.symbol === 'C'
                           ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700'
                           : option.symbol === 'U'
@@ -257,7 +266,7 @@ export function Filters({ className }: { className?: string }) {
 
             {/* Sort Options */}
             <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-lg font-medium">Sort By</h3>
+              <h3 className="text-base font-medium md:text-lg">Sort By</h3>
               <div className="grid grid-rows-[auto_auto] gap-3">
                 {/* Active sort fields */}
                 <div className="space-y-2">
@@ -310,7 +319,7 @@ export function Filters({ className }: { className?: string }) {
                         key={option.value}
                         variant="outline"
                         onClick={() => handleSortFieldChange(option.value)}
-                        className="h-8 px-2 text-sm"
+                        className="h-7 px-1.5 text-xs md:h-8 md:px-2 md:text-sm"
                       >
                         {option.label}
                       </Button>
