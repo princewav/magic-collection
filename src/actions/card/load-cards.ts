@@ -7,6 +7,7 @@ export interface FilterOptions {
   cmcRange?: [number, number];
   rarities?: string[];
   sets?: string[];
+  exactColorMatch?: boolean;
   sortFields?: Array<{
     field: string;
     order: 'asc' | 'desc';

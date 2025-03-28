@@ -41,6 +41,9 @@ export function Filters({ className }: { className?: string }) {
   const [sortFields, setSortFields] = useState<SortField[]>(
     filters.sortFields || [],
   );
+  const [exactColorMatch, setExactColorMatch] = useState<boolean>(
+    filters.exactColorMatch || false,
+  );
 
   // Color filter options
   const colorFilters = [
@@ -60,13 +63,6 @@ export function Filters({ className }: { className?: string }) {
     { symbol: 'M', name: 'Mythic Rare', value: 'mythic' },
   ];
 
-  // Sort options
-  const sortOptions = [
-    { value: 'cmc', label: 'CMC' },
-    { value: 'rarity', label: 'Rarity' },
-    { value: 'color', label: 'Color' },
-  ];
-
   // Toggle color selection
   const toggleColor = (symbol: string) => {
     const newColors = selectedColors.includes(symbol)
@@ -79,6 +75,21 @@ export function Filters({ className }: { className?: string }) {
       rarities: selectedRarities,
       sets: selectedSets,
       sortFields,
+      exactColorMatch,
+    });
+  };
+
+  // Toggle exact color match mode
+  const toggleExactColorMatch = () => {
+    const newExactColorMatch = !exactColorMatch;
+    setExactColorMatch(newExactColorMatch);
+    updateFilters({
+      colors: selectedColors,
+      cmcRange,
+      rarities: selectedRarities,
+      sets: selectedSets,
+      sortFields,
+      exactColorMatch: newExactColorMatch,
     });
   };
 
@@ -94,6 +105,7 @@ export function Filters({ className }: { className?: string }) {
       rarities: newRarities,
       sets: selectedSets,
       sortFields,
+      exactColorMatch,
     });
   };
 
@@ -106,6 +118,7 @@ export function Filters({ className }: { className?: string }) {
       rarities: selectedRarities,
       sets: newSets.map((set) => set.toLowerCase()),
       sortFields,
+      exactColorMatch,
     });
   };
 
@@ -131,6 +144,7 @@ export function Filters({ className }: { className?: string }) {
       rarities: selectedRarities,
       sets: selectedSets,
       sortFields: newFields,
+      exactColorMatch,
     });
     console.log('sortFields', newFields);
   };
@@ -145,6 +159,7 @@ export function Filters({ className }: { className?: string }) {
       rarities: selectedRarities,
       sets: selectedSets,
       sortFields: newFields,
+      exactColorMatch,
     });
   };
 
@@ -158,6 +173,7 @@ export function Filters({ className }: { className?: string }) {
       rarities: selectedRarities,
       sets: selectedSets,
       sortFields,
+      exactColorMatch,
     });
   };
 
@@ -177,6 +193,7 @@ export function Filters({ className }: { className?: string }) {
         rarities: selectedRarities,
         sets: selectedSets,
         sortFields: newFields,
+        exactColorMatch,
       });
     }
   };
@@ -237,6 +254,23 @@ export function Filters({ className }: { className?: string }) {
                     />
                   </button>
                 ))}
+                {/* Multicolor Filter Toggle Button */}
+                <button
+                  onClick={toggleExactColorMatch}
+                  className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
+                    exactColorMatch
+                      ? 'bg-primary/20 ring-primary ring-2'
+                      : 'hover:bg-muted'
+                  }`}
+                  title="Exact color match"
+                >
+                  <ManaSymbol symbol="M" size={20} className="md:hidden" />
+                  <ManaSymbol
+                    symbol="M"
+                    size={27}
+                    className="hidden md:block"
+                  />
+                </button>
               </div>
             </div>
 

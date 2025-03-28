@@ -13,6 +13,7 @@ interface FilterOptions {
     order: 'asc' | 'desc';
   }>;
   sets?: string[];
+  exactColorMatch?: boolean;
 }
 
 const rarityOrder = [
@@ -316,7 +317,16 @@ export class CardService extends BaseService<Card> {
   ): void {
     // Apply color filter
     if (filters.colors && filters.colors.length > 0) {
-      query.colors = { $in: filters.colors };
+      if (filters.exactColorMatch && filters.colors.length > 0) {
+        // Exact color matching - only return cards with exactly these colors
+        query.$and = [
+          { colors: { $all: filters.colors } }, // Must contain all selected colors
+          { colors: { $size: filters.colors.length } }, // Must have exactly this many colors
+        ];
+      } else {
+        // Normal matching - return cards that have at least one of the selected colors
+        query.colors = { $in: filters.colors };
+      }
     }
 
     // Apply CMC range filter
