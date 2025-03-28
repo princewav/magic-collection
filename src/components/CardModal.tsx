@@ -152,7 +152,7 @@ export default function CardModal() {
                   <div className="bg-background/20 rounded-2xl p-4 text-xl text-gray-300">
                     {card.oracle_text.split('\n').map((line, index) => (
                       <React.Fragment key={index}>
-                        <span className="flex flex-row flex-wrap items-center space-x-1">
+                        <div className="inline-block">
                           {line.split(/({[^}]+})/).map((part, idx) => {
                             const match = part.match(/{([^}]+)}/);
                             if (match) {
@@ -163,6 +163,7 @@ export default function CardModal() {
                                     key={idx}
                                     symbol={symbol}
                                     size={20}
+                                    className="mx-0.5 inline-block align-middle"
                                   />
                                 );
                               }
@@ -171,12 +172,17 @@ export default function CardModal() {
                                   key={idx}
                                   symbol={symbol}
                                   size={20}
+                                  className="mx-0.5 inline-block align-middle"
                                 />
                               );
                             }
-                            return <span key={idx}>{part}</span>;
+                            return (
+                              <span key={idx} className="inline">
+                                {part}
+                              </span>
+                            );
                           })}
-                        </span>
+                        </div>
                         {index < card.oracle_text.split('\n').length - 1 && (
                           <p className="my-3" />
                         )}
