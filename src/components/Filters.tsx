@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { ManaSymbol } from './ManaSymbol';
-import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { SetFilter } from './SetFilter';
 import {
@@ -13,17 +12,20 @@ import {
 import {
   ChevronDown,
   ChevronUp,
-  ArrowUp,
-  ArrowDown,
-  GripVertical,
 } from 'lucide-react';
 import { useCards } from '@/context/CardsContext';
 import { cn } from '@/lib/utils';
-
-interface SortField {
-  field: string;
-  order: 'asc' | 'desc';
-}
+import {
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { SortOptions, type SortField } from './SortOptions';
 
 export function Filters({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -149,21 +151,6 @@ export function Filters({ className }: { className?: string }) {
     });
   };
 
-  // Move sort field
-  const moveSortField = (fromIndex: number, toIndex: number) => {
-    const newFields: SortField[] = [...sortFields];
-    const [movedField] = newFields.splice(fromIndex, 1);
-    newFields.splice(toIndex, 0, movedField);
-    setSortFields(newFields);
-    updateFilters({
-      colors: selectedColors,
-      cmcRange,
-      rarities: selectedRarities,
-      sets: selectedSets,
-      sortFields: newFields,
-    });
-  };
-
   // Handle CMC range change
   const handleCmcRangeChange = (value: number[]) => {
     const newRange: [number, number] = [value[0], value[1]];
@@ -176,6 +163,33 @@ export function Filters({ className }: { className?: string }) {
       sortFields,
     });
   };
+
+  // Handle drag end
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = sortFields.findIndex((f) => f.field === active.id);
+      const newIndex = sortFields.findIndex((f) => f.field === over.id);
+
+      const newFields = arrayMove(sortFields, oldIndex, newIndex);
+      setSortFields(newFields);
+      updateFilters({
+        colors: selectedColors,
+        cmcRange,
+        rarities: selectedRarities,
+        sets: selectedSets,
+        sortFields: newFields,
+      });
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   return (
     <Collapsible
@@ -292,68 +306,12 @@ export function Filters({ className }: { className?: string }) {
             </div>
 
             {/* Sort Options */}
-            <div className="grid grid-rows-[auto_1fr] gap-3">
-              <h3 className="text-base font-medium md:text-lg">Sort By</h3>
-              <div className="grid grid-rows-[auto_auto] gap-3">
-                {/* Active sort fields */}
-                <div className="space-y-2">
-                  {sortFields.map((field, index) => (
-                    <div
-                      key={field.field}
-                      className="flex items-center gap-2 rounded-md border p-2"
-                    >
-                      <button
-                        className="text-muted-foreground hover:text-foreground cursor-move"
-                        onClick={() => {}}
-                      >
-                        <GripVertical className="h-4 w-4" />
-                      </button>
-                      <span className="flex-1">
-                        {
-                          sortOptions.find((opt) => opt.value === field.field)
-                            ?.label
-                        }
-                      </span>
-                      <button
-                        className="text-muted-foreground hover:text-foreground"
-                        onClick={() => handleSortFieldChange(field.field)}
-                      >
-                        {field.order === 'asc' ? (
-                          <ArrowUp className="h-4 w-4" />
-                        ) : (
-                          <ArrowDown className="h-4 w-4" />
-                        )}
-                      </button>
-                      <button
-                        className="text-muted-foreground hover:text-foreground"
-                        onClick={() => removeSortField(field.field)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Add sort field */}
-                <div className="flex flex-wrap gap-2">
-                  {sortOptions
-                    .filter(
-                      (option) =>
-                        !sortFields.some((f) => f.field === option.value),
-                    )
-                    .map((option) => (
-                      <Button
-                        key={option.value}
-                        variant="outline"
-                        onClick={() => handleSortFieldChange(option.value)}
-                        className="h-7 px-1.5 text-xs md:h-8 md:px-2 md:text-sm"
-                      >
-                        {option.label}
-                      </Button>
-                    ))}
-                </div>
-              </div>
-            </div>
+            <SortOptions
+              sortFields={sortFields}
+              onSortFieldChange={handleSortFieldChange}
+              onRemoveSortField={removeSortField}
+              onDragEnd={handleDragEnd}
+            />
           </div>
         </div>
       </CollapsibleContent>
