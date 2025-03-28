@@ -51,7 +51,7 @@ export function CardGrid() {
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+      <div className="mx-auto grid grid-cols-1 place-items-center gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {cards.map((card: CardType) => (
           <Card key={card.id} card={{ ...card, quantity: 0 }} />
         ))}
