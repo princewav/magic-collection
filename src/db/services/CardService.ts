@@ -3,6 +3,16 @@ import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
 
+interface FilterOptions {
+  colors?: string[];
+  cmcRange?: [number, number];
+  rarities?: string[];
+  sortFields?: Array<{
+    field: string;
+    order: 'asc' | 'desc';
+  }>;
+}
+
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
 
@@ -30,7 +40,9 @@ export class CardService extends BaseService<Card> {
       const query = {
         name: strategy.exact ? name : new RegExp(name, 'i'),
         ...(set ? { set: normalizedSet } : {}),
-        ...(strategy.includeSetNumber && setNumber ? { collector_number: setNumber } : {}),
+        ...(strategy.includeSetNumber && setNumber
+          ? { collector_number: setNumber }
+          : {}),
       };
 
       const results = await this.repo.findBy(query);
@@ -67,6 +79,100 @@ export class CardService extends BaseService<Card> {
       id: _id.toString(),
       ...doc,
     })) as unknown as Card[];
+  }
+
+  async getFilteredCards(filters: FilterOptions): Promise<Card[]> {
+    const query: Record<string, any> = {};
+
+    // Apply color filter
+    if (filters.colors && filters.colors.length > 0) {
+      query.colors = { $in: filters.colors };
+    }
+
+    // Apply CMC range filter
+    if (filters.cmcRange) {
+      const [min, max] = filters.cmcRange;
+      query.cmc = { $gte: min, $lte: max };
+    }
+
+    // Apply rarity filter
+    if (filters.rarities && filters.rarities.length > 0) {
+      query.rarity = { $in: filters.rarities };
+    }
+
+    // Create sort object for MongoDB
+    const sortOptions: Record<string, 1 | -1> = {};
+    if (filters.sortFields && filters.sortFields.length > 0) {
+      filters.sortFields.forEach(({ field, order }) => {
+        sortOptions[field] = order === 'asc' ? 1 : -1;
+      });
+    }
+
+    const cursor = this.repo.collection.find(query);
+    if (Object.keys(sortOptions).length > 0) {
+      cursor.sort(sortOptions);
+    }
+
+    const docs = await cursor.toArray();
+    return docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as Card[];
+  }
+
+  async getFilteredCardsWithPagination(
+    filters: FilterOptions,
+    page: number = 1,
+    pageSize: number = 20,
+  ): Promise<{ cards: Card[]; total: number }> {
+    const query: Record<string, any> = {};
+
+    // Apply color filter
+    if (filters.colors && filters.colors.length > 0) {
+      query.colors = { $in: filters.colors };
+    }
+
+    // Apply CMC range filter
+    if (filters.cmcRange) {
+      const [min, max] = filters.cmcRange;
+      query.cmc = { $gte: min, $lte: max };
+    }
+
+    // Apply rarity filter
+    if (filters.rarities && filters.rarities.length > 0) {
+      query.rarity = { $in: filters.rarities };
+    }
+
+    // Create sort object for MongoDB
+    const sortOptions: Record<string, 1 | -1> = {};
+    if (filters.sortFields && filters.sortFields.length > 0) {
+      filters.sortFields.forEach(({ field, order }) => {
+        sortOptions[field] = order === 'asc' ? 1 : -1;
+      });
+    }
+
+    const skip = (page - 1) * pageSize;
+
+    // Execute queries in parallel
+    const [total, docs] = await Promise.all([
+      this.repo.collection.countDocuments(query),
+      this.repo.collection
+        .find(query)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(pageSize)
+        .toArray(),
+    ]);
+
+    const cards = docs.map(({ _id, ...doc }) => ({
+      id: _id.toString(),
+      ...doc,
+    })) as unknown as Card[];
+
+    return {
+      cards,
+      total,
+    };
   }
 }
 
