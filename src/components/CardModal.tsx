@@ -183,10 +183,9 @@ export default function CardModal() {
                       <span key={index} className="flex flex-row space-x-0.5">
                         {part.match(/{(.*?)}/g)?.map((match, idx) => {
                           const symbol = match[1];
-                            return (
-                              <ManaSymbol key={idx} symbol={symbol} size={25} />
-                            );
-                         
+                          return (
+                            <ManaSymbol key={idx} symbol={symbol} size={25} />
+                          );
                         })}
                         {index < card.mana_cost.split('//').length - 1 && (
                           <span className="w-8 text-center">//</span>
@@ -195,37 +194,37 @@ export default function CardModal() {
                     ))}
                   </p>
                 )}
-                <p className="bg-background/20 rounded-2xl p-2 text-center text-xl text-gray-300 flex justify-between items-center">
-                  {card.type_line}
-                  <div className="flex justify-center">
+                <div className="bg-background/20 flex items-center justify-between rounded-2xl p-2 text-center text-xl text-gray-300">
+                  <span>{card.type_line}</span>
+                  <span
+                    className={
+                      'flex size-6 items-center justify-center rounded-full transition-all md:size-7'
+                    }
+                    title={
+                      card.rarity === 'common'
+                        ? 'Common'
+                        : card.rarity === 'uncommon'
+                          ? 'Uncommon'
+                          : card.rarity === 'rare'
+                            ? 'Rare'
+                            : 'Mythic Rare'
+                    }
+                  >
                     <span
-                      className={`flex size-6 items-center justify-center rounded-full transition-all md:size-7 `}
-                      title={
+                      className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:text-base ${
                         card.rarity === 'common'
-                          ? 'Common'
+                          ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700'
                           : card.rarity === 'uncommon'
-                            ? 'Uncommon'
+                            ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-black'
                             : card.rarity === 'rare'
-                              ? 'Rare'
-                              : 'Mythic Rare'
-                      }
+                              ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-black'
+                              : 'bg-gradient-to-br from-orange-400 to-orange-600 text-black'
+                      }`}
                     >
-                      <span
-                        className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:text-base ${
-                          card.rarity === 'common'
-                            ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700'
-                            : card.rarity === 'uncommon'
-                              ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-black'
-                              : card.rarity === 'rare'
-                                ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-black'
-                                : 'bg-gradient-to-br from-orange-400 to-orange-600 text-black'
-                        }`}
-                      >
-                        {card.rarity.charAt(0).toUpperCase()}
-                      </span>
+                      {card.rarity.charAt(0).toUpperCase()}
                     </span>
-                  </div>
-                </p>
+                  </span>
+                </div>
                 {card.oracle_text && (
                   <div className="bg-background/20 rounded-2xl p-2 text-xl text-gray-300">
                     {card.oracle_text.split('\n').map((line, index) => (
@@ -235,16 +234,15 @@ export default function CardModal() {
                             const match = part.match(/{([^}]+)}/);
                             if (match) {
                               const symbol = match[1];
-                              
-                                return (
-                                  <ManaSymbol
-                                    key={idx}
-                                    symbol={symbol}
-                                    size={20}
-                                    className="mx-0.5 inline-block align-middle"
-                                  />
-                                );
-                              
+
+                              return (
+                                <ManaSymbol
+                                  key={idx}
+                                  symbol={symbol}
+                                  size={20}
+                                  className="mx-0.5 inline-block align-middle"
+                                />
+                              );
                             }
                             return (
                               <span key={idx} className="inline">
