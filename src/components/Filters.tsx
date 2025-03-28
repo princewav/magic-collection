@@ -106,7 +106,7 @@ export function Filters({ className }: { className?: string }) {
       colors: selectedColors,
       cmcRange,
       rarities: selectedRarities,
-      sets: newSets,
+      sets: newSets.map((set) => set.toLowerCase()),
       sortFields,
     });
   };

@@ -101,6 +101,11 @@ export class CardService extends BaseService<Card> {
       query.rarity = { $in: filters.rarities };
     }
 
+    // Apply set filter
+    if (filters.sets && filters.sets.length > 0) {
+      query.set = { $in: filters.sets };
+    }
+
     // Create sort object for MongoDB
     const sortOptions: Record<string, 1 | -1> = {};
     if (filters.sortFields && filters.sortFields.length > 0) {
