@@ -3,8 +3,8 @@ import { capitalize } from '@/lib/utils';
 import CsvImportButton from '@/components/CsvImportButton';
 import { parseCSVandInsert } from '@/actions/parse-csv';
 import { Filters } from '@/components/Filters';
-import { CollectionCardGrid } from '@/components/CollectionCardGrid';
 import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
+import { CollectionWrapper } from '@/components/CollectionWrapper';
 import { CardsProvider } from '@/context/CardsContext';
 
 export const metadata: Metadata = {
@@ -21,17 +21,27 @@ type Props = {
 export default async function CollectionPage({ params }: Props) {
   const { type } = await params;
   const collectionCards = await loadCardsInCollection(type);
+
   const quantity = collectionCards.reduce(
     (acc, card) => acc + card.quantity,
     0,
   );
-  const cardIds = collectionCards.slice(50, 100).map((card) => card.cardId);
-  const cards = await loadCardsById(cardIds);
+
+  // Get first 100 cards for initial load - the rest can be loaded later if needed
+  const initialCardIds = collectionCards
+    .slice(0, 100)
+    .map((card) => card.cardId);
+  const cards = await loadCardsById(initialCardIds);
+
+  // Map collection quantities to cards
   const cardsWithQuantity = cards.map((card) => ({
     ...card,
     quantity:
       collectionCards.find((c) => c.cardId === card.cardId)?.quantity || 0,
   }));
+
+  // Only show cards that are actually in the collection (quantity > 0)
+  const collectedCards = cardsWithQuantity.filter((card) => card.quantity > 0);
 
   return (
     <CardsProvider initialCards={cards} initialTotal={cards.length}>
@@ -44,7 +54,7 @@ export default async function CollectionPage({ params }: Props) {
           <CsvImportButton collectionType={type} parseCsv={parseCSVandInsert} />
         </div>
         <Filters className="mb-4" />
-        <CollectionCardGrid cards={cardsWithQuantity} />
+        <CollectionWrapper initialCards={collectedCards} />
       </main>
     </CardsProvider>
   );
