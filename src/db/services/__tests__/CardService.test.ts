@@ -1,11 +1,16 @@
 import { CardService } from '../CardService';
 import { Rarity } from '@/types/card';
 import { CardDeduplicationService } from '../deduplication';
+import { CardFilteringService } from '../CardFilteringService';
+
 describe('CardService', () => {
   let cardService: CardService;
 
   beforeAll(async () => {
-    cardService = new CardService(new CardDeduplicationService());
+    cardService = new CardService(
+      new CardDeduplicationService(),
+      new CardFilteringService(),
+    );
   });
 
   describe('getByNameAndSet', () => {
@@ -168,7 +173,8 @@ describe('CardService', () => {
       console.log('Starting rarity sort test (asc)');
       const { cards } = await cardService.getFilteredCardsWithPagination(
         filters,
-        1, 100000
+        1,
+        100000,
       );
       console.log(`Retrieved ${cards.length} cards for rarity test`);
 
