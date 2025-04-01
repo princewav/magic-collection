@@ -1,10 +1,11 @@
 import { CardService } from '../CardService';
 import { Rarity } from '@/types/card';
+import { CardDeduplicationService } from '../deduplication';
 describe('CardService', () => {
   let cardService: CardService;
 
   beforeAll(async () => {
-    cardService = new CardService();
+    cardService = new CardService(new CardDeduplicationService());
   });
 
   describe('getByNameAndSet', () => {
