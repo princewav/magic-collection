@@ -89,13 +89,13 @@ export class CardService extends BaseService<Card> {
   ): Promise<Card[]> {
     const pipeline = this._filteringService.buildAggregationPipeline(filters);
 
-    let docs = (await this.repo.collection.aggregate(pipeline).toArray()) as Card[];
+    let docs = (await this.repo.collection.aggregate(pipeline).toArray());
+    const cards = docs.map(({ _id, ...doc }) => ({ ...doc, id: _id.toString() })) as Card[];
 
     if (deduplicate) {
-      docs = this._deduplicationService.deduplicateCardsByName(docs);
+      return this._deduplicationService.deduplicateCardsByName(cards);
     }
-
-    return docs;
+    return cards;
   }
 
   /**
@@ -115,8 +115,9 @@ export class CardService extends BaseService<Card> {
       this.repo.collection.countDocuments(filterQuery),
       this.repo.collection.aggregate(pipeline).toArray(),
     ]);
+    const docsWithIds = docs.map(({ _id, ...doc }) => ({ ...doc, id: _id.toString() }));
 
-    return { docs, totalCount: totalCountResult };
+    return { docs: docsWithIds, totalCount: totalCountResult };
   }
 
   /**
