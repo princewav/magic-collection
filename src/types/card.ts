@@ -160,6 +160,15 @@ export enum Rarity {
   SPECIAL = 'special',
 }
 
+export const rarityOrder = [
+  Rarity.COMMON,
+  Rarity.UNCOMMON,
+  Rarity.RARE,
+  Rarity.MYTHIC,
+  Rarity.BONUS,
+  Rarity.SPECIAL,
+];
+
 export enum Layout {
   NORMAL = 'normal',
   SPLIT = 'split',

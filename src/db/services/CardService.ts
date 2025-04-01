@@ -34,12 +34,6 @@ export class CardService extends BaseService<Card> {
     this._filteringService = filteringService;
   }
 
-  private _mapDocsToCards(docs: Document[]): Card[] {
-    return docs.map(({ _id, ...doc }) => ({
-      id: _id.toString(),
-      ...doc,
-    })) as unknown as Card[];
-  }
 
   async getByNameAndSet(name: string, set: string, setNumber: string = '') {
     if (!name) {
@@ -65,9 +59,8 @@ export class CardService extends BaseService<Card> {
       };
 
       const resultsDocs = await this.repo.findBy(query);
-      const results = this._mapDocsToCards(resultsDocs as Document[]);
-      if (results.length > 0) {
-        return results;
+      if (resultsDocs.length > 0) {
+        return resultsDocs;
       }
     }
 
@@ -77,17 +70,17 @@ export class CardService extends BaseService<Card> {
   async getByName(name: string) {
     const exactMatchDocs = await this.repo.findBy({ name });
     if (exactMatchDocs.length > 0) {
-      return this._mapDocsToCards(exactMatchDocs as Document[]);
+      return exactMatchDocs;
     }
     const fuzzyMatchDocs = await this.repo.findBy({
       name: new RegExp(name, 'i'),
     });
-    return this._mapDocsToCards(fuzzyMatchDocs as Document[]);
+    return fuzzyMatchDocs;
   }
 
   async getByCardId(ids: string[]): Promise<Card[] | null> {
     const docs = await this.repo.findBy({ cardId: { $in: ids } });
-    return this._mapDocsToCards(docs as Document[]);
+    return docs;
   }
 
   async getFilteredCards(
@@ -96,15 +89,13 @@ export class CardService extends BaseService<Card> {
   ): Promise<Card[]> {
     const pipeline = this._filteringService.buildAggregationPipeline(filters);
 
-    const docs = await this.repo.collection.aggregate(pipeline).toArray();
-
-    let cards = this._mapDocsToCards(docs);
+    let docs = (await this.repo.collection.aggregate(pipeline).toArray()) as Card[];
 
     if (deduplicate) {
-      cards = this._deduplicationService.deduplicateCardsByName(cards);
+      docs = this._deduplicationService.deduplicateCardsByName(docs);
     }
 
-    return cards;
+    return docs;
   }
 
   /**
@@ -188,7 +179,7 @@ export class CardService extends BaseService<Card> {
       limit,
     );
 
-    let cards = this._mapDocsToCards(docs);
+    let cards = docs as Card[];
 
     if (!deduplicate) {
       // If not deduplicating, trim results to pageSize (if limit was > pageSize)

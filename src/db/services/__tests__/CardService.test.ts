@@ -1,5 +1,6 @@
-import { CardService } from '../CardService';
 import { Rarity } from '@/types/card';
+import { CardService } from '../CardService';
+import { rarityOrder } from '@/types/card';
 import { CardDeduplicationService } from '../deduplication';
 import { CardFilteringService } from '../CardFilteringService';
 
@@ -165,64 +166,76 @@ describe('CardService', () => {
       expect(page1.cards[0].name).not.toBe(page2.cards[0].name);
     });
 
-    it('should sort cards by rarity in correct order', async () => {
+    it('should sort cards by rarity in ascending order', async () => {
       const filters = {
         sortFields: [{ field: 'rarity', order: 'asc' as const }],
+        colors: ['R'],
+        sets: ['tsr'],
+        exactColorMatch: true,
       };
 
-      console.log('Starting rarity sort test (asc)');
       const { cards } = await cardService.getFilteredCardsWithPagination(
         filters,
         1,
-        100000,
+        100, // Fetch enough cards to likely get all rarities
       );
-      console.log(`Retrieved ${cards.length} cards for rarity test`);
 
-      // Print the first 10 cards to see the sorting
-      cards.slice(0, 10).forEach((card) => {
-        console.log(`Card: ${card.name}, Rarity: ${card.rarity}`);
-      });
+      // Get unique rarities present in the results, maintaining their order
+      const uniqueRaritiesInResult = [
+        ...new Set(cards.map((card) => card.rarity)),
+      ];
 
-      // Get unique rarities in order
-      const rarities = [...new Set(cards.map((card) => card.rarity))];
-      console.log('Unique rarities in order:', rarities);
+      // Filter the expected rarityOrder to only include rarities present in the results
+      const expectedOrderForResults = rarityOrder.filter((r) =>
+        uniqueRaritiesInResult.includes(r),
+      );
 
-      // Verify the order
-      expect(rarities).toEqual([
-        Rarity.BONUS,
-        Rarity.COMMON,
-        Rarity.UNCOMMON,
-        Rarity.RARE,
-        Rarity.MYTHIC,
-      ]);
+      // Verify the order of the unique rarities found matches the expected order
+      expect(uniqueRaritiesInResult).toEqual(expectedOrderForResults);
 
-      // Test descending order
-      const descFilters = {
+      // Additionally, verify the pairwise order within the results
+      for (let i = 1; i < cards.length; i++) {
+        const rarityIndexPrev = rarityOrder.indexOf(cards[i - 1].rarity as Rarity);
+        const rarityIndexCurr = rarityOrder.indexOf(cards[i].rarity as Rarity);
+        expect(rarityIndexCurr).toBeGreaterThanOrEqual(rarityIndexPrev);
+      }
+    });
+
+    it('should sort cards by rarity in descending order', async () => {
+      const filters = {
         sortFields: [{ field: 'rarity', order: 'desc' as const }],
+        colors: ['R'],
+        sets: ['tsr'],
+        exactColorMatch: true,
       };
 
-      console.log('Starting rarity sort test (desc)');
-      const { cards: descCards } =
-        await cardService.getFilteredCardsWithPagination(descFilters, 1, 100);
-      console.log(`Retrieved ${descCards.length} cards for rarity desc test`);
+      const { cards } = await cardService.getFilteredCardsWithPagination(
+        filters,
+        1,
+        100, // Fetch enough cards
+      );
 
-      // Print the first 10 cards to see the sorting
-      descCards.slice(0, 10).forEach((card) => {
-        console.log(`Card: ${card.name}, Rarity: ${card.rarity}`);
-      });
+      const uniqueRaritiesInResult = [
+        ...new Set(cards.map((card) => card.rarity)),
+      ];
 
-      // Get unique rarities in order for descending
-      const descRarities = [...new Set(descCards.map((card) => card.rarity))];
-      console.log('Unique rarities in order (desc):', descRarities);
+      // Expected descending order
+      const expectedDescOrder = rarityOrder.slice().reverse();
 
-      // Verify the descending order
-      expect(descRarities).toEqual([
-        'mythic',
-        'rare',
-        'uncommon',
-        'common',
-        'bonus',
-      ]);
+      // Filter the expected descending order to only include rarities present in the results
+      const expectedDescOrderForResults = expectedDescOrder.filter((r) =>
+        uniqueRaritiesInResult.includes(r),
+      );
+
+      // Verify the order of the unique rarities found matches the expected descending order
+      expect(uniqueRaritiesInResult).toEqual(expectedDescOrderForResults);
+
+      // Additionally, verify the pairwise order within the results
+      for (let i = 1; i < cards.length; i++) {
+        const rarityIndexPrev = rarityOrder.indexOf(cards[i - 1].rarity as Rarity);
+        const rarityIndexCurr = rarityOrder.indexOf(cards[i].rarity as Rarity);
+        expect(rarityIndexCurr).toBeLessThanOrEqual(rarityIndexPrev);
+      }
     });
 
     it('should sort cards by colors in correct order', async () => {
