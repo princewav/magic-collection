@@ -152,7 +152,10 @@ export class CardFilteringService {
    * Constructs the main aggregation pipeline stages based on filters.
    * Includes $match, custom sort fields ($addFields), $sort, and $project stages.
    */
-  public buildAggregationPipeline(filters: FilterOptions): Document[] {
+  public buildAggregationPipeline(
+    filters: FilterOptions,
+    deduplicate: boolean = false,
+  ): Document[] {
     const query: Record<string, any> = {};
     this._applyFilters(query, filters); // Apply filters to build the match query
 
@@ -168,6 +171,26 @@ export class CardFilteringService {
     }
 
     pipeline.push({ $sort: sortStage }); // Add the sort stage
+
+    // Deduplicate by name if requested, keeping the first document based on the sort order
+    if (deduplicate) {
+      pipeline.push({
+        $group: {
+          _id: '$name', // Group by card name
+          firstDoc: { $first: '$$ROOT' }, // Keep the first document in each group
+        },
+      });
+      pipeline.push({ $replaceRoot: { newRoot: '$firstDoc' } }); // Restore document structure
+      // Re-sort after grouping, as $group doesn't guarantee order preservation
+      // (though $first usually relies on the input order, it's safer to re-sort)
+      if (needsCustomSort) {
+        // If custom sort fields were used, they are present in firstDoc, re-apply sort
+        pipeline.push({ $sort: sortStage });
+      } else {
+        // If only standard fields were used, they are still in firstDoc
+        pipeline.push({ $sort: sortStage });
+      }
+    }
 
     // Add projection stage to remove temporary sort fields if they were added
     if (needsCustomSort) {
@@ -187,6 +210,46 @@ export class CardFilteringService {
 
     // Return the complete pipeline stages array
     return pipeline;
+  }
+
+  /**
+   * Builds the aggregation pipeline required to count documents based on filters,
+   * optionally including deduplication.
+   */
+  public buildCountPipeline(
+    filters: FilterOptions,
+    deduplicate: boolean = false,
+  ): Document[] {
+    const query: Record<string, any> = {};
+    this._applyFilters(query, filters);
+
+    const needsCustomSort = this._needsCustomSorting(filters);
+    const sortStage = this._buildSortStage(filters); // Sort is needed for $first in group
+
+    let countPipeline: Document[] = [];
+
+    countPipeline.push({ $match: query });
+
+    // Add stages needed for sorting if deduplicating, as $first relies on sort order
+    if (needsCustomSort && deduplicate) {
+      countPipeline.push(...this._buildCustomSortStages(filters));
+    }
+
+    // Sort stage is necessary for $first in the deduplication group stage
+    if (deduplicate) {
+      countPipeline.push({ $sort: sortStage });
+      countPipeline.push({
+        $group: {
+          _id: '$name',
+          // No need to keep the document ($first: '$$ROOT'), just group by name
+        },
+      });
+    }
+
+    // Add the final count stage
+    countPipeline.push({ $count: 'total' });
+
+    return countPipeline;
   }
 
   /**

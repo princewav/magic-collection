@@ -3,7 +3,6 @@ import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
 import { Document } from 'mongodb';
-import { CardDeduplicationService } from './deduplication';
 import { CardFilteringService } from './CardFilteringService';
 
 interface FilterOptions {
@@ -22,18 +21,12 @@ const DEDUPLICATION_FETCH_MULTIPLIER = 3;
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
-  private _deduplicationService: CardDeduplicationService;
   private _filteringService: CardFilteringService;
 
-  constructor(
-    deduplicationService: CardDeduplicationService,
-    filteringService: CardFilteringService,
-  ) {
+  constructor(filteringService: CardFilteringService) {
     super();
-    this._deduplicationService = deduplicationService;
     this._filteringService = filteringService;
   }
-
 
   async getByNameAndSet(name: string, set: string, setNumber: string = '') {
     if (!name) {
@@ -87,14 +80,17 @@ export class CardService extends BaseService<Card> {
     filters: FilterOptions,
     deduplicate: boolean = true,
   ): Promise<Card[]> {
-    const pipeline = this._filteringService.buildAggregationPipeline(filters);
+    const pipeline = this._filteringService.buildAggregationPipeline(
+      filters,
+      deduplicate,
+    );
 
-    let docs = (await this.repo.collection.aggregate(pipeline).toArray());
-    const cards = docs.map(({ _id, ...doc }) => ({ ...doc, id: _id.toString() })) as Card[];
+    let docs = await this.repo.collection.aggregate(pipeline).toArray();
+    const cards = docs.map(({ _id, ...doc }) => ({
+      ...doc,
+      id: _id.toString(),
+    })) as Card[];
 
-    if (deduplicate) {
-      return this._deduplicationService.deduplicateCardsByName(cards);
-    }
     return cards;
   }
 
@@ -105,63 +101,45 @@ export class CardService extends BaseService<Card> {
     filters: FilterOptions,
     skip: number,
     limit: number,
+    deduplicate: boolean,
   ): Promise<{ docs: Document[]; totalCount: number }> {
-    const filterQuery = this._filteringService.buildFilterQuery(filters);
-    const pipeline = this._filteringService.buildAggregationPipeline(filters);
+    const pipeline = this._filteringService.buildAggregationPipeline(
+      filters,
+      deduplicate,
+    );
+
     pipeline.push({ $skip: skip });
     pipeline.push({ $limit: limit });
 
-    const [totalCountResult, docs] = await Promise.all([
-      this.repo.collection.countDocuments(filterQuery),
-      this.repo.collection.aggregate(pipeline).toArray(),
+    const fetchDocsPromise = this.repo.collection.aggregate(pipeline).toArray();
+
+    let totalCountPromise: Promise<number>;
+
+    if (deduplicate) {
+      const countPipeline = this._filteringService.buildCountPipeline(
+        filters,
+        true,
+      );
+      totalCountPromise = this.repo.collection
+        .aggregate(countPipeline)
+        .toArray()
+        .then((result) => result[0]?.total ?? 0);
+    } else {
+      const filterQuery = this._filteringService.buildFilterQuery(filters);
+      totalCountPromise = this.repo.collection.countDocuments(filterQuery);
+    }
+
+    const [docs, totalCountResult] = await Promise.all([
+      fetchDocsPromise,
+      totalCountPromise,
     ]);
-    const docsWithIds = docs.map(({ _id, ...doc }) => ({ ...doc, id: _id.toString() }));
+
+    const docsWithIds = docs.map(({ _id, ...doc }) => ({
+      ...doc,
+      id: _id.toString(),
+    }));
 
     return { docs: docsWithIds, totalCount: totalCountResult };
-  }
-
-  /**
-   * Handles deduplication and adjusts the total count based on deduplication results.
-   */
-  private _processDeduplicationAndTotal(
-    cards: Card[],
-    totalCount: number,
-    page: number,
-    pageSize: number,
-    fetchedLimit: number, // The limit used in the DB query
-  ): { cards: Card[]; total: number } {
-    const originalLength = cards.length;
-    let deduplicatedCards =
-      this._deduplicationService.deduplicateCardsByName(cards);
-    deduplicatedCards = deduplicatedCards.slice(0, pageSize); // Trim to page size after deduplication
-
-    let adjustedTotal = totalCount;
-
-    // Adjust total count estimate only on the first page when deduplication significantly reduces results
-    if (page === 1 && originalLength > 0 && deduplicatedCards.length > 0) {
-      // Check if we fetched extra items for deduplication
-      if (fetchedLimit > pageSize) {
-        // Avoid division by zero
-        const deduplicationRatio = deduplicatedCards.length / originalLength;
-        // Estimate total based on the ratio, ensuring it's at least the number of cards on the current page
-        adjustedTotal = Math.max(
-          Math.ceil(totalCount * deduplicationRatio),
-          deduplicatedCards.length,
-        );
-      } else {
-        // If we didn't fetch extra (limit == pageSize), the total is just the count on this page
-        adjustedTotal = deduplicatedCards.length;
-      }
-    } else if (page > 1) {
-      // For subsequent pages, use the original total count as estimation is less reliable
-      adjustedTotal = totalCount;
-    } else if (page === 1 && deduplicatedCards.length === 0) {
-      // If the first page is empty after deduplication, the total is 0
-      adjustedTotal = 0;
-    }
-    // If totalCount was 0 initially, adjustedTotal remains 0
-
-    return { cards: deduplicatedCards, total: adjustedTotal };
   }
 
   async getFilteredCardsWithPagination(
@@ -171,39 +149,21 @@ export class CardService extends BaseService<Card> {
     deduplicate: boolean = true,
   ): Promise<{ cards: Card[]; total: number }> {
     const skip = (page - 1) * pageSize;
-    // Fetch more items if deduplicating to increase chances of filling the page
-    const limit = pageSize * (deduplicate ? DEDUPLICATION_FETCH_MULTIPLIER : 1);
+    const limit = pageSize;
 
     const { docs, totalCount } = await this._fetchPaginatedCardData(
       filters,
       skip,
       limit,
+      deduplicate,
     );
 
     let cards = docs as Card[];
 
-    if (!deduplicate) {
-      // If not deduplicating, trim results to pageSize (if limit was > pageSize)
-      // and return the accurate total count from the database.
-      cards = cards.slice(0, pageSize);
-      return { cards, total: totalCount };
-    }
-
-    // Handle deduplication and total count adjustment
-    return this._processDeduplicationAndTotal(
-      cards,
-      totalCount,
-      page,
-      pageSize,
-      limit,
-    );
+    return { cards, total: totalCount };
   }
 }
 
-const cardDeduplicationService = new CardDeduplicationService();
 const cardFilteringService = new CardFilteringService();
 
-export const cardService = new CardService(
-  cardDeduplicationService,
-  cardFilteringService,
-);
+export const cardService = new CardService(cardFilteringService);
