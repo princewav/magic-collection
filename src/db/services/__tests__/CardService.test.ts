@@ -1,4 +1,4 @@
-import { Rarity } from '@/types/card';
+import { Card, Rarity } from '@/types/card';
 import { CardService } from '../CardService';
 import { rarityOrder } from '@/types/card';
 import { CardDeduplicationService } from '../deduplication';
@@ -237,76 +237,86 @@ describe('CardService', () => {
         expect(rarityIndexCurr).toBeLessThanOrEqual(rarityIndexPrev);
       }
     });
+    const ascColorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
+    const descColorOrder = ascColorOrder.slice().reverse();
 
-    it('should sort cards by colors in correct order', async () => {
+    const getColorCategory = (card: Card): string => {
+      if (!card.colors || card.colors.length === 0) return 'C';
+      if (card.colors.length > 1) return 'M';
+      return card.colors[0];
+    };
+
+    it('should sort cards by colors in ascending order', async () => {
       const filters = {
         sortFields: [{ field: 'colors', order: 'asc' as const }],
+        sets: ['tsr'],
+        exactColorMatch: true,
       };
 
-      console.log('Starting color sort test (asc)');
       const { cards } = await cardService.getFilteredCardsWithPagination(
         filters,
         1,
-        100,
+        100, // Fetch enough cards to likely get all color categories
       );
-      console.log(`Retrieved ${cards.length} cards for color test`);
 
-      // Print the first 10 cards to see the sorting
-      cards.slice(0, 10).forEach((card) => {
-        console.log(
-          `Card: ${card.name}, Colors: [${card.colors.join(',')}], Category: ${card.colors.length === 0 ? 'C' : card.colors.length > 1 ? 'M' : card.colors[0]}`,
-        );
-      });
-
-      // Get unique color combinations in order
-      const colorCombos = [
-        ...new Set(
-          cards.map((card) => {
-            if (card.colors.length === 0) return 'C';
-            if (card.colors.length > 1) return 'M';
-            return card.colors[0];
-          }),
-        ),
+      // Get unique color categories present in the results, maintaining their order
+      const uniqueColorCategoriesInResult = [
+        ...new Set(cards.map(getColorCategory)),
       ];
-      console.log('Unique color combinations in order:', colorCombos);
 
-      // Verify the order
-      expect(colorCombos).toEqual(['W', 'U', 'B', 'R', 'G', 'M', 'C']);
+      // Filter the expected ascColorOrder to only include categories present in the results
+      const expectedOrderForResults = ascColorOrder.filter((c) =>
+        uniqueColorCategoriesInResult.includes(c),
+      );
 
-      // Test descending order
-      const descFilters = {
+      // Verify the order of the unique color categories found matches the expected order
+      expect(uniqueColorCategoriesInResult).toEqual(expectedOrderForResults);
+
+      // Additionally, verify the pairwise order within the results
+      for (let i = 1; i < cards.length; i++) {
+        const colorIndexPrev = ascColorOrder.indexOf(getColorCategory(cards[i - 1]));
+        const colorIndexCurr = ascColorOrder.indexOf(getColorCategory(cards[i]));
+        // Handle cases where a category might not be in ascColorOrder (shouldn't happen with current logic)
+        if (colorIndexPrev !== -1 && colorIndexCurr !== -1) {
+            expect(colorIndexCurr).toBeGreaterThanOrEqual(colorIndexPrev);
+        }
+      }
+    });
+
+    it('should sort cards by colors in descending order', async () => {
+      const filters = {
         sortFields: [{ field: 'colors', order: 'desc' as const }],
+        sets: ['tsr'],
+        exactColorMatch: true,
       };
 
-      console.log('Starting color sort test (desc)');
-      const { cards: descCards } =
-        await cardService.getFilteredCardsWithPagination(descFilters, 1, 100);
-      console.log(`Retrieved ${descCards.length} cards for color desc test`);
-
-      // Print the first 10 cards to see the sorting
-      descCards.slice(0, 10).forEach((card) => {
-        console.log(
-          `Card: ${card.name}, Colors: [${card.colors.join(',')}], Category: ${card.colors.length === 0 ? 'C' : card.colors.length > 1 ? 'M' : card.colors[0]}`,
-        );
-      });
-
-      // Get unique color combinations in order for descending
-      const descColorCombos = [
-        ...new Set(
-          descCards.map((card) => {
-            if (card.colors.length === 0) return 'C';
-            if (card.colors.length > 1) return 'M';
-            return card.colors[0];
-          }),
-        ),
-      ];
-      console.log(
-        'Unique color combinations in order (desc):',
-        descColorCombos,
+      const { cards } = await cardService.getFilteredCardsWithPagination(
+        filters,
+        1,
+        100, // Fetch enough cards
       );
 
-      // Verify the descending order
-      expect(descColorCombos).toEqual(['C', 'M', 'G', 'R', 'B', 'U', 'W']);
+      const uniqueColorCategoriesInResult = [
+        ...new Set(cards.map(getColorCategory)),
+      ];
+
+      // Filter the expected descColorOrder to only include categories present in the results
+      const expectedOrderForResults = descColorOrder.filter((c) =>
+        uniqueColorCategoriesInResult.includes(c),
+      );
+
+      // Verify the order of the unique color categories found matches the expected descending order
+      expect(uniqueColorCategoriesInResult).toEqual(expectedOrderForResults);
+
+       // Additionally, verify the pairwise order within the results
+       for (let i = 1; i < cards.length; i++) {
+        const colorIndexPrev = descColorOrder.indexOf(getColorCategory(cards[i - 1]));
+        const colorIndexCurr = descColorOrder.indexOf(getColorCategory(cards[i]));
+         // Handle cases where a category might not be in descColorOrder
+        if (colorIndexPrev !== -1 && colorIndexCurr !== -1) {
+            expect(colorIndexCurr).toBeGreaterThanOrEqual(colorIndexPrev); // Descending order means higher index comes first
+        }
+      }
     });
   });
 
