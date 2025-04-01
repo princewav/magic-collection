@@ -50,15 +50,15 @@ export class MongoRepository<T extends { id: string }> extends BaseRepository<T>
     }
   }
 
-  async getAll(): Promise<T[]> {
-    const cursor = this.collection.find({});
+  async getAll(limit: number = 0): Promise<T[]> {
+    const cursor = this.collection.find({}).limit(limit > 0 ? limit : 0);
     const docs = await cursor.toArray();
     return docs.map(({ _id, ...doc }) => ({
       id: _id.toString(),
       ...doc,
     })) as unknown as T[];
   }
-
+  
   async update(id: string, item: Partial<T>): Promise<T | null> {
     try {
       const objectId = new ObjectId(id);

@@ -150,3 +150,20 @@ export type CollectionCard = {
 };
 
 export type CardWithQuantity = Card & { quantity: number };
+
+export enum Rarity {
+  BONUS = 'bonus',
+  COMMON = 'common',
+  UNCOMMON = 'uncommon',
+  RARE = 'rare',
+  MYTHIC = 'mythic',
+  SPECIAL = 'special',
+}
+
+export enum Layout {
+  NORMAL = 'normal',
+  SPLIT = 'split',
+  FLIP = 'flip',
+  TRANSFORM = 'transform',
+  MODAL_DFC = 'modal_dfc',
+}

@@ -1,8 +1,9 @@
-import { Card, CollectionCard } from '@/types/card';
+import { Card } from '@/types/card';
 import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
 import { Document } from 'mongodb';
+import { Rarity, Layout } from '@/types/card';
 
 interface FilterOptions {
   colors?: string[];
@@ -16,14 +17,7 @@ interface FilterOptions {
   exactColorMatch?: boolean;
 }
 
-const rarityOrder = [
-  'bonus',
-  'common',
-  'uncommon',
-  'rare',
-  'mythic',
-  'special',
-];
+
 
 const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
 
@@ -69,15 +63,6 @@ export class CardService extends BaseService<Card> {
     return [];
   }
 
-  async getAll(limit: number): Promise<Card[]> {
-    const cursor = this.repo.collection.find().limit(limit);
-    const docs = await cursor.toArray();
-    return docs.map(({ _id, ...doc }) => ({
-      id: _id.toString(),
-      ...doc,
-    })) as unknown as Card[];
-  }
-
   async getByName(name: string) {
     const exactMatch = await this.repo.findBy({ name });
     if (exactMatch.length > 0) {
@@ -87,12 +72,7 @@ export class CardService extends BaseService<Card> {
   }
 
   async getByCardId(ids: string[]): Promise<Card[] | null> {
-    const cursor = this.repo.collection.find({ cardId: { $in: ids } });
-    const docs = await cursor.toArray();
-    return docs.map(({ _id, ...doc }) => ({
-      id: _id.toString(),
-      ...doc,
-    })) as unknown as Card[];
+    return this.repo.findBy({ cardId: { $in: ids } });
   }
 
   async getFilteredCards(
@@ -246,14 +226,20 @@ export class CardService extends BaseService<Card> {
    * 5. Most recent set (for newer artwork/templating)
    */
   deduplicateCardsByName(cards: Card[]): Card[] {
+    const acceptedLayouts = [
+      Layout.SPLIT,
+      Layout.FLIP,
+      Layout.TRANSFORM,
+      Layout.MODAL_DFC,
+    ];
+    
     const uniqueCards = new Map<string, Card>();
 
     // Score function for determining which version of a card to keep
     const getCardNormalityScore = (card: Card): number => {
       let score = 0;
 
-      // Prefer non-special rarities (avoid promotional/special versions)
-      if (['common', 'uncommon', 'rare', 'mythic'].includes(card.rarity)) {
+      if (![Rarity.BONUS, Rarity.SPECIAL].includes(card.rarity as Rarity)) {
         score += 100;
       }
 
@@ -269,10 +255,11 @@ export class CardService extends BaseService<Card> {
       score += rarityValues[card.rarity] || 0;
 
       // Prefer normal layouts
-      if (card.layout === 'normal') {
+      if (card.layout === Layout.NORMAL) {
         score += 30;
       } else if (
-        ['split', 'flip', 'transform', 'modal_dfc'].includes(card.layout)
+        
+        acceptedLayouts.includes(card.layout as Layout)
       ) {
         score += 10;
       }
@@ -364,7 +351,7 @@ export class CardService extends BaseService<Card> {
       stages.push({
         $addFields: {
           _rarityIndex: {
-            $indexOfArray: [rarityOrder, '$rarity'],
+            $indexOfArray: [Object.values(Rarity), '$rarity'],
           },
         },
       });

@@ -1,5 +1,5 @@
 import { CardService } from '../CardService';
-
+import { Rarity } from '@/types/card';
 describe('CardService', () => {
   let cardService: CardService;
 
@@ -143,12 +143,14 @@ describe('CardService', () => {
         filters,
         1,
         5,
+        false,
       );
 
       const page2 = await cardService.getFilteredCardsWithPagination(
         filters,
         2,
         5,
+        false,
       );
 
       expect(page1.cards.length).toBeLessThanOrEqual(5);
@@ -165,8 +167,7 @@ describe('CardService', () => {
       console.log('Starting rarity sort test (asc)');
       const { cards } = await cardService.getFilteredCardsWithPagination(
         filters,
-        1,
-        100,
+        1, 100000
       );
       console.log(`Retrieved ${cards.length} cards for rarity test`);
 
@@ -181,11 +182,11 @@ describe('CardService', () => {
 
       // Verify the order
       expect(rarities).toEqual([
-        'bonus',
-        'common',
-        'uncommon',
-        'rare',
-        'mythic',
+        Rarity.BONUS,
+        Rarity.COMMON,
+        Rarity.UNCOMMON,
+        Rarity.RARE,
+        Rarity.MYTHIC,
       ]);
 
       // Test descending order
