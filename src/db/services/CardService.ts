@@ -291,25 +291,24 @@ export class CardService extends BaseService<Card> {
     let cards = this._mapDocsToCards(docs);
     let total = totalCountResult;
 
-    if (deduplicate) {
-      const originalLength = cards.length;
-      cards = this.deduplicationService.deduplicateCardsByName(cards);
+    if (!deduplicate) return { cards, total };
 
-      cards = cards.slice(0, pageSize);
+    const originalLength = cards.length;
+    cards = this.deduplicationService.deduplicateCardsByName(cards);
+    cards = cards.slice(0, pageSize);
 
-      if (page === 1 && originalLength > 0 && cards.length > 0) {
-        if (limit > pageSize) {
-          const deduplicationRatio = cards.length / originalLength;
-          total = Math.max(
-            Math.ceil(totalCountResult * deduplicationRatio),
-            cards.length,
-          );
-        } else {
-          total = cards.length;
-        }
-      } else if (deduplicate && page > 1) {
-        total = totalCountResult;
+    if (page === 1 && originalLength > 0 && cards.length > 0) {
+      if (limit > pageSize) {
+        const deduplicationRatio = cards.length / originalLength;
+        total = Math.max(
+          Math.ceil(totalCountResult * deduplicationRatio),
+          cards.length,
+        );
+      } else {
+        total = cards.length;
       }
+    } else if (page > 1) {
+      total = totalCountResult;
     }
 
     return {
