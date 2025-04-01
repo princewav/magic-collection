@@ -1,6 +1,7 @@
 'use server';
 
-import { cardService, collectionCardService } from "@/db/services/CardService";
+import { cardService } from "@/db/services/CardService";
+import { collectionCardService } from "@/db/services/CollectionCardService";
 import { Card, CollectionCard } from "@/types/card";
 
 export async function loadCardsById(ids: string[]): Promise<Card[]> {

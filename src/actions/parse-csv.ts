@@ -1,7 +1,8 @@
 'use server';
 
 import { parse } from 'csv-parse/sync';
-import { collectionCardService, cardService } from '@/db/services/CardService';
+import { cardService } from '@/db/services/CardService';
+import { collectionCardService } from '@/db/services/CollectionCardService';
 import { CollectionCard } from '@/types/card';
 
 async function getCardId(card: CollectionCard) {

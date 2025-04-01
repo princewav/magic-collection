@@ -1,6 +1,6 @@
 import { Deck } from '@/types/deck';
 import { deckService } from '@/db/services/DeckService';
-import { collectionCardService } from '@/db/services/CardService';
+import { collectionCardService } from '@/db/services/CollectionCardService';
 import { CollectionCard } from '@/types/card';
 import { loadCardsById } from '@/actions/load-cards';
 import { DBDeck } from '@/types/deck';
