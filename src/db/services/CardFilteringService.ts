@@ -1,5 +1,5 @@
 import { Document } from 'mongodb';
-import { Rarity, Layout } from '@/types/card'; // Assuming FilterOptions is also needed or defined elsewhere
+import { rarityOrder } from '@/types/card';
 
 // Re-define or import FilterOptions if it's not globally available
 // For now, assume FilterOptions structure is known
@@ -65,7 +65,7 @@ export class CardFilteringService {
       stages.push({
         $addFields: {
           _rarityIndex: {
-            $indexOfArray: [Object.values(Rarity), '$rarity'],
+            $indexOfArray: [rarityOrder, '$rarity'],
           },
         },
       });

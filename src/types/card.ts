@@ -152,11 +152,11 @@ export type CollectionCard = {
 export type CardWithQuantity = Card & { quantity: number };
 
 export enum Rarity {
-  BONUS = 'bonus',
   COMMON = 'common',
   UNCOMMON = 'uncommon',
   RARE = 'rare',
   MYTHIC = 'mythic',
+  BONUS = 'bonus',
   SPECIAL = 'special',
 }
 
