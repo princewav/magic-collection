@@ -107,17 +107,15 @@ export class CardService extends BaseService<Card> {
     return cards;
   }
 
-  async getFilteredCardsWithPagination(
+  /**
+   * Fetches card documents and total count based on filters and pagination settings.
+   */
+  private async _fetchPaginatedCardData(
     filters: FilterOptions,
-    page: number = 1,
-    pageSize: number = 50,
-    deduplicate: boolean = true,
-  ): Promise<{ cards: Card[]; total: number }> {
+    skip: number,
+    limit: number,
+  ): Promise<{ docs: Document[]; totalCount: number }> {
     const filterQuery = this._filteringService.buildFilterQuery(filters);
-
-    const skip = (page - 1) * pageSize;
-    const limit = pageSize * (deduplicate ? DEDUPLICATION_FETCH_MULTIPLIER : 1);
-
     const pipeline = this._filteringService.buildAggregationPipeline(filters);
     pipeline.push({ $skip: skip });
     pipeline.push({ $limit: limit });
@@ -127,35 +125,86 @@ export class CardService extends BaseService<Card> {
       this.repo.collection.aggregate(pipeline).toArray(),
     ]);
 
-    let cards = this._mapDocsToCards(docs);
-    let total = totalCountResult;
+    return { docs, totalCount: totalCountResult };
+  }
 
-    if (!deduplicate) return { cards, total };
-
+  /**
+   * Handles deduplication and adjusts the total count based on deduplication results.
+   */
+  private _processDeduplicationAndTotal(
+    cards: Card[],
+    totalCount: number,
+    page: number,
+    pageSize: number,
+    fetchedLimit: number, // The limit used in the DB query
+  ): { cards: Card[]; total: number } {
     const originalLength = cards.length;
-    cards = this._deduplicationService.deduplicateCardsByName(cards);
-    cards = cards.slice(0, pageSize);
+    let deduplicatedCards =
+      this._deduplicationService.deduplicateCardsByName(cards);
+    deduplicatedCards = deduplicatedCards.slice(0, pageSize); // Trim to page size after deduplication
 
-    if (page === 1 && originalLength > 0 && cards.length > 0) {
-      if (limit > pageSize) {
-        const deduplicationRatio = cards.length / originalLength;
-        total = Math.max(
-          Math.ceil(totalCountResult * deduplicationRatio),
-          cards.length,
+    let adjustedTotal = totalCount;
+
+    // Adjust total count estimate only on the first page when deduplication significantly reduces results
+    if (page === 1 && originalLength > 0 && deduplicatedCards.length > 0) {
+      // Check if we fetched extra items for deduplication
+      if (fetchedLimit > pageSize) {
+        // Avoid division by zero
+        const deduplicationRatio = deduplicatedCards.length / originalLength;
+        // Estimate total based on the ratio, ensuring it's at least the number of cards on the current page
+        adjustedTotal = Math.max(
+          Math.ceil(totalCount * deduplicationRatio),
+          deduplicatedCards.length,
         );
       } else {
-        total = cards.length;
+        // If we didn't fetch extra (limit == pageSize), the total is just the count on this page
+        adjustedTotal = deduplicatedCards.length;
       }
     } else if (page > 1) {
-      total = totalCountResult;
-    } else if (page === 1 && cards.length === 0) {
-      total = 0;
+      // For subsequent pages, use the original total count as estimation is less reliable
+      adjustedTotal = totalCount;
+    } else if (page === 1 && deduplicatedCards.length === 0) {
+      // If the first page is empty after deduplication, the total is 0
+      adjustedTotal = 0;
+    }
+    // If totalCount was 0 initially, adjustedTotal remains 0
+
+    return { cards: deduplicatedCards, total: adjustedTotal };
+  }
+
+  async getFilteredCardsWithPagination(
+    filters: FilterOptions,
+    page: number = 1,
+    pageSize: number = 50,
+    deduplicate: boolean = true,
+  ): Promise<{ cards: Card[]; total: number }> {
+    const skip = (page - 1) * pageSize;
+    // Fetch more items if deduplicating to increase chances of filling the page
+    const limit = pageSize * (deduplicate ? DEDUPLICATION_FETCH_MULTIPLIER : 1);
+
+    const { docs, totalCount } = await this._fetchPaginatedCardData(
+      filters,
+      skip,
+      limit,
+    );
+
+    let cards = this._mapDocsToCards(docs);
+
+    if (!deduplicate) {
+      // If not deduplicating, trim results to pageSize (if limit was > pageSize)
+      // and return the accurate total count from the database.
+      cards = cards.slice(0, pageSize);
+      return { cards, total: totalCount };
     }
 
-    return {
+    // Handle deduplication and total count adjustment
+    return this._processDeduplicationAndTotal(
       cards,
-      total,
-    };
+      totalCount,
+      page,
+      pageSize,
+      limit,
+    );
   }
 }
 
