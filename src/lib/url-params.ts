@@ -56,17 +56,17 @@ export function updateUrlWithFilters(
   window.history.pushState({}, '', url.toString());
 }
 
-export function getFiltersFromUrl(): {
+// Add a type for the search params object to allow different implementations
+type SearchParamsLike = {
+  get(name: string): string | null;
+  getAll?(name: string): string[]; // Optional, depending on usage
+};
+
+// Core parsing logic
+function parseSearchParams(params: SearchParamsLike): {
   filters: FilterOptions;
   deduplicate: boolean;
 } {
-  if (typeof window === 'undefined') {
-    return { filters: {}, deduplicate: true };
-  }
-
-  const url = new URL(window.location.href);
-  const params = url.searchParams;
-
   const filters: FilterOptions = {};
 
   // Get color filters
@@ -114,7 +114,48 @@ export function getFiltersFromUrl(): {
 
   // Get deduplicate option
   const dedupeParam = params.get('dedupe');
-  const deduplicate = dedupeParam ? dedupeParam === 'true' : true;
+  const deduplicate = dedupeParam ? dedupeParam === 'true' : true; // Default to true if not present
 
   return { filters, deduplicate };
+}
+
+// Client-side function using window.location
+export function getFiltersFromUrl(): {
+  filters: FilterOptions;
+  deduplicate: boolean;
+} {
+  if (typeof window === 'undefined') {
+    // Return default values or handle server-side case if needed differently here
+    return { filters: {}, deduplicate: true };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return parseSearchParams(params);
+}
+
+// Server-side function accepting Next.js searchParams object
+export function getFiltersFromSearchParams(searchParams: {
+  [key: string]: string | string[] | undefined;
+}): { filters: FilterOptions; deduplicate: boolean; page: number } {
+  // Adapt the Next.js searchParams object to SearchParamsLike interface
+  const paramsAdapter: SearchParamsLike = {
+    get: (name: string): string | null => {
+      const value = searchParams[name];
+      if (Array.isArray(value)) {
+        // Handle array case if necessary, maybe join or take first?
+        // For this specific parser, it seems single values are expected.
+        // Returning the first element for simplicity, adjust if needed.
+        return value[0] ?? null;
+      }
+      return value ?? null;
+    },
+  };
+
+  const { filters, deduplicate } = parseSearchParams(paramsAdapter);
+
+  // Get page number
+  const pageParam = paramsAdapter.get('page');
+  const page = pageParam ? parseInt(pageParam, 10) : 1;
+
+  return { filters, deduplicate, page };
 }

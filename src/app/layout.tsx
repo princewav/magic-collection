@@ -27,13 +27,13 @@ export default function RootLayout({
           'bg-background text-foreground min-h-screen',
         )}
       >
-        <React.StrictMode>
+        {/* <React.StrictMode> */}
           <ThemeProvider>
             <Navbar />
             <CardModalProvider>{children}</CardModalProvider>
             <Toaster />
           </ThemeProvider>
-        </React.StrictMode>
+        {/* </React.StrictMode> */}
       </body>
     </html>
   );

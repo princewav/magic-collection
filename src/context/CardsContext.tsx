@@ -56,27 +56,6 @@ export function CardsProvider({
     sortFields: [],
   });
 
-  // Initialize filters from URL if available (client-side only)
-  useEffect(() => {
-    const { filters: urlFilters, deduplicate: urlDeduplicate } =
-      getFiltersFromUrl();
-
-    if (Object.keys(urlFilters).length > 0) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        ...urlFilters,
-      }));
-
-      if (urlDeduplicate !== deduplicate) {
-        setDeduplicate(urlDeduplicate);
-      }
-
-      // Load cards with the URL filters
-      loadCards(1, urlFilters);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const loadCards = useCallback(
     async (page: number, newFilters?: FilterOptions) => {
       setIsLoading(true);
