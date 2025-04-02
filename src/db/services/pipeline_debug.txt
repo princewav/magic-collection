@@ -1,0 +1,53 @@
+[
+  {
+    "$match": {
+      "set": {
+        "$in": [
+          "tdm"
+        ]
+      }
+    }
+  },
+  {
+    "$addFields": {
+      "_collectorNumberNumeric": {
+        "$convert": {
+          "input": "$collector_number",
+          "to": "int",
+          "onError": 999999,
+          "onNull": 999999
+        }
+      }
+    }
+  },
+  {
+    "$sort": {
+      "_collectorNumberNumeric": 1,
+      "name": 1
+    }
+  },
+  {
+    "$group": {
+      "_id": "$name",
+      "firstDoc": {
+        "$first": "$$ROOT"
+      }
+    }
+  },
+  {
+    "$replaceRoot": {
+      "newRoot": "$firstDoc"
+    }
+  },
+  {
+    "$sort": {
+      "_collectorNumberNumeric": 1,
+      "name": 1
+    }
+  },
+  {
+    "$project": {
+      "_collectorNumberNumeric": 0
+    }
+  }
+]

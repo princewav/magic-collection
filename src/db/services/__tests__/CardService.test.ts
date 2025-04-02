@@ -13,8 +13,6 @@ describe('CardService', () => {
     cardService = new CardService(new CardFilteringService());
   });
 
-  
-
   describe('getByNameAndSet', () => {
     it('should find a real card by name and set', async () => {
       const result = await cardService.getByNameAndSet('Lightning Bolt', 'lea');

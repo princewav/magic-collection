@@ -115,15 +115,20 @@ export class CardFilteringService {
   private _buildSortStage(filters: FilterOptions): Record<string, 1 | -1> {
     const sortStage: Record<string, 1 | -1> = {};
 
-    if (filters.sortFields && filters.sortFields.length > 0) {
-      for (const { field, order } of filters.sortFields) {
-        const sortDirection = order === 'asc' ? 1 : -1;
+    // Add user-specified sort fields
+    if (filters.sortFields) {
+      filters.sortFields.forEach(({ field, order }) => {
+        // Handle custom sort fields like rarity and colors
+        const sortDirection = order === 'desc' ? -1 : 1;
         switch (field) {
           case 'rarity':
             sortStage._rarityIndex = sortDirection;
             break;
           case 'colors':
             sortStage._colorIndex = sortDirection;
+            break;
+          case 'collector_number': // Ensure collector_number uses the numeric field
+            sortStage._collectorNumberNumeric = sortDirection;
             break;
           case 'cmc':
             sortStage.cmc = sortDirection;
@@ -132,17 +137,20 @@ export class CardFilteringService {
             sortStage[field] = sortDirection;
             break;
         }
-      }
+      });
     }
 
+    // Always sort by name as a tie-breaker if not already specified
     if (
       !sortStage.name &&
       !filters.sortFields?.some((f) => f.field === 'name')
     ) {
       sortStage.name = 1;
     }
-    if (!sortStage._id) {
-      sortStage._id = 1; // Add _id for stable sort tie-breaking
+
+    // Add numeric collector number sort if not specified and deduplication needs it
+    if (!('_collectorNumberNumeric' in sortStage)) {
+      sortStage._collectorNumberNumeric = 1;
     }
 
     return sortStage;
@@ -157,63 +165,49 @@ export class CardFilteringService {
     deduplicate: boolean = false,
   ): Document[] {
     const query: Record<string, any> = {};
-    this._applyFilters(query, filters); // Apply filters to build the match query
+    this._applyFilters(query, filters);
 
     const needsCustomSort = this._needsCustomSorting(filters);
-    const sortStage = this._buildSortStage(filters);
+    const sortSpec = this._buildSortStage(filters); // Get the sort specification
 
     let pipeline: Document[] = [];
 
-    pipeline.push({ $match: query }); // Start with the match stage
+    pipeline.push({ $match: query });
 
     if (needsCustomSort) {
-      pipeline.push(...this._buildCustomSortStages(filters)); // Add custom sort fields if needed
+      pipeline.push(...this._buildCustomSortStages(filters));
     }
 
-    // Add stage to convert collector_number to numeric for proper sorting
     pipeline.push({
       $addFields: {
         _collectorNumberNumeric: {
           $convert: {
             input: '$collector_number',
             to: 'int',
-            onError: 999999, // High number for non-numeric values
+            onError: 999999,
             onNull: 999999,
           },
         },
       },
     });
 
-    // Modify the sort stage to use the numeric field
-    const numericSortStage = { ...sortStage };
-    if (numericSortStage.collector_number) {
-      numericSortStage._collectorNumberNumeric =
-        numericSortStage.collector_number;
-      delete numericSortStage.collector_number;
-    }
+    // Add the $sort stage correctly
+    pipeline.push({ $sort: sortSpec });
 
-    pipeline.push({ $sort: numericSortStage }); // Add the modified sort stage
-
-    // Deduplicate by name if requested, keeping the first document based on the sort order
     if (deduplicate) {
       pipeline.push({
         $group: {
-          _id: '$name', // Group by card name
-          firstDoc: { $first: '$$ROOT' }, // Keep the first document in each group
+          _id: '$name',
+          firstDoc: { $first: '$$ROOT' },
         },
       });
-      pipeline.push({ $replaceRoot: { newRoot: '$firstDoc' } }); // Restore document structure
-      // Re-sort after grouping, as $group doesn't guarantee order preservation
-      if (needsCustomSort) {
-        pipeline.push({ $sort: numericSortStage });
-      } else {
-        pipeline.push({ $sort: numericSortStage });
-      }
+      pipeline.push({ $replaceRoot: { newRoot: '$firstDoc' } });
+      // Re-sort after grouping
+      pipeline.push({ $sort: sortSpec }); // Use the same sort spec
     }
 
-    // Prepare projection stage to remove temporary fields
     const projectFields: Record<string, 0> = {
-      _collectorNumberNumeric: 0, // Always remove the numeric collector number field
+      _collectorNumberNumeric: 0,
     };
 
     if (needsCustomSort) {
@@ -227,7 +221,6 @@ export class CardFilteringService {
       }
     }
 
-    // Add projection stage if there are fields to remove
     if (Object.keys(projectFields).length > 0) {
       pipeline.push({ $project: projectFields });
     }
@@ -247,19 +240,17 @@ export class CardFilteringService {
     this._applyFilters(query, filters);
 
     const needsCustomSort = this._needsCustomSorting(filters);
-    const sortStage = this._buildSortStage(filters);
+    const sortSpec = this._buildSortStage(filters); // Get the sort specification
 
     let countPipeline: Document[] = [];
 
     countPipeline.push({ $match: query });
 
-    // Add stages needed for sorting if deduplicating
     if (deduplicate) {
       if (needsCustomSort) {
         countPipeline.push(...this._buildCustomSortStages(filters));
       }
 
-      // Add numeric conversion for collector_number
       countPipeline.push({
         $addFields: {
           _collectorNumberNumeric: {
@@ -273,15 +264,8 @@ export class CardFilteringService {
         },
       });
 
-      // Modify sort stage to use numeric field
-      const numericSortStage = { ...sortStage };
-      if (numericSortStage.collector_number) {
-        numericSortStage._collectorNumberNumeric =
-          numericSortStage.collector_number;
-        delete numericSortStage.collector_number;
-      }
-
-      countPipeline.push({ $sort: numericSortStage });
+      // Add the $sort stage correctly
+      countPipeline.push({ $sort: sortSpec });
       countPipeline.push({
         $group: {
           _id: '$name',
