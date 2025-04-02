@@ -21,11 +21,11 @@ const DEDUPLICATION_FETCH_MULTIPLIER = 3;
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
-  private _filteringService: CardFilteringService;
+  private filteringService: CardFilteringService;
 
   constructor(filteringService: CardFilteringService) {
     super();
-    this._filteringService = filteringService;
+    this.filteringService = filteringService;
   }
 
   async getByNameAndSet(name: string, set: string, setNumber: string = '') {
@@ -80,7 +80,7 @@ export class CardService extends BaseService<Card> {
     filters: FilterOptions,
     deduplicate: boolean = true,
   ): Promise<Card[]> {
-    const pipeline = this._filteringService.buildAggregationPipeline(
+    const pipeline = this.filteringService.buildAggregationPipeline(
       filters,
       deduplicate,
     );
@@ -94,16 +94,16 @@ export class CardService extends BaseService<Card> {
     return cards;
   }
 
-  /**
-   * Fetches card documents and total count based on filters and pagination settings.
-   */
-  private async _fetchPaginatedCardData(
+  async getFilteredCardsWithPagination(
     filters: FilterOptions,
-    skip: number,
-    limit: number,
-    deduplicate: boolean,
-  ): Promise<{ docs: Document[]; totalCount: number }> {
-    const pipeline = this._filteringService.buildAggregationPipeline(
+    page: number = 1,
+    pageSize: number = 50,
+    deduplicate: boolean = true,
+  ): Promise<{ cards: Card[]; total: number }> {
+    const skip = (page - 1) * pageSize;
+    const limit = pageSize;
+
+    const pipeline = this.filteringService.buildAggregationPipeline(
       filters,
       deduplicate,
     );
@@ -116,7 +116,7 @@ export class CardService extends BaseService<Card> {
     let totalCountPromise: Promise<number>;
 
     if (deduplicate) {
-      const countPipeline = this._filteringService.buildCountPipeline(
+      const countPipeline = this.filteringService.buildCountPipeline(
         filters,
         true,
       );
@@ -125,7 +125,7 @@ export class CardService extends BaseService<Card> {
         .toArray()
         .then((result) => result[0]?.total ?? 0);
     } else {
-      const filterQuery = this._filteringService.buildFilterQuery(filters);
+      const filterQuery = this.filteringService.buildFilterQuery(filters);
       totalCountPromise = this.repo.collection.countDocuments(filterQuery);
     }
 
@@ -137,30 +137,9 @@ export class CardService extends BaseService<Card> {
     const docsWithIds = docs.map(({ _id, ...doc }) => ({
       ...doc,
       id: _id.toString(),
-    }));
+    })) as Card[];
 
-    return { docs: docsWithIds, totalCount: totalCountResult };
-  }
-
-  async getFilteredCardsWithPagination(
-    filters: FilterOptions,
-    page: number = 1,
-    pageSize: number = 50,
-    deduplicate: boolean = true,
-  ): Promise<{ cards: Card[]; total: number }> {
-    const skip = (page - 1) * pageSize;
-    const limit = pageSize;
-
-    const { docs, totalCount } = await this._fetchPaginatedCardData(
-      filters,
-      skip,
-      limit,
-      deduplicate,
-    );
-
-    let cards = docs as Card[];
-
-    return { cards, total: totalCount };
+    return { cards: docsWithIds, total: totalCountResult };
   }
 }
 

@@ -1,18 +1,19 @@
 import { Card, Rarity } from '@/types/card';
 import { CardService } from '../CardService';
 import { rarityOrder } from '@/types/card';
-import { CardDeduplicationService } from '../deduplication';
 import { CardFilteringService } from '../CardFilteringService';
+import { DB } from '../../db';
+import { RepoCls } from '../../db';
 
 describe('CardService', () => {
   let cardService: CardService;
+  let mockCollection: any;
 
-  beforeAll(async () => {
-    cardService = new CardService(
-      new CardDeduplicationService(),
-      new CardFilteringService(),
-    );
+  beforeAll(() => {
+    cardService = new CardService(new CardFilteringService());
   });
+
+  
 
   describe('getByNameAndSet', () => {
     it('should find a real card by name and set', async () => {
@@ -195,7 +196,9 @@ describe('CardService', () => {
 
       // Additionally, verify the pairwise order within the results
       for (let i = 1; i < cards.length; i++) {
-        const rarityIndexPrev = rarityOrder.indexOf(cards[i - 1].rarity as Rarity);
+        const rarityIndexPrev = rarityOrder.indexOf(
+          cards[i - 1].rarity as Rarity,
+        );
         const rarityIndexCurr = rarityOrder.indexOf(cards[i].rarity as Rarity);
         expect(rarityIndexCurr).toBeGreaterThanOrEqual(rarityIndexPrev);
       }
@@ -232,7 +235,9 @@ describe('CardService', () => {
 
       // Additionally, verify the pairwise order within the results
       for (let i = 1; i < cards.length; i++) {
-        const rarityIndexPrev = rarityOrder.indexOf(cards[i - 1].rarity as Rarity);
+        const rarityIndexPrev = rarityOrder.indexOf(
+          cards[i - 1].rarity as Rarity,
+        );
         const rarityIndexCurr = rarityOrder.indexOf(cards[i].rarity as Rarity);
         expect(rarityIndexCurr).toBeLessThanOrEqual(rarityIndexPrev);
       }
@@ -274,11 +279,15 @@ describe('CardService', () => {
 
       // Additionally, verify the pairwise order within the results
       for (let i = 1; i < cards.length; i++) {
-        const colorIndexPrev = ascColorOrder.indexOf(getColorCategory(cards[i - 1]));
-        const colorIndexCurr = ascColorOrder.indexOf(getColorCategory(cards[i]));
+        const colorIndexPrev = ascColorOrder.indexOf(
+          getColorCategory(cards[i - 1]),
+        );
+        const colorIndexCurr = ascColorOrder.indexOf(
+          getColorCategory(cards[i]),
+        );
         // Handle cases where a category might not be in ascColorOrder (shouldn't happen with current logic)
         if (colorIndexPrev !== -1 && colorIndexCurr !== -1) {
-            expect(colorIndexCurr).toBeGreaterThanOrEqual(colorIndexPrev);
+          expect(colorIndexCurr).toBeGreaterThanOrEqual(colorIndexPrev);
         }
       }
     });
@@ -308,13 +317,17 @@ describe('CardService', () => {
       // Verify the order of the unique color categories found matches the expected descending order
       expect(uniqueColorCategoriesInResult).toEqual(expectedOrderForResults);
 
-       // Additionally, verify the pairwise order within the results
-       for (let i = 1; i < cards.length; i++) {
-        const colorIndexPrev = descColorOrder.indexOf(getColorCategory(cards[i - 1]));
-        const colorIndexCurr = descColorOrder.indexOf(getColorCategory(cards[i]));
-         // Handle cases where a category might not be in descColorOrder
+      // Additionally, verify the pairwise order within the results
+      for (let i = 1; i < cards.length; i++) {
+        const colorIndexPrev = descColorOrder.indexOf(
+          getColorCategory(cards[i - 1]),
+        );
+        const colorIndexCurr = descColorOrder.indexOf(
+          getColorCategory(cards[i]),
+        );
+        // Handle cases where a category might not be in descColorOrder
         if (colorIndexPrev !== -1 && colorIndexCurr !== -1) {
-            expect(colorIndexCurr).toBeGreaterThanOrEqual(colorIndexPrev); // Descending order means higher index comes first
+          expect(colorIndexCurr).toBeGreaterThanOrEqual(colorIndexPrev); // Descending order means higher index comes first
         }
       }
     });
@@ -325,6 +338,31 @@ describe('CardService', () => {
       const results = await cardService.getByName('Black Lotus');
       expect(results).toBeTruthy();
       expect(results[0]?.name).toBe('Black Lotus');
+    });
+  });
+
+  describe('getFilteredCards', () => {
+    it('should deduplicate cards and return the one with lowest collector number', async () => {
+      // Execute the test with real database
+      const result = await cardService.getFilteredCards(
+        {
+          sets: ['tdm'],
+          sortFields: [{ field: 'collector_number', order: 'asc' }],
+        },
+        true,
+      );
+
+      // Find Clarion Conqueror in the results
+      const clarionConqueror = result.find(
+        (card) => card.name === 'Clarion Conqueror',
+      );
+
+      // Verify the result
+      expect(clarionConqueror).toBeDefined();
+      expect(clarionConqueror?.cardId).toBe(
+        'f892d156-371c-4391-8ae6-25513c5032b0',
+      );
+      expect(clarionConqueror?.collector_number).toBe('5');
     });
   });
 });

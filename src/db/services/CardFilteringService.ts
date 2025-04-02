@@ -170,7 +170,29 @@ export class CardFilteringService {
       pipeline.push(...this._buildCustomSortStages(filters)); // Add custom sort fields if needed
     }
 
-    pipeline.push({ $sort: sortStage }); // Add the sort stage
+    // Add stage to convert collector_number to numeric for proper sorting
+    pipeline.push({
+      $addFields: {
+        _collectorNumberNumeric: {
+          $convert: {
+            input: '$collector_number',
+            to: 'int',
+            onError: 999999, // High number for non-numeric values
+            onNull: 999999,
+          },
+        },
+      },
+    });
+
+    // Modify the sort stage to use the numeric field
+    const numericSortStage = { ...sortStage };
+    if (numericSortStage.collector_number) {
+      numericSortStage._collectorNumberNumeric =
+        numericSortStage.collector_number;
+      delete numericSortStage.collector_number;
+    }
+
+    pipeline.push({ $sort: numericSortStage }); // Add the modified sort stage
 
     // Deduplicate by name if requested, keeping the first document based on the sort order
     if (deduplicate) {
@@ -182,19 +204,19 @@ export class CardFilteringService {
       });
       pipeline.push({ $replaceRoot: { newRoot: '$firstDoc' } }); // Restore document structure
       // Re-sort after grouping, as $group doesn't guarantee order preservation
-      // (though $first usually relies on the input order, it's safer to re-sort)
       if (needsCustomSort) {
-        // If custom sort fields were used, they are present in firstDoc, re-apply sort
-        pipeline.push({ $sort: sortStage });
+        pipeline.push({ $sort: numericSortStage });
       } else {
-        // If only standard fields were used, they are still in firstDoc
-        pipeline.push({ $sort: sortStage });
+        pipeline.push({ $sort: numericSortStage });
       }
     }
 
-    // Add projection stage to remove temporary sort fields if they were added
+    // Prepare projection stage to remove temporary fields
+    const projectFields: Record<string, 0> = {
+      _collectorNumberNumeric: 0, // Always remove the numeric collector number field
+    };
+
     if (needsCustomSort) {
-      const projectFields: Record<string, 0> = {};
       if (filters.sortFields?.some((f) => f.field === 'rarity')) {
         projectFields._rarityIndex = 0;
       }
@@ -203,12 +225,13 @@ export class CardFilteringService {
         projectFields._colorCategory = 0;
         projectFields._colorsArray = 0;
       }
-      if (Object.keys(projectFields).length > 0) {
-        pipeline.push({ $project: projectFields });
-      }
     }
 
-    // Return the complete pipeline stages array
+    // Add projection stage if there are fields to remove
+    if (Object.keys(projectFields).length > 0) {
+      pipeline.push({ $project: projectFields });
+    }
+
     return pipeline;
   }
 
@@ -224,29 +247,48 @@ export class CardFilteringService {
     this._applyFilters(query, filters);
 
     const needsCustomSort = this._needsCustomSorting(filters);
-    const sortStage = this._buildSortStage(filters); // Sort is needed for $first in group
+    const sortStage = this._buildSortStage(filters);
 
     let countPipeline: Document[] = [];
 
     countPipeline.push({ $match: query });
 
-    // Add stages needed for sorting if deduplicating, as $first relies on sort order
-    if (needsCustomSort && deduplicate) {
-      countPipeline.push(...this._buildCustomSortStages(filters));
-    }
-
-    // Sort stage is necessary for $first in the deduplication group stage
+    // Add stages needed for sorting if deduplicating
     if (deduplicate) {
-      countPipeline.push({ $sort: sortStage });
+      if (needsCustomSort) {
+        countPipeline.push(...this._buildCustomSortStages(filters));
+      }
+
+      // Add numeric conversion for collector_number
+      countPipeline.push({
+        $addFields: {
+          _collectorNumberNumeric: {
+            $convert: {
+              input: '$collector_number',
+              to: 'int',
+              onError: 999999,
+              onNull: 999999,
+            },
+          },
+        },
+      });
+
+      // Modify sort stage to use numeric field
+      const numericSortStage = { ...sortStage };
+      if (numericSortStage.collector_number) {
+        numericSortStage._collectorNumberNumeric =
+          numericSortStage.collector_number;
+        delete numericSortStage.collector_number;
+      }
+
+      countPipeline.push({ $sort: numericSortStage });
       countPipeline.push({
         $group: {
           _id: '$name',
-          // No need to keep the document ($first: '$$ROOT'), just group by name
         },
       });
     }
 
-    // Add the final count stage
     countPipeline.push({ $count: 'total' });
 
     return countPipeline;
