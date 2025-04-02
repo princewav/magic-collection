@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import { Card } from '@/types/card';
 import { loadFilteredCards, FilterOptions } from '@/actions/card/load-cards';
-import { getFiltersFromUrl } from '@/lib/url-params';
 
 interface CardsContextType {
   cards: Card[];
