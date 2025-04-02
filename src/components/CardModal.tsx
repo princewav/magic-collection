@@ -155,7 +155,7 @@ export default function CardModal() {
                     <Image
                       src={
                         card.image_uris?.normal ||
-                        'https://via.placeholder.com/223x310'
+                        '/images/placeholder.webp'
                       }
                       alt={card.name}
                       className="rounded-md"
