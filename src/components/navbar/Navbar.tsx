@@ -1,26 +1,18 @@
 'use client';
 
-import { Home, Book, ListChecks, Heart } from 'lucide-react';
+import { Book, Heart, ListChecks } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import React, { useState, useRef, useEffect } from 'react';
-import './Navbar.css';
+import { usePathname } from 'next/navigation';
+import React from 'react';
 import { Logo } from '../Logo';
 import { ThemeToggle } from '../theme/ThemeToggle';
-import { usePathname } from 'next/navigation';
-import {NavDropdown} from './NavDropdown';
-import {ListItem} from './NavListItem';
-import {NavLink} from './NavLink';
-
-
-
+import { NavDropdown } from './NavDropdown';
+import { NavLink } from './NavLink';
+import { ListItem } from './NavListItem';
 
 const Navbar: React.FC<{}> = () => {
   const pathname = usePathname();
 
-  const elementCLS =
-    'flex flex-col items-center !px-0 gap-0.5 md:flex-row md:gap-2';
   return (
     <nav
       className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t p-1 px-4 text-xs shadow-md md:relative md:bottom-auto md:border-t-0 md:px-4 md:py-1 md:text-sm"
@@ -37,10 +29,10 @@ const Navbar: React.FC<{}> = () => {
           label="Decks"
           className="bg-sidebar"
           triggerContent={
-            <div className={elementCLS}>
+            <>
               <Book className="text-accent h-5 w-5" aria-hidden="true" />
               <span className="text-xs md:text-base">Decks</span>
-            </div>
+            </>
           }
         >
           <ListItem
@@ -48,7 +40,7 @@ const Navbar: React.FC<{}> = () => {
             title="Paper Decks"
             imageSrc="/images/card-w.png"
           >
-            Manage your physical Magic: The Gathering decks
+            Manage your physical MTG decks
           </ListItem>
           <ListItem
             href="/decks/arena"
@@ -63,10 +55,10 @@ const Navbar: React.FC<{}> = () => {
           label="Collection"
           className="bg-sidebar"
           triggerContent={
-            <div className={elementCLS}>
+            <>
               <ListChecks className="text-accent h-5 w-5" aria-hidden="true" />
               <span className="text-xs md:text-base">Collect</span>
-            </div>
+            </>
           }
         >
           <ListItem
@@ -74,7 +66,7 @@ const Navbar: React.FC<{}> = () => {
             title="Paper Collection"
             imageSrc="/images/card-w.png"
           >
-            Catalog your physical Magic cards
+            Catalog your physical MTG cards
           </ListItem>
           <ListItem
             href="/collection/arena"
@@ -91,10 +83,8 @@ const Navbar: React.FC<{}> = () => {
           ariaLabel="Wishlists"
           className="bg-sidebar"
         >
-          <div className={elementCLS}>
-            <Heart className="text-accent size-5" aria-hidden="true" />
-            <span className="text-xs md:text-base">Wishlists</span>
-          </div>
+          <Heart className="text-accent size-5" aria-hidden="true" />
+          <span className="text-xs md:text-base">Wishlists</span>
         </NavLink>
       </div>
       <div className="hidden items-center md:flex">
