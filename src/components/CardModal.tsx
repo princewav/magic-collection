@@ -107,39 +107,48 @@ export default function CardModal() {
       ? `${card.power} / ${card.toughness}`
       : null;
 
+
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
-        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-2xl border-2 p-6 px-8 shadow-2xl"
+        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-2xl border-2 p-6 px-10 shadow-2xl"
         ref={modalRef}
       >
         {hasPrevCard && (
           <button
             onClick={goToPrevCard}
-            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 left-2 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 left-4 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
             aria-label="Previous card"
           >
-            <ChevronLeft size={24} strokeWidth={4} className="right-1 absolute" />
+            <ChevronLeft
+              size={24}
+              strokeWidth={4}
+              className="absolute right-1"
+            />
           </button>
         )}
 
         {hasNextCard && (
           <button
             onClick={goToNextCard}
-            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 right-2 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 right-4 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
             aria-label="Next card"
           >
-            <ChevronRight size={24} strokeWidth={4} className="left-1 absolute" />
+            <ChevronRight
+              size={24}
+              strokeWidth={4}
+              className="absolute left-1"
+            />
           </button>
         )}
 
-        <div className="relative p-4" id="modal-box">
           <button
             onClick={closeModal}
-            className="bg-background text-muted-foreground hover:text-foreground absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-4 right-4 flex size-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
           >
             <X size={20} strokeWidth={4} />
           </button>
+        <div className="relative p-4" id="modal-box">
           <div className="flex h-full flex-col md:flex-row">
             <div className="justify-left flex items-center md:w-1/2 md:pr-4">
               {imageError ? (
