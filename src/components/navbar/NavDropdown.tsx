@@ -110,9 +110,9 @@ export const NavDropdown = ({
           'hover:bg-accent/20 hover:text-accent-foreground',
           'focus:bg-accent focus:text-accent-foreground',
           'inline-flex w-max items-center justify-center',
-          'rounded-md px-0 py-2 text-xs font-medium transition-colors',
+          'rounded-md px-4 py-2 text-xs font-medium transition-colors',
           'focus:outline-none disabled:pointer-events-none',
-          'disabled:opacity-50 md:px-4 md:text-sm',
+          'disabled:opacity-50 md:text-sm',
           'flex flex-col items-center gap-0.5',
           'md:flex-row md:gap-2',
           // --- End Existing styles ---
@@ -130,8 +130,10 @@ export const NavDropdown = ({
         <div
           ref={dropdownRef}
           className={cn(
-            'absolute bottom-full md:top-full left-0 z-20 w-auto',
-            'origin-bottom-left md:origin-top-left',
+            'absolute left-1/2 z-20 w-auto md:left-0',
+            'bottom-full mb-2', // Default (mobile): Opens upwards
+            '-translate-x-1/2 md:top-full md:bottom-auto md:mt-2 md:translate-x-0', // Medium screens and up: Opens downwards & centered
+            'origin-bottom-left md:origin-top-left', // Adjust origin based on direction
             {
               [`animate-in fade-in-0 zoom-in-95 duration-${ANIMATION_DURATION} ease-out`]:
                 isOpen,
@@ -144,9 +146,7 @@ export const NavDropdown = ({
           onMouseLeave={handleDropdownMouseLeave}
         >
           <div className="bg-popover text-popover-foreground overflow-hidden rounded-md border shadow-lg">
-            <ul className="grid gap-1 p-2 md:p-3">
-              {children}
-            </ul>
+            <ul className="grid gap-1 p-2 md:p-3">{children}</ul>
           </div>
         </div>
       )}
