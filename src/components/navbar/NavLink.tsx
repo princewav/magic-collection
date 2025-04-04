@@ -17,8 +17,6 @@ export const NavLink = ({
   className?: string;
   active?: boolean;
 }) => {
-  console.log(active);
-
   return (
     <Link
       href={href}

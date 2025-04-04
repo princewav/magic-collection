@@ -111,7 +111,7 @@ export default function CardModal() {
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
-        className="bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-md p-6 shadow-md"
+        className="border-2 border-border/70 rounded-2xl bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto p-6 shadow-2xl"
         ref={modalRef}
       >
         {hasPrevCard && (
@@ -173,18 +173,18 @@ export default function CardModal() {
               )}
             </div>
             <div className="flex w-1/2 flex-col justify-between">
-              <div className="flex flex-col space-y-2">
-                <h2 className="p-4 pb-0 text-3xl font-bold text-white">
+              <div className="flex flex-col space-y-1">
+                <h2 className="p-2 pb-0 text-2xl font-bold">
                   {card.name}
                 </h2>
                 {card.mana_cost && (
-                  <p className="p-b flex flex-row rounded-2xl p-4 text-xl text-gray-400">
+                  <p className="flex flex-row rounded-2xl p-2">
                     {card.mana_cost?.split('//').map((part, index) => (
                       <span key={index} className="flex flex-row space-x-0.5">
                         {part.match(/{(.*?)}/g)?.map((match, idx) => {
                           const symbol = match[1];
                           return (
-                            <ManaSymbol key={idx} symbol={symbol} size={25} />
+                            <ManaSymbol key={idx} symbol={symbol} size={20} />
                           );
                         })}
                         {index < card.mana_cost.split('//').length - 1 && (
@@ -194,7 +194,7 @@ export default function CardModal() {
                     ))}
                   </p>
                 )}
-                <div className="bg-background/20 flex items-center justify-between rounded-2xl p-2 text-center text-xl text-gray-300">
+                <div className="bg-background/20 flex items-center justify-between rounded-2xl p-2 text-center text-xl font-semibold">
                   <span>{card.type_line}</span>
                   <span
                     className={
@@ -213,7 +213,7 @@ export default function CardModal() {
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:text-base ${
                         card.rarity === 'common'
-                          ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700'
+                          ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700 border border-gray-500 dark:border-0'
                           : card.rarity === 'uncommon'
                             ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-black'
                             : card.rarity === 'rare'
@@ -226,7 +226,7 @@ export default function CardModal() {
                   </span>
                 </div>
                 {card.oracle_text && (
-                  <div className="bg-background/20 rounded-2xl p-2 text-xl text-gray-300">
+                  <div className="bg-background/20 rounded-2xl p-2 text-xl">
                     {card.oracle_text.split('\n').map((line, index) => (
                       <React.Fragment key={index}>
                         <div className="inline-block">
@@ -239,7 +239,7 @@ export default function CardModal() {
                                 <ManaSymbol
                                   key={idx}
                                   symbol={symbol}
-                                  size={20}
+                                  size={17}
                                   className="mx-0.5 inline-block align-middle"
                                 />
                               );
@@ -262,7 +262,7 @@ export default function CardModal() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-purple-400/50 text-white transition-all duration-300 hover:bg-purple-300/40"
+                    className="bg-purple-400/50  transition-all duration-300 hover:bg-purple-300/40"
                     onClick={() =>
                       window.open(
                         `https://scryfall.com/search?q=!"${encodeURIComponent(card.name)}"`,
@@ -276,7 +276,7 @@ export default function CardModal() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-blue-600/50 text-white transition-all duration-300 hover:bg-blue-500/50"
+                    className="bg-blue-600/50 transition-all duration-300 hover:bg-blue-500/50"
                     onClick={() =>
                       window.open(
                         `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(card.name)}`,
@@ -290,10 +290,10 @@ export default function CardModal() {
                 </div>
               </div>
               <div className="flex flex-row items-center justify-between">
-                <p className="text-white">{card.set_name}</p>
+                <p>{card.set_name}</p>
                 {powerToughness && (
                   <div className="mt-2 flex items-center justify-end">
-                    <p className="text-3xl text-white">{powerToughness}</p>
+                    <p className="text-3xl">{powerToughness}</p>
                   </div>
                 )}
               </div>
