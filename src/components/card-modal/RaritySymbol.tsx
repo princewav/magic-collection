@@ -4,6 +4,7 @@ import React from 'react';
 
 interface RaritySymbolProps {
   card: { rarity: string };
+  className?: string;
 }
 
 const rarityStyles: Record<string, string> = {
@@ -14,7 +15,7 @@ const rarityStyles: Record<string, string> = {
   mythic: 'bg-gradient-to-br from-orange-400 to-orange-600 text-black',
 };
 
-export function RaritySymbol({ card }: RaritySymbolProps) {
+export function RaritySymbol({ card, className }: RaritySymbolProps) {
   const { rarity } = card;
   const style = rarityStyles[rarity] || rarityStyles.mythic;
 
@@ -27,7 +28,10 @@ export function RaritySymbol({ card }: RaritySymbolProps) {
 
   return (
     <span
-      className="flex size-6 items-center justify-center rounded-full transition-all md:size-7"
+      className={cn(
+        'flex size-6 items-center justify-center rounded-full transition-all md:size-7',
+        className,
+      )}
       title={rarityTitles[rarity] || rarityTitles.mythic}
     >
       <span

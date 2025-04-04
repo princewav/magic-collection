@@ -122,40 +122,39 @@ export default function CardModal() {
         >
           <X size={20} strokeWidth={4} />
         </button>
-        <div className="relative p-4" id="modal-box">
-          <div className="flex h-full flex-col md:flex-row">
-            <div className="justify-left flex items-center md:w-1/2 md:pr-4">
-              {imageError ? (
-                <div className="flex aspect-[223/310] items-center justify-center rounded-md bg-gray-800">
-                  <span className="text-lg text-white">
-                    Image failed to load
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center overflow-hidden rounded-3xl">
-                  <div className="relative h-[500px] w-[360px] flex-shrink-0">
-                    <Image
-                      src={
-                        card.image_uris?.normal || '/images/placeholder.webp'
-                      }
-                      alt={card.name}
-                      className="rounded-md"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 360px"
-                      priority
-                      style={{
-                        objectFit: 'contain',
-                        objectPosition: 'center center',
-                      }}
-                      onError={() => setImageError(true)}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="flex w-1/2 flex-col justify-between">
-              <div className="flex flex-col space-y-1">
-                <h2 className="p-2 pb-0 text-2xl font-bold">{card.name}</h2>
+
+        {/* Modal Box */}
+        <div
+          className="relative flex h-full flex-col p-4 md:flex-row"
+          id="modal-box"
+        >
+          <div className="md:justify-left mb-6 flex items-center justify-center md:mb-0 md:w-1/2 md:pr-4">
+            {imageError ? (
+              <div className="flex aspect-[223/310] items-center justify-center rounded-md bg-gray-800">
+                <span className="text-lg text-white">Image failed to load</span>
+              </div>
+            ) : (
+              <div className="relative flex h-[300px] w-[223px] items-center justify-center overflow-hidden rounded-3xl md:h-[500px] md:w-[360px]">
+                <Image
+                  src={card.image_uris?.normal || '/images/placeholder.webp'}
+                  alt={card.name}
+                  fill
+                  priority
+                  style={{
+                    objectFit: 'contain',
+                    objectPosition: 'center center',
+                  }}
+                  onError={() => setImageError(true)}
+                />
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col justify-between md:w-1/2">
+            <div className="flex flex-col space-y-1">
+              <div className="flex flex-row justify-between md:flex-col md:space-y-1">
+                <h2 className="p-2 pb-0 text-center text-xl font-bold md:text-left md:text-2xl">
+                  {card.name}
+                </h2>
                 {card.mana_cost && (
                   <p className="flex flex-row rounded-2xl p-2">
                     {card.mana_cost?.split('//').map((part, index, arr) => (
@@ -170,62 +169,64 @@ export default function CardModal() {
                     ))}
                   </p>
                 )}
-                <div className="bg-background/20 flex items-center justify-between rounded-2xl p-2 text-center text-xl font-semibold">
-                  <span>{card.type_line}</span>
-                  <RaritySymbol card={card} />
-                </div>
-                {card.oracle_text && (
-                  <div className="bg-background/20 rounded-2xl p-2 text-xl">
-                    {card.oracle_text.split('\n').map((line, index, arr) => (
-                      <React.Fragment key={index}>
-                        <div className="inline-block">
-                          <TextWithSymbols
-                            text={line}
-                            symbolSize={17}
-                            symbolClassName="mx-0.5 inline-block align-middle"
-                          />
-                        </div>
-                        {index < arr.length - 1 && <p className="my-3" />}
-                      </React.Fragment>
-                    ))}
-                  </div>
-                )}
-                <div className="bg-background/20 flex items-center justify-center gap-2 rounded-2xl p-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-purple-400/50 transition-all duration-300 hover:bg-purple-300/40"
-                    onClick={() =>
-                      window.open(
-                        `https://scryfall.com/search?q=!"${encodeURIComponent(card.name)}"`,
-                        '_blank',
-                      )
-                    }
-                  >
-                    <ExternalLink className="mr-1 h-4 w-4" />
-                    View on Scryfall
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-blue-600/50 transition-all duration-300 hover:bg-blue-500/50"
-                    onClick={() =>
-                      window.open(
-                        `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(card.name)}`,
-                        '_blank',
-                      )
-                    }
-                  >
-                    <ExternalLink className="mr-1 h-4 w-4" />
-                    View on Cardmarket
-                  </Button>
-                </div>
               </div>
-              <div className="flex flex-row items-center justify-between">
+              <div className="bg-background/20 text-md flex items-center justify-between rounded-2xl p-2 text-center font-semibold md:text-xl">
+                <span>{card.type_line}</span>
+                <RaritySymbol card={card} />
+              </div>
+              {card.oracle_text && (
+                <div className="bg-background/20 rounded-2xl p-2 text-sm md:text-lg">
+                  {card.oracle_text.split('\n').map((line, index, arr) => (
+                    <React.Fragment key={index}>
+                      <div className="inline-block">
+                        <TextWithSymbols
+                          text={line}
+                          symbolSize={17}
+                          symbolClassName="mx-0.5 inline-block align-middle"
+                        />
+                      </div>
+                      {index < arr.length - 1 && <p className="my-3" />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <div className="bg-background/20 flex items-center justify-center gap-2 rounded-2xl p-2 md:justify-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-purple-400/50 transition-all duration-300 hover:bg-purple-300/40"
+                  onClick={() =>
+                    window.open(
+                      `https://scryfall.com/search?q=!"${encodeURIComponent(card.name)}"`,
+                      '_blank',
+                    )
+                  }
+                >
+                  <ExternalLink className="mr-1 h-4 w-4" />
+                  View on Scryfall
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-blue-600/50 transition-all duration-300 hover:bg-blue-500/50"
+                  onClick={() =>
+                    window.open(
+                      `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(card.name)}`,
+                      '_blank',
+                    )
+                  }
+                >
+                  <ExternalLink className="mr-1 h-4 w-4" />
+                  View on Cardmarket
+                </Button>
+              </div>
+              <div className="text-md flex flex-row items-center justify-between md:text-xl p-2">
                 <p>{card.set_name}</p>
                 {card.power !== null && card.toughness !== null && (
-                  <div className="mt-2 flex items-center justify-end">
-                    <p className="text-3xl">{`${card.power} / ${card.toughness}`}</p>
+                  <div className="flex items-center justify-end">
+                    <p>{`${card.power} / ${card.toughness}`}</p>
                   </div>
                 )}
               </div>
