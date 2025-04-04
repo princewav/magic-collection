@@ -6,7 +6,6 @@ import { useCardModal } from '@/context/CardModalContext';
 import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ManaSymbol } from './ManaSymbol';
-import { NumberSymbol } from './NumberSymbol';
 import React from 'react';
 
 interface CardData {
@@ -111,26 +110,26 @@ export default function CardModal() {
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
-        className="border-2 border-border/70 rounded-2xl bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto p-6 shadow-2xl"
+        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-2xl border-2 p-6 px-8 shadow-2xl"
         ref={modalRef}
       >
         {hasPrevCard && (
           <button
             onClick={goToPrevCard}
-            className="bg-background/70 text-muted-foreground hover:text-foreground hover:bg-background/90 absolute top-1/2 left-4 z-10 flex h-10 w-10 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full transition-all duration-300"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 left-2 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
             aria-label="Previous card"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={24} strokeWidth={4} className="right-1 absolute" />
           </button>
         )}
 
         {hasNextCard && (
           <button
             onClick={goToNextCard}
-            className="bg-background/70 text-muted-foreground hover:text-foreground hover:bg-background/90 absolute top-1/2 right-4 z-10 flex h-10 w-10 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full transition-all duration-300"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 right-2 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
             aria-label="Next card"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={24} strokeWidth={4} className="left-1 absolute" />
           </button>
         )}
 
@@ -154,8 +153,7 @@ export default function CardModal() {
                   <div className="relative h-[500px] w-[360px] flex-shrink-0">
                     <Image
                       src={
-                        card.image_uris?.normal ||
-                        '/images/placeholder.webp'
+                        card.image_uris?.normal || '/images/placeholder.webp'
                       }
                       alt={card.name}
                       className="rounded-md"
@@ -174,9 +172,7 @@ export default function CardModal() {
             </div>
             <div className="flex w-1/2 flex-col justify-between">
               <div className="flex flex-col space-y-1">
-                <h2 className="p-2 pb-0 text-2xl font-bold">
-                  {card.name}
-                </h2>
+                <h2 className="p-2 pb-0 text-2xl font-bold">{card.name}</h2>
                 {card.mana_cost && (
                   <p className="flex flex-row rounded-2xl p-2">
                     {card.mana_cost?.split('//').map((part, index) => (
@@ -213,7 +209,7 @@ export default function CardModal() {
                     <span
                       className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:text-base ${
                         card.rarity === 'common'
-                          ? 'bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700 border border-gray-500 dark:border-0'
+                          ? 'border border-gray-500 bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700 dark:border-0'
                           : card.rarity === 'uncommon'
                             ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-black'
                             : card.rarity === 'rare'
@@ -262,7 +258,7 @@ export default function CardModal() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-purple-400/50  transition-all duration-300 hover:bg-purple-300/40"
+                    className="bg-purple-400/50 transition-all duration-300 hover:bg-purple-300/40"
                     onClick={() =>
                       window.open(
                         `https://scryfall.com/search?q=!"${encodeURIComponent(card.name)}"`,
