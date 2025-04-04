@@ -17,6 +17,8 @@ export const NavLink = ({
   className?: string;
   active?: boolean;
 }) => {
+  console.log(active);
+
   return (
     <Link
       href={href}
@@ -24,19 +26,19 @@ export const NavLink = ({
       className={cn(
         // hover and focus states
         'hover:bg-accent/20',
-        'hover:text-accent-foreground',
-        'focus:bg-accent',
-        'focus:text-accent-foreground',
+        'focus:bg-accent/40',
         // layout and spacing
         'inline-flex w-max items-center justify-center',
         'rounded-md py-2 text-xs font-medium transition-colors',
         'focus:outline-none disabled:pointer-events-none',
-        'disabled:opacity-50 px-4 md:text-sm',
+        'px-4 disabled:opacity-50 md:text-sm',
         // flex properties
         'flex flex-col items-center gap-0.5',
         'md:flex-row md:gap-2',
         // active state
-        active ? 'bg-accent/40 text-accent-foreground' : '',
+        active
+          ? 'bg-secondary/40 dark:bg-primary/30 dark:hover:bg-primary/40 font-semibold'
+          : '',
         className,
       )}
     >

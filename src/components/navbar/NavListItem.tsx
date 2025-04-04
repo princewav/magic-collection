@@ -21,10 +21,10 @@ export const ListItem = React.forwardRef<
         className={cn(
           // hover and focus states
           'hover:bg-accent/10 hover:dark:bg-accent/20 hover:text-accent-foreground',
-          'focus:bg-accent focus:text-accent-foreground',
+          'focus:bg-accent/30 focus:text-accent-foreground',
           // layout and spacing
           'block space-y-0.5 rounded-md p-2 no-underline',
-          'transition-colors outline-none select-none md:space-y-1 md:p-3',
+          'outline-none select-none md:space-y-1 md:p-3',
           // border styles
           'border-accent rounded-l-none border-l-2',
           'transition-all duration-300 ease-in-out',

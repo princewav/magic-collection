@@ -27,7 +27,6 @@ const Navbar: React.FC<{}> = () => {
       <div className="flex flex-grow justify-around md:justify-start md:gap-2">
         <NavDropdown
           label="Decks"
-          className="bg-sidebar"
           triggerContent={
             <>
               <Book className="text-accent h-5 w-5" aria-hidden="true" />
@@ -51,7 +50,6 @@ const Navbar: React.FC<{}> = () => {
 
         <NavDropdown
           label="Collection"
-          className="bg-sidebar"
           triggerContent={
             <>
               <ListChecks className="text-accent h-5 w-5" aria-hidden="true" />
@@ -75,7 +73,6 @@ const Navbar: React.FC<{}> = () => {
           active={pathname === '/wishlists'}
           href="/wishlists"
           ariaLabel="Wishlists"
-          className="bg-sidebar"
         >
           <Heart className="text-accent size-5" aria-hidden="true" />
           <span className="text-xs md:text-base">Wishlists</span>

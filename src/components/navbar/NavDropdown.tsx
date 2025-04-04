@@ -107,8 +107,8 @@ export const NavDropdown = ({
         type="button"
         className={cn(
           // --- Existing styles ---
-          'hover:bg-accent/20 hover:text-accent-foreground',
-          'focus:bg-accent focus:text-accent-foreground',
+          'hover:bg-accent/20',
+          'focus:bg-accent/40',
           'inline-flex w-max items-center justify-center',
           'rounded-md px-4 py-2 text-xs font-medium transition-colors',
           'focus:outline-none disabled:pointer-events-none',
@@ -132,7 +132,7 @@ export const NavDropdown = ({
           className={cn(
             'absolute left-1/2 z-20 w-auto md:left-0',
             'bottom-full mb-2', // Default (mobile): Opens upwards
-            '-translate-x-1/2 md:top-full md:bottom-auto md:mt-2 md:translate-x-0', // Medium screens and up: Opens downwards & centered
+            '-translate-x-1/2 md:top-full md:bottom-auto md:mt-0 md:translate-x-0', // Medium screens and up: Opens downwards & centered
             'origin-bottom-left md:origin-top-left', // Adjust origin based on direction
             {
               [`animate-in fade-in-0 zoom-in-95 duration-${ANIMATION_DURATION} ease-out`]:
