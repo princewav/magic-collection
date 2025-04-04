@@ -23,7 +23,7 @@ export const ListItem = React.forwardRef<
           'hover:bg-accent/10 hover:dark:bg-accent/20 hover:text-accent-foreground',
           'focus:bg-accent focus:text-accent-foreground',
           // layout and spacing
-          'block space-y-0.5 rounded-md p-1.5 leading-none no-underline',
+          'block space-y-0.5 rounded-md p-2 no-underline',
           'transition-colors outline-none select-none md:space-y-1 md:p-3',
           // border styles
           'border-accent rounded-l-none border-l-2',
@@ -33,7 +33,7 @@ export const ListItem = React.forwardRef<
         ref={ref}
         {...props}
       >
-        <div className="flex flex-row items-center space-x-2">
+        <div className="flex flex-row items-center space-x-2 pr-3 ">
           <Image
             src={imageSrc}
             alt=""
@@ -41,7 +41,7 @@ export const ListItem = React.forwardRef<
             height={12}
             className="invert-75 md:h-[15px] md:w-[15px] dark:invert-0"
           />
-          <div className="text-xs leading-none font-medium md:text-sm">
+          <div className="text-xs leading-none font-medium md:text-sm whitespace-nowrap">
             {title}
           </div>
         </div>

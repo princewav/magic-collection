@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 // --- Define animation durations ---
-const ANIMATION_DURATION = 150; // ms - Match this with Tailwind duration class
+const ANIMATION_DURATION = 100; // ms - Match this with Tailwind duration class
 
 export const NavDropdown = ({
   triggerContent,
@@ -130,8 +130,8 @@ export const NavDropdown = ({
         <div
           ref={dropdownRef}
           className={cn(
-            'absolute top-full left-0 z-20 mt-1 w-auto md:mt-2',
-            'origin-top-left',
+            'absolute bottom-full md:top-full left-0 z-20 w-auto',
+            'origin-bottom-left md:origin-top-left',
             {
               [`animate-in fade-in-0 zoom-in-95 duration-${ANIMATION_DURATION} ease-out`]:
                 isOpen,
@@ -144,7 +144,7 @@ export const NavDropdown = ({
           onMouseLeave={handleDropdownMouseLeave}
         >
           <div className="bg-popover text-popover-foreground overflow-hidden rounded-md border shadow-lg">
-            <ul className="grid gap-2 p-2 md:gap-3 md:p-4">
+            <ul className="grid gap-1 p-2 md:p-3">
               {children}
             </ul>
           </div>
