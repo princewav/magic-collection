@@ -1,7 +1,7 @@
 import { Deck } from '@/types/deck';
 import { deckService } from '@/db/services/DeckService';
 import { collectionCardService } from '@/db/services/CollectionCardService';
-import { CollectionCard } from '@/types/card';
+import { Card, CollectionCard } from '@/types/card';
 import { loadCardsById } from '@/actions/load-cards';
 import { DBDeck } from '@/types/deck';
 
@@ -13,14 +13,38 @@ async function loadDeckCards(deck: DBDeck): Promise<Deck> {
       setNumber?: number;
     }> = [],
   ) => {
-    const cardIds = section.map((card) => card.cardId);
-    const cards = await loadCardsById(cardIds);
+    if (!section || section.length === 0) {
+      return [];
+    }
 
-    return cards.map((card) => ({
-      ...card,
-      quantity: section.find((c) => c.cardId === card.cardId)?.quantity || 0,
-      setNumber: section.find((c) => c.cardId === card.cardId)?.setNumber || 0,
-    }));
+    // 1. Get unique cardIds from the input section
+    const uniqueCardIds = [...new Set(section.map((card) => card.cardId))];
+
+    // 2. Fetch card objects - potentially containing duplicates if multiple printings share the same cardId
+    const fetchedCards = await loadCardsById(uniqueCardIds);
+
+    // 4. Map over the fetched (and now correctly deduplicated by the service) cards and calculate the total quantity for each
+    return fetchedCards.map((card) => {
+      // Find all entries in the original section that match the current unique cardId
+      const matchingSectionEntries = section.filter(
+        (c) => c.cardId === card.cardId,
+      );
+
+      // Sum the quantities from all matching entries in the original section
+      const totalQuantity = matchingSectionEntries.reduce(
+        (sum, entry) => sum + (entry.quantity || 0),
+        0,
+      );
+
+      // Optionally, get setNumber from the first matching entry (adjust if needed)
+      const setNumber = matchingSectionEntries[0]?.setNumber || 0;
+
+      return {
+        ...card,
+        quantity: totalQuantity,
+        setNumber: setNumber,
+      };
+    });
   };
 
   const [maindeck, sideboard, maybeboard] = await Promise.all([
@@ -74,7 +98,7 @@ export async function loadCollectionCardsByName(
 export async function loadDecks(type?: 'paper' | 'arena'): Promise<Deck[]> {
   try {
     if (type) {
-      const decks = await deckService.findByType(type); 
+      const decks = await deckService.findByType(type);
       return await Promise.all(decks.map(loadDeckCards));
     }
     const decks = await deckService.repo.getAll();

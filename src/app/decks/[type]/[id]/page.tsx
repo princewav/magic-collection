@@ -33,6 +33,7 @@ async function getCollectedQuantities(cardList: any[] | undefined) {
 export default async function DeckDetailPage({ params }: Props) {
   const { id, type } = await params;
   const deck = await loadDeckById(id);
+
   if (!deck) {
     return notFound();
   }

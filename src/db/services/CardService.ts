@@ -72,8 +72,36 @@ export class CardService extends BaseService<Card> {
   }
 
   async getByCardId(ids: string[]): Promise<Card[] | null> {
-    const docs = await this.repo.findBy({ cardId: { $in: ids } });
-    return docs;
+    // Use aggregation to ensure only one document per cardId is returned
+    const pipeline = [
+      {
+        $match: {
+          cardId: { $in: ids },
+        },
+      },
+      {
+        $sort: { released_at: -1 }, // Optional: Sort to prefer newer printings if duplicates exist
+      },
+      {
+        $group: {
+          _id: '$cardId', // Group by the unique cardId
+          firstDoc: { $first: '$$ROOT' }, // Take the first document found for each group
+        },
+      },
+      {
+        $replaceRoot: { newRoot: '$firstDoc' }, // Promote the selected document to the root level
+      },
+    ];
+
+    const docs = await this.repo.collection.aggregate(pipeline).toArray();
+
+    // Map _id back to id if necessary (depending on BaseService/RepoCls implementation)
+    const cards = docs.map(({ _id, ...doc }) => ({
+      ...doc,
+      id: _id?.toString(), // Handle potential ObjectId _id from aggregation
+    })) as Card[];
+
+    return cards;
   }
 
   async getFilteredCards(

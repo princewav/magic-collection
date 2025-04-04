@@ -8,7 +8,14 @@ import { Card } from '../Card';
 import { CardWithQuantity } from '@/types/card';
 import { cn } from '@/lib/utils';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+  useRef,
+  useMemo,
+} from 'react';
 import { updateCardQuantity } from '@/actions/deck/update-card-quantity';
 import { toast } from 'sonner';
 import { Minus, Plus } from 'lucide-react';
@@ -31,41 +38,49 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
   const [rarityTotals, setRarityTotals] = useState<Record<string, number>>({});
   const { openModal } = useCardModal();
 
+  const cardIds = useMemo(() => {
+    if (!decklist) return [];
+    return decklist.map((card) => card.cardId).filter(Boolean) || [];
+  }, [decklist]);
+
   useEffect(() => {
-    const loadCards = async () => {
-      if (!decklist) return;
+    if (!decklist) return;
 
-      const cardIds: string[] =
-        decklist.map((card) => card.cardId).filter(Boolean) || [];
-      const cards = await loadCardsById(cardIds);
-      const sortedCards = defaultSort(cards);
-      const withQuantity: CardWithQuantity[] = sortedCards.map(
-        (card: CardType) => ({
-          ...card,
-          quantity:
-            decklist?.find((c) => c.cardId === card.cardId)?.quantity || 0,
-        }),
-      );
+    // Sort the cards with quantity
+    const sortedCards = [...decklist].sort((a, b) => {
+      // First sort by type (lands last)
+      const isLandA = a.type_line?.toLowerCase().includes('land') || false;
+      const isLandB = b.type_line?.toLowerCase().includes('land') || false;
+      if (isLandA !== isLandB) return isLandA ? 1 : -1;
 
-      setCardsWithQuantity(withQuantity);
+      // Then by color
+      const colorA = (a.colors || []).join('');
+      const colorB = (b.colors || []).join('');
+      if (colorA !== colorB) return colorA.localeCompare(colorB);
 
-      // Calculate rarity totals
-      const totals = withQuantity.reduce(
-        (acc, card) => {
-          const rarity = card.rarity.toLowerCase() || 'common';
-          if (!acc[rarity]) {
-            acc[rarity] = 0;
-          }
-          acc[rarity] += card.quantity || 1;
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
+      // Then by CMC
+      if (a.cmc !== b.cmc) return a.cmc - b.cmc;
 
-      setRarityTotals(totals);
-    };
+      // Finally by name
+      return a.name.localeCompare(b.name);
+    });
 
-    loadCards();
+    setCardsWithQuantity(sortedCards);
+
+    // Calculate rarity totals
+    const totals = sortedCards.reduce(
+      (acc, card) => {
+        const rarity = card.rarity.toLowerCase() || 'common';
+        if (!acc[rarity]) {
+          acc[rarity] = 0;
+        }
+        acc[rarity] += card.quantity || 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    setRarityTotals(totals);
   }, [decklist]);
 
   const handleQuantityChange = useCallback(
