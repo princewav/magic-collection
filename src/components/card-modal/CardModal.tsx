@@ -5,26 +5,9 @@ import Image from 'next/image';
 import { useCardModal } from '@/context/CardModalContext';
 import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ManaSymbol } from '../ManaSymbol';
 import React from 'react';
 import { RaritySymbol } from './RaritySymbol';
-
-interface CardData {
-  name: string;
-  mana_cost: string;
-  type_line: string;
-  oracle_text: string;
-  power?: string;
-  toughness?: string;
-  image_uris?: {
-    small: string;
-    normal: string;
-    large: string;
-    png: string;
-    art_crop: string;
-    border_crop: string;
-  };
-}
+import { TextWithSymbols } from './TextWithSymbols';
 
 export default function CardModal() {
   const {
@@ -99,15 +82,6 @@ export default function CardModal() {
     );
   }
 
-  const handleImageError = () => {
-    setImageError(true);
-  };
-
-  const powerToughness =
-    card.power !== null && card.toughness !== null
-      ? `${card.power} / ${card.toughness}`
-      : null;
-
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
@@ -173,7 +147,7 @@ export default function CardModal() {
                         objectFit: 'contain',
                         objectPosition: 'center center',
                       }}
-                      onError={handleImageError}
+                      onError={() => setImageError(true)}
                     />
                   </div>
                 </div>
@@ -184,18 +158,15 @@ export default function CardModal() {
                 <h2 className="p-2 pb-0 text-2xl font-bold">{card.name}</h2>
                 {card.mana_cost && (
                   <p className="flex flex-row rounded-2xl p-2">
-                    {card.mana_cost?.split('//').map((part, index) => (
-                      <span key={index} className="flex flex-row space-x-0.5">
-                        {part.match(/{(.*?)}/g)?.map((match, idx) => {
-                          const symbol = match[1];
-                          return (
-                            <ManaSymbol key={idx} symbol={symbol} size={20} />
-                          );
-                        })}
-                        {index < card.mana_cost.split('//').length - 1 && (
+                    {card.mana_cost?.split('//').map((part, index, arr) => (
+                      <React.Fragment key={index}>
+                        <span className="flex flex-row space-x-0.5">
+                          <TextWithSymbols text={part} symbolSize={20} />
+                        </span>
+                        {index < arr.length - 1 && (
                           <span className="w-8 text-center">//</span>
                         )}
-                      </span>
+                      </React.Fragment>
                     ))}
                   </p>
                 )}
@@ -205,33 +176,16 @@ export default function CardModal() {
                 </div>
                 {card.oracle_text && (
                   <div className="bg-background/20 rounded-2xl p-2 text-xl">
-                    {card.oracle_text.split('\n').map((line, index) => (
+                    {card.oracle_text.split('\n').map((line, index, arr) => (
                       <React.Fragment key={index}>
                         <div className="inline-block">
-                          {line.split(/({[^}]+})/).map((part, idx) => {
-                            const match = part.match(/{([^}]+)}/);
-                            if (match) {
-                              const symbol = match[1];
-
-                              return (
-                                <ManaSymbol
-                                  key={idx}
-                                  symbol={symbol}
-                                  size={17}
-                                  className="mx-0.5 inline-block align-middle"
-                                />
-                              );
-                            }
-                            return (
-                              <span key={idx} className="inline">
-                                {part}
-                              </span>
-                            );
-                          })}
+                          <TextWithSymbols
+                            text={line}
+                            symbolSize={17}
+                            symbolClassName="mx-0.5 inline-block align-middle"
+                          />
                         </div>
-                        {index < card.oracle_text.split('\n').length - 1 && (
-                          <p className="my-3" />
-                        )}
+                        {index < arr.length - 1 && <p className="my-3" />}
                       </React.Fragment>
                     ))}
                   </div>
@@ -269,9 +223,9 @@ export default function CardModal() {
               </div>
               <div className="flex flex-row items-center justify-between">
                 <p>{card.set_name}</p>
-                {powerToughness && (
+                {card.power !== null && card.toughness !== null && (
                   <div className="mt-2 flex items-center justify-end">
-                    <p className="text-3xl">{powerToughness}</p>
+                    <p className="text-3xl">{`${card.power} / ${card.toughness}`}</p>
                   </div>
                 )}
               </div>
