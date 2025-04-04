@@ -7,6 +7,7 @@ import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ManaSymbol } from '../ManaSymbol';
 import React from 'react';
+import { RaritySymbol } from './RaritySymbol';
 
 interface CardData {
   name: string;
@@ -200,34 +201,7 @@ export default function CardModal() {
                 )}
                 <div className="bg-background/20 flex items-center justify-between rounded-2xl p-2 text-center text-xl font-semibold">
                   <span>{card.type_line}</span>
-                  <span
-                    className={
-                      'flex size-6 items-center justify-center rounded-full transition-all md:size-7'
-                    }
-                    title={
-                      card.rarity === 'common'
-                        ? 'Common'
-                        : card.rarity === 'uncommon'
-                          ? 'Uncommon'
-                          : card.rarity === 'rare'
-                            ? 'Rare'
-                            : 'Mythic Rare'
-                    }
-                  >
-                    <span
-                      className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold shadow-sm md:text-base ${
-                        card.rarity === 'common'
-                          ? 'border border-gray-500 bg-gradient-to-br from-gray-100 to-gray-300 text-gray-700 dark:border-0'
-                          : card.rarity === 'uncommon'
-                            ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-black'
-                            : card.rarity === 'rare'
-                              ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-black'
-                              : 'bg-gradient-to-br from-orange-400 to-orange-600 text-black'
-                      }`}
-                    >
-                      {card.rarity.charAt(0).toUpperCase()}
-                    </span>
-                  </span>
+                  <RaritySymbol card={card} />
                 </div>
                 {card.oracle_text && (
                   <div className="bg-background/20 rounded-2xl p-2 text-xl">
