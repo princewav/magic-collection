@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCardModal } from '@/context/CardModalContext';
 import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ManaSymbol } from './ManaSymbol';
+import { ManaSymbol } from '../ManaSymbol';
 import React from 'react';
 
 interface CardData {
@@ -107,7 +107,6 @@ export default function CardModal() {
       ? `${card.power} / ${card.toughness}`
       : null;
 
-
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
       <div
@@ -142,12 +141,12 @@ export default function CardModal() {
           </button>
         )}
 
-          <button
-            onClick={closeModal}
-            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-4 right-4 flex size-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
-          >
-            <X size={20} strokeWidth={4} />
-          </button>
+        <button
+          onClick={closeModal}
+          className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-4 right-4 flex size-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
+        >
+          <X size={20} strokeWidth={4} />
+        </button>
         <div className="relative p-4" id="modal-box">
           <div className="flex h-full flex-col md:flex-row">
             <div className="justify-left flex items-center md:w-1/2 md:pr-4">

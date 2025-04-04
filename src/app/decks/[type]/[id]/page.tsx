@@ -5,7 +5,7 @@ import { DeckCardGrid } from '@/components/deck/DeckCardGrid';
 import { DeckInfo } from '@/components/deck/DeckInfo';
 import { loadDeckById } from '@/actions/deck/load-decks';
 import { CardModalProvider } from '@/context/CardModalContext';
-import CardModal from '@/components/CardModal';
+import CardModal from '@/components/card-modal/CardModal';
 import { Separator } from '@/components/ui/separator';
 import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
 import { MissingCardsModal } from '@/components/deck/MissingCardsModal';
@@ -47,7 +47,7 @@ export default async function DeckDetailPage({ params }: Props) {
         <MissingCardsModal />
         <CardModalProvider>
           {/* <Filters /> */}
-          <h2 className="mt-8 mb-3 text-xl md:text-2xl font-bold">Main Deck</h2>
+          <h2 className="mt-8 mb-3 text-xl font-bold md:text-2xl">Main Deck</h2>
           <DeckCardGrid
             decklist={deck.maindeck}
             collectedCards={maindeckOwned}

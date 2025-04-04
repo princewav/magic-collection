@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Filters } from '@/components/Filters';
-import CardModal from '@/components/CardModal';
+import CardModal from '@/components/card-modal/CardModal';
 import { CardModalProvider } from '@/context/CardModalContext';
 import { CardsProvider } from '@/context/CardsContext';
 import { CardGrid } from '@/components/CardGrid';
@@ -16,8 +16,9 @@ interface PageProps {
 }
 
 export default async function Page({ searchParams }: PageProps) {
-  const { filters, deduplicate, page } =
-    getFiltersFromSearchParams(await searchParams);
+  const { filters, deduplicate, page } = getFiltersFromSearchParams(
+    await searchParams,
+  );
   const pageSize = 50;
 
   const { cards, total } = await loadFilteredCards(
