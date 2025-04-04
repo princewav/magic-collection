@@ -10,7 +10,7 @@ export const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<'a'> & {
     title: string;
     imageSrc: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     href: string;
   }
 >(({ className, title, imageSrc, children, href, ...props }, ref) => {
@@ -33,7 +33,7 @@ export const ListItem = React.forwardRef<
         ref={ref}
         {...props}
       >
-        <div className="flex flex-row items-center space-x-1">
+        <div className="flex flex-row items-center space-x-2">
           <Image
             src={imageSrc}
             alt=""
@@ -45,9 +45,7 @@ export const ListItem = React.forwardRef<
             {title}
           </div>
         </div>
-        <p className="text-muted-foreground line-clamp-2 text-xs leading-snug md:text-sm">
           {children}
-        </p>
       </Link>
     </li>
   );

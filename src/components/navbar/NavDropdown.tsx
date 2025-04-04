@@ -130,14 +130,8 @@ export const NavDropdown = ({
         <div
           ref={dropdownRef}
           className={cn(
-            // --- Base Positioning & Layout ---
             'absolute top-full left-0 z-20 mt-1 w-auto md:mt-2',
-
-            // --- Animation Classes ---
-            'origin-top-left', // Set transform origin
-
-            // Conditionally apply enter or exit animations
-            // Make sure ANIMATION_DURATION matches the Tailwind duration class (e.g., duration-150)
+            'origin-top-left',
             {
               [`animate-in fade-in-0 zoom-in-95 duration-${ANIMATION_DURATION} ease-out`]:
                 isOpen,
@@ -150,7 +144,7 @@ export const NavDropdown = ({
           onMouseLeave={handleDropdownMouseLeave}
         >
           <div className="bg-popover text-popover-foreground overflow-hidden rounded-md border shadow-lg">
-            <ul className="grid gap-2 p-2 md:w-[400px] md:gap-3 md:p-6 lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+            <ul className="grid gap-2 p-2 md:gap-3 md:p-4">
               {children}
             </ul>
           </div>

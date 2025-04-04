@@ -40,14 +40,12 @@ const Navbar: React.FC<{}> = () => {
             title="Paper Decks"
             imageSrc="/images/card-w.png"
           >
-            Manage your physical MTG decks
           </ListItem>
           <ListItem
             href="/decks/arena"
             title="Arena Decks"
             imageSrc="/images/arena-w.png"
           >
-            Organize and track your MTG Arena decks
           </ListItem>
         </NavDropdown>
 
@@ -65,16 +63,12 @@ const Navbar: React.FC<{}> = () => {
             href="/collection/paper"
             title="Paper Collection"
             imageSrc="/images/card-w.png"
-          >
-            Catalog your physical MTG cards
-          </ListItem>
+          />
           <ListItem
             href="/collection/arena"
             title="Arena Collection"
             imageSrc="/images/arena-w.png"
-          >
-            Track your MTG Arena card collection
-          </ListItem>
+          />
         </NavDropdown>
 
         <NavLink
