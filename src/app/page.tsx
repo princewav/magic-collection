@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Filters } from '@/components/Filters';
 import CardModal from '@/components/card-modal/CardModal';
-import { CardModalProvider } from '@/context/CardModalContext';
 import { CardsProvider } from '@/context/CardsContext';
 import { CardGrid } from '@/components/CardGrid';
 import { loadFilteredCards } from '@/actions/card/load-cards';
@@ -32,10 +31,8 @@ export default async function Page({ searchParams }: PageProps) {
     <CardsProvider initialCards={cards} initialTotal={total}>
       <div className="min-h-screen px-4 pt-2 pb-4">
         <Filters className="mb-4" />
-        <CardModalProvider>
-          <CardGrid />
-          <CardModal />
-        </CardModalProvider>
+        <CardGrid />
+        <CardModal />
       </div>
     </CardsProvider>
   );
