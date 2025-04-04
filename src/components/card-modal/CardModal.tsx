@@ -83,7 +83,7 @@ export default function CardModal() {
   }
 
   return (
-    <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-center justify-center p-4">
+    <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-start justify-center p-4 md:items-center">
       <div
         className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-2xl border-2 p-6 px-10 shadow-2xl"
         ref={modalRef}
@@ -91,7 +91,7 @@ export default function CardModal() {
         {hasPrevCard && (
           <button
             onClick={goToPrevCard}
-            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 left-4 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-80 left-4 z-10 flex size-8 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300 md:top-1/2 md:-translate-y-1/2"
             aria-label="Previous card"
           >
             <ChevronLeft
@@ -105,7 +105,7 @@ export default function CardModal() {
         {hasNextCard && (
           <button
             onClick={goToNextCard}
-            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-1/2 right-4 z-10 flex size-8 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300"
+            className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-80 right-4 z-10 flex size-8 transform cursor-pointer items-center justify-center rounded-full border transition-all duration-300 md:top-1/2 md:-translate-y-1/2"
             aria-label="Next card"
           >
             <ChevronRight
@@ -152,7 +152,7 @@ export default function CardModal() {
           <div className="flex flex-col justify-between md:w-1/2">
             <div className="flex flex-col space-y-1">
               <div className="flex flex-row justify-between md:flex-col md:space-y-1">
-                <h2 className="p-2 pb-0 text-center text-xl font-bold md:text-left md:text-2xl">
+                <h2 className="p-2 pb-0 text-xl font-bold text-left md:text-2xl">
                   {card.name}
                 </h2>
                 {card.mana_cost && (
@@ -222,7 +222,7 @@ export default function CardModal() {
                   View on Cardmarket
                 </Button>
               </div>
-              <div className="text-md flex flex-row items-center justify-between md:text-xl p-2">
+              <div className="text-md flex flex-row items-center justify-between p-2 md:text-xl">
                 <p>{card.set_name}</p>
                 {card.power !== null && card.toughness !== null && (
                   <div className="flex items-center justify-end">
