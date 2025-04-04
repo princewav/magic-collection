@@ -24,16 +24,16 @@ export default function RootLayout({
       <body
         className={cn(
           inter.className,
-          'bg-background text-foreground min-h-screen',
+          'bg-background text-foreground min-h-screen mb-20 md:mb-0',
         )}
       >
-        {/* <React.StrictMode> */}
+        <React.StrictMode>
           <ThemeProvider>
             <Navbar />
             <CardModalProvider>{children}</CardModalProvider>
             <Toaster />
           </ThemeProvider>
-        {/* </React.StrictMode> */}
+        </React.StrictMode>
       </body>
     </html>
   );
