@@ -38,14 +38,12 @@ const Navbar: React.FC<{}> = () => {
             href="/decks/paper"
             title="Paper Decks"
             imageSrc="/images/card-w.png"
-          >
-          </ListItem>
+          ></ListItem>
           <ListItem
             href="/decks/arena"
             title="Arena Decks"
             imageSrc="/images/arena-w.png"
-          >
-          </ListItem>
+          ></ListItem>
         </NavDropdown>
 
         <NavDropdown
@@ -78,7 +76,7 @@ const Navbar: React.FC<{}> = () => {
           <span className="text-xs md:text-base">Wishlists</span>
         </NavLink>
       </div>
-      <div className="hidden items-center md:flex">
+      <div className="flex items-center">
         <ThemeToggle />
       </div>
     </nav>
