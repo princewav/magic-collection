@@ -60,11 +60,13 @@ export default function CardModal() {
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
+      document.body.classList.add('overflow-hidden');
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
+      document.body.classList.remove('overflow-hidden');
     };
   }, [isOpen, closeModal, handleKeyDown]);
 
@@ -85,7 +87,7 @@ export default function CardModal() {
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-start justify-center p-4 md:items-center">
       <div
-        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto rounded-2xl border-2 p-6 px-2 md:px-10 shadow-2xl"
+        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overscroll-contain rounded-2xl border-2 p-6 px-2 shadow-2xl md:px-10"
         ref={modalRef}
       >
         {hasPrevCard && (
@@ -152,7 +154,7 @@ export default function CardModal() {
           <div className="flex flex-col justify-between md:w-1/2">
             <div className="flex flex-col space-y-1">
               <div className="flex flex-row justify-between md:flex-col md:space-y-1">
-                <h2 className="p-2 pb-0 text-xl font-bold text-left md:text-2xl">
+                <h2 className="p-2 pb-0 text-left text-xl font-bold md:text-2xl">
                   {card.name}
                 </h2>
                 {card.mana_cost && (
@@ -191,8 +193,8 @@ export default function CardModal() {
                 </div>
               )}
             </div>
-            <div className="flex flex-col">
-              <div className="bg-background/20 flex items-center justify-center gap-2 rounded-2xl p-2 md:justify-start">
+            <div className="mt-4 flex flex-col">
+              <div className="bg-background/20 flex flex-wrap items-center justify-center gap-2 rounded-2xl p-2 md:justify-start">
                 <Button
                   variant="outline"
                   size="sm"
