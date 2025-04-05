@@ -24,7 +24,7 @@ const Navbar: React.FC<{}> = () => {
           <Logo className="w-15" />
         </Link>
       </div>
-      <div className="flex flex-grow justify-around md:justify-start md:gap-2">
+      <div className="ml-2 flex flex-grow justify-around md:justify-start md:gap-4">
         <NavDropdown
           label="Decks"
           triggerContent={
