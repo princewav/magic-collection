@@ -6,6 +6,7 @@ import { Filters } from '@/components/Filters';
 import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
 import { CollectionWrapper } from '@/components/CollectionWrapper';
 import { CardsProvider } from '@/context/CardsContext';
+import { collectionCardService } from '@/db/services/CollectionCardService';
 
 export const metadata: Metadata = {
   title: 'Collection',

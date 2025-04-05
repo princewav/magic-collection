@@ -3,7 +3,7 @@ import { rarityOrder } from '@/types/card';
 
 // Re-define or import FilterOptions if it's not globally available
 // For now, assume FilterOptions structure is known
-interface FilterOptions {
+export interface FilterOptions {
   colors?: string[];
   cmcRange?: [number, number];
   rarities?: string[];
@@ -13,12 +13,14 @@ interface FilterOptions {
   }>;
   sets?: string[];
   exactColorMatch?: boolean;
+  collectionType?: string[];
 }
 
 const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
 
 export class CardFilteringService {
   /** Applies filter criteria to a MongoDB query object. */
+  
   private _applyFilters(
     query: Record<string, any>,
     filters: FilterOptions,

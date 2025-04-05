@@ -2,22 +2,7 @@ import { Card } from '@/types/card';
 import { BaseService } from './BaseService';
 import { DB } from '../db';
 import { RepoCls } from '../db';
-import { Document } from 'mongodb';
-import { CardFilteringService } from './CardFilteringService';
-
-interface FilterOptions {
-  colors?: string[];
-  cmcRange?: [number, number];
-  rarities?: string[];
-  sortFields?: Array<{
-    field: string;
-    order: 'asc' | 'desc';
-  }>;
-  sets?: string[];
-  exactColorMatch?: boolean;
-}
-
-const DEDUPLICATION_FETCH_MULTIPLIER = 3;
+import { CardFilteringService, FilterOptions } from './CardFilteringService';
 
 export class CardService extends BaseService<Card> {
   public repo = new RepoCls<Card>(DB, 'cards');
