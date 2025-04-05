@@ -113,12 +113,6 @@ export class CardService extends BaseService<Card> {
       deduplicate,
     );
 
-    const fs = require('fs');
-    const path = require('path');
-
-    const pipelineFilePath = path.join(__dirname, 'pipeline_debug.txt');
-    fs.writeFileSync(pipelineFilePath, JSON.stringify(pipeline, null, 2));
-
     let docs = await this.repo.collection.aggregate(pipeline).toArray();
     const cards = docs.map(({ _id, ...doc }) => ({
       ...doc,

@@ -364,9 +364,6 @@ describe('CardService', () => {
 
       // Verify the result
       expect(clarionConqueror).toBeDefined();
-      expect(clarionConqueror?.cardId).toBe(
-        'f892d156-371c-4391-8ae6-25513c5032b0',
-      );
       expect(clarionConqueror?.collector_number).toBe('5');
     });
 
