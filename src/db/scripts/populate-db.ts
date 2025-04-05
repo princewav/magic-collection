@@ -5,7 +5,7 @@ import logger from '@/lib/logger';
 
 async function fetchCards(): Promise<Card[]> {
   const filePath = new URL(
-    '../../../data/unique-artwork-20250405090346.json',
+    '../../../data/default-cards-20250405090853.json',
     import.meta.url,
   );
   const rawData = fs.readFileSync(filePath, 'utf-8');
