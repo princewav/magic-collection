@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import React from 'react';
 import { RaritySymbol } from './RaritySymbol';
 import { TextWithSymbols } from './TextWithSymbols';
+import { CardFace } from '@/types/card';
 
 export default function CardModal() {
   const {
@@ -20,7 +21,13 @@ export default function CardModal() {
     hasPrevCard,
   } = useCardModal();
   const [imageError, setImageError] = useState<boolean>(false);
+  const [selectedFaceIndex, setSelectedFaceIndex] = useState<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const currentFace: CardFace | null = card?.card_faces
+    ? card.card_faces[selectedFaceIndex]
+    : (card as CardFace | null);
+  const hasMultipleFaces = card?.card_faces && card.card_faces.length > 1;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -138,8 +145,8 @@ export default function CardModal() {
             ) : (
               <div className="relative flex h-[300px] w-[223px] items-center justify-center overflow-hidden rounded-3xl md:h-[500px] md:w-[360px]">
                 <Image
-                  src={card.image_uris?.normal || '/images/placeholder.webp'}
-                  alt={card.name}
+                  src={card?.image_uris?.normal || '/images/placeholder.webp'}
+                  alt={currentFace?.name || 'Card image'}
                   fill
                   priority
                   style={{
@@ -153,43 +160,58 @@ export default function CardModal() {
           </div>
           <div className="flex flex-col justify-between md:w-1/2">
             <div className="flex flex-col space-y-1">
+              {hasMultipleFaces && card?.card_faces && (
+                <div className="mb-4 flex justify-center space-x-2">
+                  {card.card_faces.map((face, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedFaceIndex(index)}
+                      className={`rounded-lg px-4 py-2 transition-all duration-300 ${
+                        selectedFaceIndex === index
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted hover:bg-muted/80'
+                      }`}
+                    >
+                      {face.name}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="flex flex-row justify-between md:flex-col md:space-y-1">
                 <h2 className="p-2 pb-0 text-left text-xl font-bold md:text-2xl">
-                  {card.name}
+                  {currentFace?.name}
                 </h2>
-                {card.mana_cost && (
+                {currentFace?.mana_cost && (
                   <p className="flex flex-row rounded-2xl p-2">
-                    {card.mana_cost?.split('//').map((part, index, arr) => (
-                      <React.Fragment key={index}>
-                        <span className="flex flex-row space-x-0.5">
-                          <TextWithSymbols text={part} symbolSize={20} />
-                        </span>
-                        {index < arr.length - 1 && (
-                          <span className="w-8 text-center">//</span>
-                        )}
-                      </React.Fragment>
-                    ))}
+                    <span className="flex flex-row space-x-0.5">
+                      <TextWithSymbols
+                        text={currentFace.mana_cost}
+                        symbolSize={20}
+                      />
+                    </span>
                   </p>
                 )}
               </div>
               <div className="bg-background/20 text-md flex items-center justify-between rounded-2xl p-2 text-center font-semibold md:text-xl">
-                <span>{card.type_line}</span>
+                <span>{currentFace?.type_line}</span>
                 <RaritySymbol card={card} />
               </div>
-              {card.oracle_text && (
+              {currentFace?.oracle_text && (
                 <div className="bg-background/20 rounded-2xl p-2 text-sm md:text-lg">
-                  {card.oracle_text.split('\n').map((line, index, arr) => (
-                    <React.Fragment key={index}>
-                      <div className="inline-block">
-                        <TextWithSymbols
-                          text={line}
-                          symbolSize={17}
-                          symbolClassName="mx-0.5 inline-block align-middle"
-                        />
-                      </div>
-                      {index < arr.length - 1 && <p className="my-3" />}
-                    </React.Fragment>
-                  ))}
+                  {currentFace.oracle_text
+                    .split('\n')
+                    .map((line, index, arr) => (
+                      <React.Fragment key={index}>
+                        <div className="inline-block">
+                          <TextWithSymbols
+                            text={line}
+                            symbolSize={17}
+                            symbolClassName="mx-0.5 inline-block align-middle"
+                          />
+                        </div>
+                        {index < arr.length - 1 && <p className="my-3" />}
+                      </React.Fragment>
+                    ))}
                 </div>
               )}
             </div>
@@ -201,7 +223,7 @@ export default function CardModal() {
                   className="bg-purple-400/50 transition-all duration-300 hover:bg-purple-300/40"
                   onClick={() =>
                     window.open(
-                      `https://scryfall.com/search?q=!"${encodeURIComponent(card.name)}"`,
+                      `https://scryfall.com/search?q=!"${encodeURIComponent(card?.name || '')}"`,
                       '_blank',
                     )
                   }
@@ -215,7 +237,7 @@ export default function CardModal() {
                   className="bg-blue-600/50 transition-all duration-300 hover:bg-blue-500/50"
                   onClick={() =>
                     window.open(
-                      `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(card.name)}`,
+                      `https://www.cardmarket.com/en/Magic/Products/Search?searchString=${encodeURIComponent(card?.name || '')}`,
                       '_blank',
                     )
                   }
@@ -225,12 +247,13 @@ export default function CardModal() {
                 </Button>
               </div>
               <div className="text-md flex flex-row items-center justify-between p-2 md:text-xl">
-                <p>{card.set_name}</p>
-                {card.power !== null && card.toughness !== null && (
-                  <div className="flex items-center justify-end">
-                    <p>{`${card.power} / ${card.toughness}`}</p>
-                  </div>
-                )}
+                <p>{card?.set_name}</p>
+                {currentFace?.power != null &&
+                  currentFace?.toughness != null && (
+                    <div className="flex items-center justify-end">
+                      <p>{`${currentFace?.power} / ${currentFace?.toughness}`}</p>
+                    </div>
+                  )}
               </div>
             </div>
           </div>
