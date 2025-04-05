@@ -1,3 +1,16 @@
+export type CardFace = {
+  object: string;
+  name: string;
+  mana_cost: string;
+  type_line: string;
+  oracle_text: string;
+  power?: string;
+  toughness?: string;
+  artist: string;
+  artist_id: string;
+  illustration_id?: string;
+};
+
 export type Card = {
   id: string;
   cardId: string;
@@ -54,6 +67,7 @@ export type Card = {
   rarity: string;
   flavor_text?: string;
   cardmarket_uri?: string;
+  card_faces?: CardFace[];
 };
 
 export function extractMtgCardData(sourceObj: unknown & Card): Card {
@@ -83,6 +97,7 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
     rarity,
     flavor_text,
     cardmarket_uri,
+    card_faces,
   } = sourceObj;
 
   // Return a new object with just the properties we want
@@ -112,6 +127,7 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
     rarity,
     ...(flavor_text !== undefined && { flavor_text }),
     ...(cardmarket_uri !== undefined && { cardmarket_uri }),
+    ...(card_faces !== undefined && { card_faces }),
   };
 }
 

@@ -3,14 +3,21 @@ import { CardService } from '../CardService';
 import { rarityOrder } from '@/types/card';
 import { CardFilteringService } from '../CardFilteringService';
 import { DB } from '../../db';
-import { RepoCls } from '../../db';
+import { testCard } from './testCard';
 
 describe('CardService', () => {
   let cardService: CardService;
   let mockCollection: any;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     cardService = new CardService(new CardFilteringService());
+
+    // Ensure test card exists in database
+    const collection = DB.collection('cards');
+    const existingCard = await collection.findOne({ cardId: testCard.cardId });
+    if (!existingCard) {
+      await collection.insertOne(testCard);
+    }
   });
 
   describe('getByNameAndSet', () => {
@@ -361,6 +368,25 @@ describe('CardService', () => {
         'f892d156-371c-4391-8ae6-25513c5032b0',
       );
       expect(clarionConqueror?.collector_number).toBe('5');
+    });
+
+    it('should find the test card in the database', async () => {
+      const result = await cardService.getFilteredCards(
+        {
+          sets: ['tsr'],
+          sortFields: [{ field: 'name', order: 'asc' }],
+        },
+        true,
+      );
+
+      const testCardResult = result.find((card) => card.name === 'test');
+      expect(testCardResult).toBeDefined();
+      expect(testCardResult?.cardId).toBe(
+        '0656ed76-4c8e-4094-8edd-9b49780cadf-test',
+      );
+      expect(testCardResult?.set).toBe('tsr');
+      expect(testCardResult?.colors).toEqual(['R']);
+      expect(testCardResult?.cmc).toBe(1);
     });
   });
 });
