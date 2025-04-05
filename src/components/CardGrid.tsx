@@ -3,7 +3,7 @@
 import { useCards } from '@/context/CardsContext';
 import { Card as CardType } from '@/types/card';
 import { Card } from './Card';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useCardModal } from '@/context/CardModalContext';
 
@@ -12,6 +12,11 @@ export function CardGrid() {
   const { openModal } = useCardModal();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
@@ -24,6 +29,8 @@ export function CardGrid() {
   );
 
   useEffect(() => {
+    if (!isMounted) return;
+
     const options = {
       root: null,
       rootMargin: '20px',
@@ -32,8 +39,9 @@ export function CardGrid() {
 
     observerRef.current = new IntersectionObserver(handleObserver, options);
 
-    if (loadingRef.current) {
-      observerRef.current.observe(loadingRef.current);
+    const currentLoadingRef = loadingRef.current;
+    if (currentLoadingRef) {
+      observerRef.current.observe(currentLoadingRef);
     }
 
     return () => {
@@ -41,7 +49,11 @@ export function CardGrid() {
         observerRef.current.disconnect();
       }
     };
-  }, [handleObserver]);
+  }, [handleObserver, isMounted]);
+
+  if (!isMounted) {
+    return null;
+  }
 
   if (!cards.length && !isLoading) {
     return (
@@ -50,16 +62,15 @@ export function CardGrid() {
       </div>
     );
   }
-
   return (
     <div className="relative">
       <div className="flex flex-wrap justify-center gap-4">
         {cards.map((card: CardType, index: number) => (
-          <div
-            key={`${card.id}-${index}`}
-            className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]"
-          >
-            <div onClick={() => openModal(card, cards)}>
+          <div key={`${card.id}-${index}`} className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]">
+            <div
+              onClick={() => openModal(card, cards)}
+              className="cursor-pointer"
+            >
               <Card card={{ ...card, quantity: 0 }} />
             </div>
           </div>

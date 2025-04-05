@@ -16,6 +16,16 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+function CardGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {Array.from({ length: 10 }).map((_, index) => (
+        <Skeleton key={index} className="h-[330px] w-[240px] rounded-lg" />
+      ))}
+    </div>
+  );
+}
+
 export default async function Page({ searchParams }: PageProps) {
   const { filters, deduplicate, page } = getFiltersFromSearchParams(
     await searchParams,
@@ -39,15 +49,5 @@ export default async function Page({ searchParams }: PageProps) {
         </div>
       </CardsProvider>
     </CardModalProvider>
-  );
-}
-
-export function CardGridSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      {Array.from({ length: 10 }).map((_, index) => (
-        <Skeleton key={index} className="h-[330px] w-[240px] rounded-lg" />
-      ))}
-    </div>
   );
 }
