@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent } from 'react';
-import { X } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 
 interface SetFilterProps {
   selectedSets: string[];
@@ -24,14 +24,29 @@ export function SetFilter({ selectedSets, onSetChange }: SetFilterProps) {
     onSetChange(selectedSets.filter((s) => s !== setToRemove));
   };
 
+  const clearAllSets = () => {
+    onSetChange([]);
+  };
+
   return (
     <div className="grid grid-rows-[auto_1fr] gap-2">
-      <h3 className="text-xs md:text-sm font-medium">Sets</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-medium md:text-sm">Sets</h3>
+        {selectedSets.length > 0 && (
+          <button
+            onClick={clearAllSets}
+            className="text-muted-foreground hover:text-foreground cursor-pointer"
+            title="Clear all sets"
+          >
+            <Trash2 size={15} />
+          </button>
+        )}
+      </div>
       <div className="flex flex-wrap gap-2">
         {selectedSets.map((set) => (
           <div
             key={set}
-            className="bg-primary/20 flex items-center gap-1 rounded-md px-2 py-1 text-xs md:text-sm font-semibold"
+            className="bg-primary/20 flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold md:text-sm"
           >
             <span>{set}</span>
             <button

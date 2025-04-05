@@ -23,6 +23,7 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
 import { updateUrlWithFilters, getFiltersFromUrl } from '@/lib/url-params';
+import { STANDARD_SETS } from '@/lib/constants';
 
 export function Filters({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -37,7 +38,7 @@ export function Filters({ className }: { className?: string }) {
     filters.rarities || [],
   );
   const [selectedSets, setSelectedSets] = useState<string[]>(
-    filters.sets || [],
+    filters.sets || STANDARD_SETS,
   );
   const [sortFields, setSortFields] = useState<SortField[]>(
     filters.sortFields || [],
@@ -346,12 +347,6 @@ export function Filters({ className }: { className?: string }) {
               />
             </div>
 
-            {/* Set Filter */}
-            <SetFilter
-              selectedSets={selectedSets}
-              onSetChange={handleSetChange}
-            />
-
             {/* Rarity Filter */}
             <div className="flex min-w-fit flex-col gap-2">
               <h3 className="text-xs font-medium md:text-sm">Rarity</h3>
@@ -404,6 +399,12 @@ export function Filters({ className }: { className?: string }) {
                 <Label htmlFor="deduplicate">One card per name</Label>
               </div>
             </div>
+
+            {/* Set Filter */}
+            <SetFilter
+              selectedSets={selectedSets}
+              onSetChange={handleSetChange}
+            />
 
             {/* Sort Options */}
             <SortOptions

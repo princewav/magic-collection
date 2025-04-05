@@ -45,3 +45,18 @@ export const COLOR_OPTIONS = [
 export const CARD_DATA_PATH = "src/data/sample-cards.json";
 export const POUCHDB_PATH = 'data/pouchdb/magic';
 export const ITEMS_PER_PAGE = 18;
+export const STANDARD_SETS = [
+  'DMU', // Dominaria United
+  'BRO', // The Brothers' War
+  'ONE', // Phyrexia: All Will Be One
+  'MOM', // March of the Machine
+  'MAT', // March of the Machine: The Aftermath
+  'WOE', // Wilds of Eldraine
+  'LCI', // The Lost Caverns of Ixalan
+  'MKM', // Murders at Karlov Manor
+  'OTJ', // Outlaws of Thunder Junction
+  'BIG', // Outlaws of Thunder Junction: The Big Score
+  'BLB', // Bloomburrow
+  'DSK', // Duskmourn: House of Horror
+  'FDN', // Magic Foundations
+];

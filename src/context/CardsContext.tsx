@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { Card } from '@/types/card';
 import { loadFilteredCards, FilterOptions } from '@/actions/card/load-cards';
+import { STANDARD_SETS } from '@/lib/constants';
 
 interface CardsContextType {
   cards: Card[];
@@ -53,6 +54,7 @@ export function CardsProvider({
     cmcRange: [0, 10],
     rarities: [],
     sortFields: [],
+    sets: STANDARD_SETS,
   });
 
   const loadCards = useCallback(
