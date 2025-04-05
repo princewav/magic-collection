@@ -10,7 +10,9 @@ async function fetchCards(): Promise<Card[]> {
   );
   const rawData = fs.readFileSync(filePath, 'utf-8');
   const cards = JSON.parse(rawData);
-  return cards.map((card: Card) => extractMtgCardData(card));
+  return cards
+    .filter((card: Card) => card.layout !== 'art_series')
+    .map((card: Card) => extractMtgCardData(card));
 }
 
 async function populateCardsCollection() {
