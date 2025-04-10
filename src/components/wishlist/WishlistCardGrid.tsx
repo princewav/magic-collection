@@ -83,8 +83,8 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                   [{card.set.toUpperCase()}]
                 </span>
               </div>
-              <div className="flex items-center gap-4">
-                {card.mana_cost && (
+              {card.mana_cost && (
+                <div className="flex items-center gap-4">
                   <div className="flex items-center">
                     <TextWithSymbols
                       text={card.mana_cost}
@@ -92,16 +92,13 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                       symbolClassName="mx-0.5"
                     />
                   </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-sm">
-                    CMC: {card.cmc}
-                  </span>
-                  {card.colors?.map((color) => (
-                    <ManaSymbol key={color} symbol={color} size={16} />
-                  ))}
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-sm">
+                      CMC: {card.cmc}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
         </div>
