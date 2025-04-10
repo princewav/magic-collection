@@ -94,7 +94,7 @@ export default function CardModal() {
   return (
     <div className="bg-opacity-50 bg-background/90 fixed top-0 left-0 flex h-full w-full items-start justify-center p-4 md:items-center">
       <div
-        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overscroll-contain rounded-2xl border-2 p-6 px-2 shadow-2xl md:px-10"
+        className="border-border/70 bg-sidebar relative max-h-[90vh] w-full max-w-4xl overflow-auto overscroll-contain rounded-2xl border-2 p-6 px-2 shadow-2xl md:px-10"
         ref={modalRef}
       >
         {hasPrevCard && (

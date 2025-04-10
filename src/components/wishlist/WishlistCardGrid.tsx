@@ -1,13 +1,13 @@
 'use client';
 
 import { Wishlist } from '@/types/wishlist';
-import Image from 'next/image';
-import { ManaSymbol } from '@/components/ManaSymbol';
 import { Card } from '@/components/Card';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Grid2X2, List } from 'lucide-react';
 import { TextWithSymbols } from '@/components/card-modal/TextWithSymbols';
+import { useCardModal } from '@/context/CardModalContext';
+import CardModal from '@/components/card-modal/CardModal';
 
 interface Props {
   wishlist: Wishlist;
@@ -15,6 +15,7 @@ interface Props {
 
 export const WishlistCardGrid = ({ wishlist }: Props) => {
   const [isGridView, setIsGridView] = useState(true);
+  const { openModal } = useCardModal();
 
   // Load layout preference from localStorage
   useEffect(() => {
@@ -63,6 +64,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
             <Card
               key={card.cardId}
               card={card}
+              onClick={() => openModal(card, wishlist.cards)}
               className="sm:w-[min(100%,350px)] md:w-[min(100%,250px)] lg:w-[min(100%,200px)]"
             />
           ))}
@@ -72,7 +74,8 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
           {wishlist.cards.map((card) => (
             <div
               key={card.cardId}
-              className="bg-card flex items-center justify-between rounded-lg border p-3 shadow-sm"
+              onClick={() => openModal(card, wishlist.cards)}
+              className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
@@ -103,6 +106,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
           ))}
         </div>
       )}
+      <CardModal />
     </div>
   );
 };

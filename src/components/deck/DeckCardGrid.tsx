@@ -277,7 +277,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
           {cardsWithQuantity?.map((card) => (
             <div
               key={card.id}
-              className="bg-card group flex items-center justify-between rounded-lg border p-3 shadow-sm"
+              className="bg-card group flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm hover:bg-accent/5"
               onClick={() => openModal(card, cardsWithQuantity)}
             >
               <div className="flex items-center gap-3">
@@ -314,7 +314,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
                   ))}
                 </div>
                 <div
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-4"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <QuantityButton
