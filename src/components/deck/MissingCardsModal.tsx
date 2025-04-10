@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Copy, Download as DownloadIcon } from 'lucide-react';
+import { Copy, Download as DownloadIcon, Heart } from 'lucide-react';
 import {
   downloadMissingCards,
   getMissingCardsText,
@@ -16,11 +16,15 @@ import { CardWithQuantity } from '@/types/card';
 import { useMissingCardsModal } from '@/context/MissingCardsModalContext';
 import { useEffect, useState } from 'react';
 import { getMissingCards } from '@/actions/deck/missing-cards';
+import { createWishlistFromMissingCards } from '@/actions/wishlist/create-wishlist-from-missing-cards';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export function MissingCardsModal() {
   const { isOpen, closeModal, deckId } = useMissingCardsModal();
   const [cards, setCards] = useState<CardWithQuantity[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (isOpen && deckId) {
@@ -66,6 +70,24 @@ export function MissingCardsModal() {
     }
   };
 
+  const handleCreateWishlist = async () => {
+    if (!deckId) return;
+
+    try {
+      setLoading(true);
+      await createWishlistFromMissingCards(deckId);
+      toast.success('Wishlist created successfully');
+      router.push('/wishlists');
+      router.refresh();
+      closeModal();
+    } catch (error) {
+      console.error('Failed to create wishlist:', error);
+      toast.error('Failed to create wishlist');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent className="max-w-md">
@@ -102,6 +124,14 @@ export function MissingCardsModal() {
           >
             <DownloadIcon className="mr-2 h-4 w-4" />
             Scarica
+          </Button>
+          <Button
+            onClick={handleCreateWishlist}
+            className="flex-1"
+            disabled={loading}
+          >
+            <Heart className="mr-2 h-4 w-4" />
+            Wishlist
           </Button>
         </div>
       </DialogContent>
