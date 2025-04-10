@@ -11,7 +11,8 @@ export const ManaSymbol: React.FC<ManaSymbolProps> = ({
   size = 20,
   className,
 }) => {
-  const imageUrl = `/images/mana/${symbol}.svg`;
+  const formattedSymbol = symbol.toLowerCase().replace(/\//g, '');
+  const imageUrl = `/images/mana/${formattedSymbol}.svg`;
 
   return (
     <img
