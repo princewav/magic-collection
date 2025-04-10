@@ -18,8 +18,11 @@ import {
 } from 'react';
 import { updateCardQuantity } from '@/actions/deck/update-card-quantity';
 import { toast } from 'sonner';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, Grid2X2, List } from 'lucide-react';
 import { useCardModal } from '@/context/CardModalContext';
+import { Button } from '@/components/ui/button';
+import { ManaSymbol } from '@/components/ManaSymbol';
+import { TextWithSymbols } from '@/components/card-modal/TextWithSymbols';
 
 interface Props {
   decklist?: CardWithQuantity[];
@@ -37,6 +40,22 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
   >([]);
   const [rarityTotals, setRarityTotals] = useState<Record<string, number>>({});
   const { openModal } = useCardModal();
+  const [isGridView, setIsGridView] = useState(true);
+
+  // Load layout preference
+  useEffect(() => {
+    const savedLayout = localStorage.getItem(`deckLayout-${board}`);
+    if (savedLayout) {
+      setIsGridView(savedLayout === 'grid');
+    }
+  }, [board]);
+
+  // Save layout preference
+  const toggleLayout = () => {
+    const newLayout = !isGridView;
+    setIsGridView(newLayout);
+    localStorage.setItem(`deckLayout-${board}`, newLayout ? 'grid' : 'list');
+  };
 
   const cardIds = useMemo(() => {
     if (!decklist) return [];
@@ -170,72 +189,150 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
 
   return (
     <>
-      <div className="right-0 mb-4 flex items-center gap-4">
-        <p className="flex items-center gap-1 text-sm md:text-base">
-          <Image
-            src="/images/rarities/common.png"
-            alt="Common"
-            width={32}
-            height={32}
-            className="size-6 md:size-8"
-          />
-          {rarityTotals.common || 0}
-        </p>
-        <p className="flex items-center gap-1 text-xs md:text-base">
-          <Image
-            src="/images/rarities/uncommon.png"
-            alt="Uncommon"
-            width={32}
-            height={32}
-            className="size-6 md:size-8"
-          />
-          {rarityTotals.uncommon || 0}
-        </p>
-        <p className="flex items-center gap-1 text-sm md:text-base">
-          <Image
-            src="/images/rarities/rare.png"
-            alt="Rare"
-            width={32}
-            height={32}
-            className="size-6 md:size-8"
-          />
-          {rarityTotals.rare || 0}
-        </p>
-        <p className="flex items-center gap-1 text-sm md:text-base">
-          <Image
-            src="/images/rarities/mythic.png"
-            alt="Mythic"
-            width={32}
-            height={32}
-            className="size-6 md:size-8"
-          />
-          {rarityTotals.mythic || 0}
-        </p>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <p className="flex items-center gap-1 text-sm md:text-base">
+            <Image
+              src="/images/rarities/common.png"
+              alt="Common"
+              width={32}
+              height={32}
+              className="size-6 md:size-8"
+            />
+            {rarityTotals.common || 0}
+          </p>
+          <p className="flex items-center gap-1 text-xs md:text-base">
+            <Image
+              src="/images/rarities/uncommon.png"
+              alt="Uncommon"
+              width={32}
+              height={32}
+              className="size-6 md:size-8"
+            />
+            {rarityTotals.uncommon || 0}
+          </p>
+          <p className="flex items-center gap-1 text-sm md:text-base">
+            <Image
+              src="/images/rarities/rare.png"
+              alt="Rare"
+              width={32}
+              height={32}
+              className="size-6 md:size-8"
+            />
+            {rarityTotals.rare || 0}
+          </p>
+          <p className="flex items-center gap-1 text-sm md:text-base">
+            <Image
+              src="/images/rarities/mythic.png"
+              alt="Mythic"
+              width={32}
+              height={32}
+              className="size-6 md:size-8"
+            />
+            {rarityTotals.mythic || 0}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleLayout}
+          className="h-8 w-8"
+          title={isGridView ? 'Switch to list view' : 'Switch to grid view'}
+        >
+          {isGridView ? (
+            <List className="h-4 w-4" />
+          ) : (
+            <Grid2X2 className="h-4 w-4" />
+          )}
+        </Button>
       </div>
 
-      <div className="mx-auto mt-2 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-        {cardsWithQuantity?.map((card: CardWithQuantity) => (
-          <div
-            key={card.id}
-            className="group relative"
-            onClick={() => openModal(card, cardsWithQuantity)}
-          >
+      {isGridView ? (
+        <div className="mx-auto mt-2 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+          {cardsWithQuantity?.map((card: CardWithQuantity) => (
             <div
-              className="absolute inset-0 flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
+              key={card.id}
+              className="group relative"
+              onClick={() => openModal(card, cardsWithQuantity)}
             >
-              <QuantityButton card={card} sign="+" />
-              <QuantityButton card={card} sign="-" />
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <QuantityButton card={card} sign="+" />
+                <QuantityButton card={card} sign="-" />
+              </div>
+              <Card
+                card={card}
+                collectedQuantity={
+                  collectedCards?.find((c) => c.name === card.name)?.quantity ||
+                  0
+                }
+              />
             </div>
-            <Card
-              card={card}
-              collectedQuantity={
-                collectedCards?.find((c) => c.name === card.name)?.quantity || 0
-              }
-            />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {cardsWithQuantity?.map((card) => (
+            <div
+              key={card.id}
+              className="bg-card group flex items-center justify-between rounded-lg border p-3 shadow-sm"
+              onClick={() => openModal(card, cardsWithQuantity)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
+                    {card.quantity}x
+                  </div>
+                  {collectedCards?.find((c) => c.name === card.name)
+                    ?.quantity ? (
+                    <div className="bg-accent h-2 w-2 rotate-45 transform" />
+                  ) : null}
+                </div>
+                <span className="font-medium">{card.name}</span>
+                <span className="text-muted-foreground text-sm">
+                  [{card.set.toUpperCase()}]
+                </span>
+              </div>
+              <div className="flex items-center gap-4">
+                {card.mana_cost && (
+                  <div className="flex items-center">
+                    <TextWithSymbols
+                      text={card.mana_cost}
+                      symbolSize={16}
+                      symbolClassName="mx-0.5"
+                    />
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground text-sm">
+                    CMC: {card.cmc}
+                  </span>
+                  {card.colors?.map((color) => (
+                    <ManaSymbol key={color} symbol={color} size={16} />
+                  ))}
+                </div>
+                <div
+                  className="flex items-center gap-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <QuantityButton
+                    card={card}
+                    sign="-"
+                    className="relative opacity-100 hover:scale-110"
+                  />
+                  <QuantityButton
+                    card={card}
+                    sign="+"
+                    className="relative opacity-100 hover:scale-110"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

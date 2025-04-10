@@ -7,6 +7,7 @@ import { Card } from '@/components/Card';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Grid2X2, List } from 'lucide-react';
+import { TextWithSymbols } from '@/components/card-modal/TextWithSymbols';
 
 interface Props {
   wishlist: Wishlist;
@@ -82,9 +83,20 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                   [{card.set.toUpperCase()}]
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center">
-                  <span className="mr-2">{card.cmc}</span>
+              <div className="flex items-center gap-4">
+                {card.mana_cost && (
+                  <div className="flex items-center">
+                    <TextWithSymbols
+                      text={card.mana_cost}
+                      symbolSize={16}
+                      symbolClassName="mx-0.5"
+                    />
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground text-sm">
+                    CMC: {card.cmc}
+                  </span>
                   {card.colors?.map((color) => (
                     <ManaSymbol key={color} symbol={color} size={16} />
                   ))}

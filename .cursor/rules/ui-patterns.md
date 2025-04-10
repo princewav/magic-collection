@@ -53,12 +53,35 @@ const toggleLayout = () => {
 - Shows: quantity, name, set code, mana value, colors
 - Uses consistent spacing and alignment
 
+### Context-Specific Implementations
+
+#### Wishlist View
+
+- Simple layout with basic card information
+- Grid: Full card display with art
+- List: Compact view with quantity, name, set, mana value
+
+#### Deck View
+
+- Enhanced layout with collection tracking
+- Separate layouts per board (maindeck/sideboard)
+- Grid:
+  - Full card display with art
+  - Quantity controls as overlays
+  - Collection indicators
+- List:
+  - Quantity controls always visible
+  - Collection status indicator
+  - Mana value and color display
+- Storage key format: `deckLayout-${board}`
+
 ### User Preferences
 
 - Layout choice persists between sessions
 - Each view type serves different use cases:
   - Grid: Visual browsing and card art focus
   - List: Quick scanning and data comparison
+- Separate storage keys for different contexts
 
 ### Styling Constants
 
@@ -66,3 +89,4 @@ const toggleLayout = () => {
 - List item spacing: gap-3 for items, gap-2 for icons
 - Background colors: bg-card for items, bg-background/80 for quantity badges
 - Text styles: font-medium for card names, text-muted-foreground for secondary info
+- Collection indicator: bg-accent h-2 w-2 rotate-45 transform
