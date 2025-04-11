@@ -32,7 +32,7 @@ export const WishlistGrid = ({ wishlists }: WishlistGridProps) => {
   };
 
   return (
-    <div className="relative flex flex-wrap gap-6">
+    <div className="relative justify-center gap-6 px-6 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:px-0">
       {selectedWishlists.length > 0 && (
         <WishlistSelectionActions wishlistCount={selectedWishlists.length} />
       )}
@@ -41,6 +41,7 @@ export const WishlistGrid = ({ wishlists }: WishlistGridProps) => {
           key={wishlist.id}
           wishlist={wishlist}
           onContextMenu={handleContextMenu}
+          className="max-w-[300px] w-full mx-auto"
         />
       ))}
       {contextMenu && (

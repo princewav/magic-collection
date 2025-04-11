@@ -15,11 +15,13 @@ interface WishlistProps {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     wishlistId: string,
   ) => void;
+  className?: string;
 }
 
 export const Wishlist: React.FC<WishlistProps> = ({
   wishlist,
   onContextMenu,
+  className,
 }) => {
   const { selectedWishlists, toggleWishlistSelection } = useWishlistSelection();
   const isChecked = selectedWishlists.includes(wishlist.id);
@@ -42,6 +44,7 @@ export const Wishlist: React.FC<WishlistProps> = ({
       key={wishlist.id}
       className={cn(
         'group bg-card hover:bg-card/90 border-muted relative isolate w-50 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
+        className,
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
           : '',
@@ -64,7 +67,7 @@ export const Wishlist: React.FC<WishlistProps> = ({
               src={wishlist.imageUrl}
               alt={wishlist.name}
               fill
-              className="object-cover"
+              className="object-cover object-[80%_20%]"
             />
           ) : (
             <div className="bg-muted flex h-full w-full items-center justify-center">
