@@ -17,9 +17,10 @@ interface DeckProps {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     deckId: string,
   ) => void;
+  className?: string;
 }
 
-export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
+export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu, className }) => {
   const { selectedDecks, toggleDeckSelection } = useDeckSelection();
   const isChecked = selectedDecks.includes(deck.id);
 
@@ -43,6 +44,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu }) => {
       key={deck.id}
       className={cn(
         'group bg-card hover:bg-card/90 border-muted relative min-w-45 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg isolate',
+        className,
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
           : '',

@@ -6,6 +6,7 @@ import { useDeckSelection } from '@/context/DeckSelectionContext';
 import { Deck as DeckType } from '@/types/deck';
 import { DeleteDecksButton } from './DeleteDecksButton';
 import { DeckContextMenu } from './DeckContextMenu';
+import { cn } from '@/lib/utils';
 
 type DeckGridProps = {
   decks: DeckType[];
@@ -32,12 +33,22 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
   };
 
   return (
-    <div className="relative flex flex-wrap gap-6 justify-center md:justify-start">
+    <div
+      className={cn(
+        'relative gap-6 px-6',
+        'justify-center sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:px-0',
+      )}
+    >
       {selectedDecks.length > 0 && (
         <DeleteDecksButton deckCount={selectedDecks.length} />
       )}
       {decks.map((deck) => (
-        <Deck key={deck.id} deck={deck} onContextMenu={handleContextMenu} />
+        <Deck
+          key={deck.id}
+          deck={deck}
+          onContextMenu={handleContextMenu}
+          className="mx-auto w-full max-w-[300px]"
+        />
       ))}
       {contextMenu && (
         <DeckContextMenu
