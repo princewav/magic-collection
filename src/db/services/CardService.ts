@@ -116,36 +116,38 @@ export class CardService extends BaseService<Card> {
           name: { $in: names },
         },
       },
-      // Add fields for sorting: length of collector_number, the collector_number itself, and the EUR price.
-      // Handle potential nulls gracefully for sorting.
+      // Add a field to handle null prices for sorting. Assign a large number if price is null.
       {
         $addFields: {
-          _sortCriteria: {
-            cnLength: { $strLenCP: { $ifNull: ['$collector_number', ''] } },
-            cn: { $ifNull: ['$collector_number', ''] }, // Use empty string for nulls
-            price: { $ifNull: ['$prices.eur', Number.MAX_SAFE_INTEGER] }, // Use large number for null prices
+          priceValue: {
+            $ifNull: [{ $toDouble: '$prices.eur' }, Number.MAX_SAFE_INTEGER],
           },
         },
       },
+      // Sort by name (for grouping consistency) and then by price ascending.
+      // Documents with null prices (now MAX_SAFE_INTEGER) will be sorted last.
       {
         $sort: {
-          '_sortCriteria.cnLength': 1, // Sort by length ascending (shortest first)
-          '_sortCriteria.cn': 1, // Then by collector_number ascending (lexicographical)
-          '_sortCriteria.price': 1, // Then by price ascending
+          name: 1,
+          priceValue: 1,
         },
       },
+      // Group by card name and take the first document encountered,
+      // which will have the lowest price due to the preceding sort.
       {
         $group: {
-          _id: '$name', // Group by the card name
-          firstDoc: { $first: '$$ROOT' }, // Take the first document (basic version according to sort)
+          _id: '$name',
+          firstDoc: { $first: '$$ROOT' },
         },
       },
+      // Promote the selected document to the root.
       {
-        $replaceRoot: { newRoot: '$firstDoc' }, // Promote the selected document
+        $replaceRoot: { newRoot: '$firstDoc' },
       },
+      // Remove the temporary sorting field.
       {
         $project: {
-          _sortCriteria: 0, // Remove the temporary sorting field
+          priceValue: 0,
         },
       },
     ];

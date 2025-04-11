@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -31,7 +32,14 @@ export function MissingCardsModal() {
       setLoading(true);
       getMissingCards(deckId)
         .then((missingCards) => {
-          setCards(missingCards);
+          const sortedCards = [...missingCards].sort((a, b) => {
+            const priceA = a.prices.eur ? parseFloat(a.prices.eur) : 0;
+            const priceB = b.prices.eur ? parseFloat(b.prices.eur) : 0;
+            const totalA = priceA * a.quantity;
+            const totalB = priceB * b.quantity;
+            return totalB - totalA; // Sort descending
+          });
+          setCards(sortedCards);
         })
         .catch((error) => {
           console.error('Failed to load missing cards:', error);
@@ -43,6 +51,10 @@ export function MissingCardsModal() {
   }, [isOpen, deckId]);
 
   const totalMissing = cards.reduce((sum, card) => sum + card.quantity, 0);
+  const totalPrice = cards.reduce((sum, card) => {
+    const price = card.prices.eur ? parseFloat(card.prices.eur) : 0;
+    return sum + price * card.quantity;
+  }, 0);
 
   const handleCopy = async () => {
     if (!deckId) return;
@@ -92,20 +104,23 @@ export function MissingCardsModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            Missing Cards {totalMissing > 0 ? `(${totalMissing})` : ''}
-          </DialogTitle>
+          <DialogTitle>Missing Cards ({totalMissing})</DialogTitle>
+          <DialogDescription className="flex justify-between gap-2">
+            <span className="text-muted-foreground text-sm">
+              Total price: €{totalPrice.toFixed(2)}
+            </span>
+          </DialogDescription>
         </DialogHeader>
-        <div className="max-h-96 space-y-2 overflow-y-auto">
+        <div className="max-h-[500px] space-y-3 overflow-y-auto">
           {loading ? (
             <p>Caricamento in corso...</p>
           ) : (
             cards.map((card, index) => (
               <div
                 key={index}
-                className="gap-2 px-2 flex items-center justify-between"
+                className="flex items-center justify-between gap-2 px-2"
               >
                 <div className="flex items-center gap-2">
                   <img
@@ -118,8 +133,16 @@ export function MissingCardsModal() {
                   </span>
                 </div>
                 {card.prices.eur && (
-                  <div>
-                    <span>€ {card.prices.eur}</span>
+                  <div className="flex flex-col gap-2 text-right">
+                    <span className="">€{card.prices.eur}</span>
+                    {
+                      <span className="text-muted-foreground text-xs leading-1">
+                        Total: €
+                        {(parseFloat(card.prices.eur) * card.quantity).toFixed(
+                          2,
+                        )}
+                      </span>
+                    }
                   </div>
                 )}
               </div>
