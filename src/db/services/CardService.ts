@@ -116,17 +116,37 @@ export class CardService extends BaseService<Card> {
           name: { $in: names },
         },
       },
+      // Add fields for sorting: length of collector_number, the collector_number itself, and the EUR price.
+      // Handle potential nulls gracefully for sorting.
       {
-        $sort: { released_at: -1 }, // Sort by release date descending
+        $addFields: {
+          _sortCriteria: {
+            cnLength: { $strLenCP: { $ifNull: ['$collector_number', ''] } },
+            cn: { $ifNull: ['$collector_number', ''] }, // Use empty string for nulls
+            price: { $ifNull: ['$prices.eur', Number.MAX_SAFE_INTEGER] }, // Use large number for null prices
+          },
+        },
+      },
+      {
+        $sort: {
+          '_sortCriteria.cnLength': 1, // Sort by length ascending (shortest first)
+          '_sortCriteria.cn': 1, // Then by collector_number ascending (lexicographical)
+          '_sortCriteria.price': 1, // Then by price ascending
+        },
       },
       {
         $group: {
           _id: '$name', // Group by the card name
-          firstDoc: { $first: '$$ROOT' }, // Take the first document (newest printing)
+          firstDoc: { $first: '$$ROOT' }, // Take the first document (basic version according to sort)
         },
       },
       {
         $replaceRoot: { newRoot: '$firstDoc' }, // Promote the selected document
+      },
+      {
+        $project: {
+          _sortCriteria: 0, // Remove the temporary sorting field
+        },
       },
     ];
 
