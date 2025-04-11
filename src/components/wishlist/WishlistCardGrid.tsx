@@ -59,13 +59,13 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
       </div>
 
       {isGridView ? (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {wishlist.cards.map((card) => (
             <Card
               key={card.cardId}
               card={card}
               onClick={() => openModal(card, wishlist.cards)}
-              className="sm:w-[min(100%,350px)] md:w-[min(100%,250px)] lg:w-[min(100%,200px)]"
+              className="sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,240px)]"
             />
           ))}
         </div>
