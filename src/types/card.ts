@@ -68,6 +68,11 @@ export type Card = {
   flavor_text?: string;
   cardmarket_uri?: string;
   card_faces?: CardFace[];
+  prices: {
+    eur: string | null;
+    eur_foil: string | null;
+    tix: string | null;
+  };
 };
 
 export function extractMtgCardData(sourceObj: unknown & Card): Card {
@@ -98,6 +103,7 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
     flavor_text,
     cardmarket_uri,
     card_faces,
+    prices,
   } = sourceObj;
 
   // Return a new object with just the properties we want
@@ -125,6 +131,7 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
     scryfall_set_uri,
     collector_number,
     rarity,
+    prices,
     ...(flavor_text !== undefined && { flavor_text }),
     ...(cardmarket_uri !== undefined && { cardmarket_uri }),
     ...(card_faces !== undefined && { card_faces }),
