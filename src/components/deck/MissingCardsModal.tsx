@@ -103,15 +103,25 @@ export function MissingCardsModal() {
             <p>Caricamento in corso...</p>
           ) : (
             cards.map((card, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <img
-                  src={card.image_uris.art_crop}
-                  alt={card.name}
-                  className="h-10 w-10 object-cover"
-                />
-                <span>
-                  {card.quantity}x {card.name}
-                </span>
+              <div
+                key={index}
+                className="gap-2 px-2 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <img
+                    src={card.image_uris.art_crop}
+                    alt={card.name}
+                    className="h-10 w-10 object-cover"
+                  />
+                  <span>
+                    {card.quantity}x {card.name}
+                  </span>
+                </div>
+                {card.prices.eur && (
+                  <div>
+                    <span>€ {card.prices.eur}</span>
+                  </div>
+                )}
               </div>
             ))
           )}

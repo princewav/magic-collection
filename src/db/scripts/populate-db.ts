@@ -19,6 +19,12 @@ async function populateCardsCollection() {
   try {
     const cards = await fetchCards();
     console.log(cards.length);
+
+    // Drop the existing collection first
+    logger.debug('Dropping existing cards collection...');
+    await cardService.repo.dropCollection();
+    logger.debug('Existing cards collection dropped.');
+
     const result = await cardService.repo.createMany(cards);
     console.log(result.length);
     logger.debug('Cards collection populated successfully');
