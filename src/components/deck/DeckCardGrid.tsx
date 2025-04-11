@@ -248,7 +248,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
       </div>
 
       {isGridView ? (
-        <div className="mx-auto mt-2 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        <div className="relative justify-center gap-4 space-y-4 px-6 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0 sm:px-0">
           {cardsWithQuantity?.map((card: CardWithQuantity) => (
             <div
               key={card.id}
@@ -268,6 +268,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
                   collectedCards?.find((c) => c.name === card.name)?.quantity ||
                   0
                 }
+                className="mx-auto w-full max-w-[320px]"
               />
             </div>
           ))}
@@ -277,7 +278,7 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
           {cardsWithQuantity?.map((card) => (
             <div
               key={card.id}
-              className="bg-card group flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm hover:bg-accent/5"
+              className="bg-card group hover:bg-accent/5 flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm"
               onClick={() => openModal(card, cardsWithQuantity)}
             >
               <div className="flex items-center gap-3">
