@@ -75,7 +75,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
             <div
               key={card.cardId}
               onClick={() => openModal(card, wishlist.cards)}
-              className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm"
+              className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between rounded-xl border p-3 shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">

@@ -27,7 +27,7 @@ export function Card({
       onClick={onClick}
     >
       <div className="relative flex w-full flex-col justify-center p-2">
-        <div className="mb-2 flex w-full justify-center">
+        <div className="mb-2 flex w-full justify-center overflow-hidden">
           <div className="flex space-x-3">
             {Array.from(
               { length: Math.min(collectedQuantity, card.quantity) },
@@ -53,7 +53,7 @@ export function Card({
           <Image
             src={card.image_uris.normal}
             alt={`Card ${card.name}`}
-            className="h-auto w-full rounded-xl rounded-t-md"
+            className="h-auto w-full rounded-xl"
             width={400}
             height={550}
             style={{ aspectRatio: '0.72', width: '100%', height: 'auto' }}
