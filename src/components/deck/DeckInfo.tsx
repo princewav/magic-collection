@@ -46,13 +46,13 @@ export const DeckInfo = ({ deck }: Props) => {
   const colors = getColors();
 
   return (
-    <div className="bg-foreground/10 mb-4 flex items-center justify-between rounded-md p-4 shadow-md relative overflow-hidden">
+    <div className="bg-foreground/10 relative flex items-center justify-between overflow-hidden rounded-md p-4 shadow-md">
       <Image
         src={deck.imageUrl || '/placeholder-deck.jpg'}
         alt={deck.name}
         width={1500}
         height={1000}
-        className="absolute inset-0 object-center object-cover rounded-md -z-10 opacity-30 md:hidden"
+        className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-30 md:hidden"
       />
       <div className="flex items-center space-x-4">
         <Image
@@ -63,7 +63,7 @@ export const DeckInfo = ({ deck }: Props) => {
           className="hidden rounded-md md:block"
         />
         <div>
-          <h2 className="text-2xl font-semibold drop-shadow-xl drop-shadow-black">
+          <h2 className="drop-shadow-black text-2xl font-semibold drop-shadow-xl">
             {deck.name}{' '}
             <div className="mt-1 mb-2 flex items-center space-x-1">
               {Array.isArray(colors) && colors.length > 0
@@ -74,10 +74,14 @@ export const DeckInfo = ({ deck }: Props) => {
             </div>
           </h2>
           <div className="mt-1 flex items-center space-x-1"></div>
-          <p className="text-sm">Main: {mainboardCount} cards</p>
-          <p className="text-sm">Side: {sideboardCount} cards</p>
           <p className="text-sm">
-            Total: {mainboardCount + sideboardCount} cards
+            <b>Main:</b> {mainboardCount} cards
+          </p>
+          <p className="text-sm">
+            <b>Side:</b> {sideboardCount} cards
+          </p>
+          <p className="text-sm">
+            <b>Total:</b> {mainboardCount + sideboardCount} cards
           </p>
         </div>
       </div>

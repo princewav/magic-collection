@@ -18,7 +18,7 @@ import {
 } from 'react';
 import { updateCardQuantity } from '@/actions/deck/update-card-quantity';
 import { toast } from 'sonner';
-import { Minus, Plus, Grid2X2, List } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import { useCardModal } from '@/context/CardModalContext';
 import { Button } from '@/components/ui/button';
 import { ManaSymbol } from '@/components/ManaSymbol';
@@ -29,9 +29,16 @@ interface Props {
   collectedCards?: { name: string; quantity: number }[];
   type: 'paper' | 'arena';
   board: 'maindeck' | 'sideboard';
+  isGridView: boolean;
 }
 
-export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
+export function DeckCardGrid({
+  decklist,
+  collectedCards,
+  type,
+  board,
+  isGridView,
+}: Props) {
   const params = useParams();
   const deckId = params.id as string;
   const [isPending, startTransition] = useTransition();
@@ -40,22 +47,6 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
   >([]);
   const [rarityTotals, setRarityTotals] = useState<Record<string, number>>({});
   const { openModal } = useCardModal();
-  const [isGridView, setIsGridView] = useState(true);
-
-  // Load layout preference
-  useEffect(() => {
-    const savedLayout = localStorage.getItem(`deckLayout-${board}`);
-    if (savedLayout) {
-      setIsGridView(savedLayout === 'grid');
-    }
-  }, [board]);
-
-  // Save layout preference
-  const toggleLayout = () => {
-    const newLayout = !isGridView;
-    setIsGridView(newLayout);
-    localStorage.setItem(`deckLayout-${board}`, newLayout ? 'grid' : 'list');
-  };
 
   const cardIds = useMemo(() => {
     if (!decklist) return [];
@@ -232,19 +223,6 @@ export function DeckCardGrid({ decklist, collectedCards, type, board }: Props) {
             {rarityTotals.mythic || 0}
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleLayout}
-          className="h-8 w-8"
-          title={isGridView ? 'Switch to list view' : 'Switch to grid view'}
-        >
-          {isGridView ? (
-            <List className="h-4 w-4" />
-          ) : (
-            <Grid2X2 className="h-4 w-4" />
-          )}
-        </Button>
       </div>
 
       {isGridView ? (

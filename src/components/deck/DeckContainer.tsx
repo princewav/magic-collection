@@ -7,7 +7,9 @@ import { CardModalProvider } from '@/context/CardModalContext';
 import CardModal from '@/components/card-modal/CardModal';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, List, Grid2X2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
 
 interface DeckContainerProps {
   deck: any;
@@ -22,6 +24,23 @@ export function DeckContainer({
   sideboardOwned,
   type,
 }: DeckContainerProps) {
+  const [isGridView, setIsGridView] = useState(true);
+
+  const toggleLayout = () => {
+    setIsGridView(!isGridView);
+    // Optional: Add localStorage persistence here if needed
+    // const newLayout = !isGridView;
+    // localStorage.setItem(`deckLayout-global`, newLayout ? 'grid' : 'list');
+  };
+
+  // Optional: Load layout preference from localStorage
+  // useEffect(() => {
+  //   const savedLayout = localStorage.getItem('deckLayout-global');
+  //   if (savedLayout) {
+  //     setIsGridView(savedLayout === 'grid');
+  //   }
+  // }, []);
+
   return (
     <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-[theme(spacing.16)_1fr_theme(spacing.16)]">
       <div className="hidden md:flex md:flex-col md:items-center md:justify-start md:pt-4">
@@ -41,38 +60,62 @@ export function DeckContainer({
       </div>
 
       <div className="container mx-auto">
-        <div className="md:hidden flex justify-start">
+        <div className="flex justify-start md:hidden">
           <Link
             href={`/decks/${type}`}
             className="flex items-center justify-center gap-1"
           >
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 mb-2"
-            >
+            <Button variant="outline" size="sm" className="mb-2 gap-2">
               <ArrowLeft className="h-4 w-4" />
-            <span className="text-muted-foreground text-xs">To {type} decks</span>
+              <span className="text-muted-foreground text-xs">
+                To {type} decks
+              </span>
             </Button>
           </Link>
         </div>
         <CardModalProvider>
           <DeckInfo deck={deck} />
-          <h2 className="mt-8 mb-3 text-xl font-bold md:text-2xl">Main Deck</h2>
-          <DeckCardGrid
-            decklist={deck.maindeck}
-            collectedCards={maindeckOwned}
-            type={type}
-            board="maindeck"
-          />
-          <Separator className="my-10 h-2" />
-          <h2 className="mt-0 text-2xl font-bold">Sideboard</h2>
-          <DeckCardGrid
-            decklist={deck.sideboard}
-            collectedCards={sideboardOwned}
-            type={type}
-            board="sideboard"
-          />
+          <Tabs defaultValue="maindeck" className="mt-4">
+            <div className="mb-2 flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="maindeck">Main Deck</TabsTrigger>
+                <TabsTrigger value="sideboard">Sideboard</TabsTrigger>
+              </TabsList>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleLayout}
+                className="h-8 w-8"
+                title={
+                  isGridView ? 'Switch to list view' : 'Switch to grid view'
+                }
+              >
+                {isGridView ? (
+                  <List className="h-4 w-4" />
+                ) : (
+                  <Grid2X2 className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <TabsContent value="maindeck">
+              <DeckCardGrid
+                decklist={deck.maindeck}
+                collectedCards={maindeckOwned}
+                type={type}
+                board="maindeck"
+                isGridView={isGridView}
+              />
+            </TabsContent>
+            <TabsContent value="sideboard">
+              <DeckCardGrid
+                decklist={deck.sideboard}
+                collectedCards={sideboardOwned}
+                type={type}
+                board="sideboard"
+                isGridView={isGridView}
+              />
+            </TabsContent>
+          </Tabs>
           <CardModal />
         </CardModalProvider>
       </div>
