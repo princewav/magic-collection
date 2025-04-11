@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 interface ManaSymbolProps {
   symbol: string;
@@ -8,19 +9,19 @@ interface ManaSymbolProps {
 
 export const ManaSymbol: React.FC<ManaSymbolProps> = ({
   symbol,
-  size = 20,
+  size,
   className,
 }) => {
   const formattedSymbol = symbol.toLowerCase().replace(/\//g, '');
   const imageUrl = `/images/mana/${formattedSymbol}.svg`;
 
   return (
-    <img
+    <img 
       src={imageUrl}
       alt={symbol}
-      style={{ width: size, height: size }}
+      style={size ? { width: size, height: size } : undefined}
       title={symbol}
-      className={className}
+      className={cn('size-4 md:size-5', className)}
     />
   );
 };

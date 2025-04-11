@@ -32,6 +32,16 @@ export const WishlistInfo = ({ wishlist }: Props) => {
 
   const colors = getColors();
 
+  console.log(wishlist.cards);
+
+  const totalQuantity = wishlist.cards.reduce((acc, card) => {
+    return acc + card.quantity;
+  }, 0);
+
+  const totalPrice = wishlist.cards.reduce((acc, card) => {
+    return acc + (parseFloat(card.prices.eur || '0') * card.quantity);
+  }, 0);
+
   return (
     <div className="bg-foreground/10 relative mb-4 flex items-center justify-between overflow-hidden rounded-md p-4 shadow-md min-w-[370px]">
       <Image
@@ -50,17 +60,18 @@ export const WishlistInfo = ({ wishlist }: Props) => {
           className="hidden rounded-md md:block"
         />
         <div>
-          <h2 className="drop-shadow-black text-2xl font-semibold drop-shadow-xl">
+          <h2 className="drop-shadow-black text-lg md:text-2xl font-semibold drop-shadow-xl">
             {wishlist.name}{' '}
             <div className="mt-1 mb-2 flex items-center space-x-1">
               {Array.isArray(colors) && colors.length > 0
                 ? colors.map((color) => (
-                    <ManaSymbol key={color} symbol={color} size={20} />
+                    <ManaSymbol key={color} symbol={color} className="size-4 md:size-5" />
                   ))
                 : 'None'}
             </div>
           </h2>
-          <p className="text-sm">Cards: {wishlist.cardCount}</p>
+          <p className="text-sm">Cards: {totalQuantity}</p>
+          <p className="text-sm">Price: €{totalPrice.toFixed(2)}</p>
         </div>
       </div>
       <div className="flex flex-col items-end justify-between space-y-2">
