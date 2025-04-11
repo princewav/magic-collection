@@ -118,7 +118,7 @@ export function MissingCardsModal() {
         </div>
         <div className="mt-4 flex justify-around gap-2">
           <Button onClick={handleCopy} className="flex-1" disabled={loading}>
-            <Copy className="mr-2 h-4 w-4" />
+            <Copy className="h-4 w-4" />
             Copia
           </Button>
           <Button
@@ -126,16 +126,16 @@ export function MissingCardsModal() {
             className="flex-1"
             disabled={loading}
           >
-            <DownloadIcon className="mr-2 h-4 w-4" />
+            <DownloadIcon className="h-4 w-4" />
             Scarica
           </Button>
           <Button
             onClick={handleCreateWishlist}
-            className="flex-1"
+            className="flex-2"
             disabled={loading}
           >
-            <Heart className="mr-2 h-4 w-4" />
-            Wishlist
+            <Heart className="h-4 w-4" />
+            Create Wishlist
           </Button>
         </div>
       </DialogContent>
