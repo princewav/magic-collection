@@ -12,6 +12,7 @@ import { ListItem } from './NavListItem';
 
 const Navbar: React.FC<{}> = () => {
   const pathname = usePathname();
+  console.log('pathname', pathname);
 
   return (
     <nav
@@ -26,6 +27,7 @@ const Navbar: React.FC<{}> = () => {
       </div>
       <div className="ml-2 flex flex-grow justify-around md:justify-start md:gap-4">
         <NavDropdown
+          active={pathname.startsWith('/decks')}
           label="Decks"
           triggerContent={
             <>
@@ -47,6 +49,7 @@ const Navbar: React.FC<{}> = () => {
         </NavDropdown>
 
         <NavDropdown
+          active={pathname.startsWith('/collection')}
           label="Collection"
           triggerContent={
             <>
@@ -68,7 +71,7 @@ const Navbar: React.FC<{}> = () => {
         </NavDropdown>
 
         <NavLink
-          active={pathname === '/wishlists'}
+          active={pathname.startsWith('/wishlists')}
           href="/wishlists"
           ariaLabel="Wishlists"
         >

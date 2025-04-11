@@ -11,11 +11,13 @@ export const NavDropdown = ({
   children,
   label,
   className,
+  active,
 }: {
   triggerContent: React.ReactNode;
   children: React.ReactNode;
   label: string;
   className?: string;
+  active?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   // State to control actual rendering in the DOM, allowing time for exit animation
@@ -117,6 +119,8 @@ export const NavDropdown = ({
           'md:flex-row md:gap-2',
           // --- End Existing styles ---
           className,
+          active &&
+            'bg-secondary/40 dark:bg-primary/30 dark:hover:bg-primary/40 font-semibold',
         )}
         aria-haspopup="true"
         aria-expanded={isOpen}
