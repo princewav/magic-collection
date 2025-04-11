@@ -42,6 +42,8 @@ export function MissingCardsModal() {
     }
   }, [isOpen, deckId]);
 
+  const totalMissing = cards.reduce((sum, card) => sum + card.quantity, 0);
+
   const handleCopy = async () => {
     if (!deckId) return;
 
@@ -92,7 +94,9 @@ export function MissingCardsModal() {
     <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Missing Cards</DialogTitle>
+          <DialogTitle>
+            Missing Cards {totalMissing > 0 ? `(${totalMissing})` : ''}
+          </DialogTitle>
         </DialogHeader>
         <div className="max-h-96 space-y-2 overflow-y-auto">
           {loading ? (

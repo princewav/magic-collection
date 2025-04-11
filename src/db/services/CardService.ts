@@ -104,6 +104,43 @@ export class CardService extends BaseService<Card> {
     return cards;
   }
 
+  async getCardsByNames(names: string[]): Promise<Card[]> {
+    if (!names || names.length === 0) {
+      return [];
+    }
+
+    // Use aggregation to fetch one document per name, preferring newer printings.
+    const pipeline = [
+      {
+        $match: {
+          name: { $in: names },
+        },
+      },
+      {
+        $sort: { released_at: -1 }, // Sort by release date descending
+      },
+      {
+        $group: {
+          _id: '$name', // Group by the card name
+          firstDoc: { $first: '$$ROOT' }, // Take the first document (newest printing)
+        },
+      },
+      {
+        $replaceRoot: { newRoot: '$firstDoc' }, // Promote the selected document
+      },
+    ];
+
+    const docs = await this.repo.collection.aggregate(pipeline).toArray();
+
+    // Map MongoDB _id to string id if necessary
+    const cards = docs.map(({ _id, ...doc }) => ({
+      ...doc,
+      id: doc.id || _id?.toString(), // Prefer existing doc.id, fallback to aggregation _id
+    })) as Card[];
+
+    return cards;
+  }
+
   async getFilteredCards(
     filters: FilterOptions,
     deduplicate: boolean = true,

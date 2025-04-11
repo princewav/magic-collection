@@ -4,7 +4,7 @@
 
 - Collection management
 - Deck building
-- Missing cards tracking
+- Missing cards tracking (refactored to accurately include unowned cards and fetch full details)
 - Card search
 - Deck import/export
 - Basic wishlist management
