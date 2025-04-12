@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Wishlist } from '@/types/wishlist';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Edit } from 'lucide-react';
+import { Edit, Heart } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
 
 interface Props {
@@ -37,17 +37,17 @@ export const WishlistInfo = ({ wishlist }: Props) => {
   }, 0);
 
   const totalPrice = wishlist.cards.reduce((acc, card) => {
-    return acc + (parseFloat(card.prices.eur || '0') * card.quantity);
+    return acc + parseFloat(card.prices.eur || '0') * card.quantity;
   }, 0);
 
   return (
-    <div className="bg-foreground/10 relative mb-4 flex items-center justify-between overflow-hidden rounded-md p-4 shadow-md min-w-[370px]">
+    <div className="bg-foreground/10 relative mb-4 flex min-w-[370px] items-center justify-between overflow-hidden rounded-md p-4 shadow-md">
       <Image
         src={wishlist.imageUrl || '/placeholder-wishlist.jpg'}
         alt={wishlist.name}
         width={1500}
         height={1000}
-        className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-30 md:hidden"
+        className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-20 md:hidden"
       />
       <div className="flex items-center space-x-4">
         <Image
@@ -58,16 +58,24 @@ export const WishlistInfo = ({ wishlist }: Props) => {
           className="hidden rounded-md md:block"
         />
         <div>
-          <h2 className="drop-shadow-black text-lg md:text-2xl font-semibold drop-shadow-xl">
+          <h2 className="drop-shadow-black flex items-center gap-2 text-lg font-semibold drop-shadow-xl md:text-2xl">
+            <Heart
+              className="inline-block size-4 -translate-y-[1px]"
+              fill="currentColor"
+            />
             {wishlist.name}{' '}
-            <div className="mt-1 mb-2 flex items-center space-x-1">
-              {Array.isArray(colors) && colors.length > 0
-                ? colors.map((color) => (
-                    <ManaSymbol key={color} symbol={color} className="size-4 md:size-5" />
-                  ))
-                : 'None'}
-            </div>
           </h2>
+          <div className="mt-1 mb-2 flex items-center space-x-1">
+            {Array.isArray(colors) && colors.length > 0
+              ? colors.map((color) => (
+                  <ManaSymbol
+                    key={color}
+                    symbol={color}
+                    className="size-4 md:size-5"
+                  />
+                ))
+              : 'None'}
+          </div>
           <p className="text-sm">Cards: {totalQuantity}</p>
           <p className="text-sm">Price: €{totalPrice.toFixed(2)}</p>
         </div>
