@@ -4,11 +4,12 @@ import Image from 'next/image';
 import { Deck } from '@/types/deck';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { BookDashed, Download, Edit, Import } from 'lucide-react';
+import { BookDashed, Edit, Import } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
 import { useParams, usePathname } from 'next/navigation';
-import { useState } from 'react';
 import { useMissingCardsModal } from '@/context/MissingCardsModalContext';
+import { calculateRarityTotals } from '@/lib/deck/utils';
+import { CardWithQuantity } from '@/types/card';
 
 interface Props {
   deck: Deck;
@@ -45,6 +46,12 @@ export const DeckInfo = ({ deck }: Props) => {
 
   const colors = getColors();
 
+  const allCards: CardWithQuantity[] = [
+    ...(deck.maindeck || []),
+    ...(deck.sideboard || []),
+  ];
+  const rarityTotals = calculateRarityTotals(allCards);
+
   return (
     <div
       data-role="deck-info-container"
@@ -55,7 +62,7 @@ export const DeckInfo = ({ deck }: Props) => {
         alt={deck.name}
         width={1500}
         height={1000}
-        className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-30 md:hidden"
+        className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-15 md:hidden"
       />
       <div
         data-role="deck-details"
@@ -68,7 +75,10 @@ export const DeckInfo = ({ deck }: Props) => {
           height={100}
           className="hidden rounded-md md:block"
         />
-        <div data-role="deck-details-grid" className="grid grid-cols-2 gap-2 w-full">
+        <div
+          data-role="deck-details-grid"
+          className="grid w-full grid-cols-2 gap-2"
+        >
           <h2
             data-role="deck-name"
             className="drop-shadow-black col-span-2 text-2xl font-semibold drop-shadow-xl"
@@ -100,8 +110,50 @@ export const DeckInfo = ({ deck }: Props) => {
               <b>Total:</b> {mainboardCount + sideboardCount} cards
             </p>
           </div>
-          <div data-role="col-2" className="">
-            {/* total rarity grouping */}
+          <div
+            data-role="col-2"
+            className="flex flex-col items-start justify-end text-sm h-full"
+          >
+            <p className="flex items-center gap-1">
+              <Image
+                src="/images/rarities/common.png"
+                alt="Common"
+                width={16}
+                height={16}
+                className="size-5"
+              />
+              {rarityTotals.common || 0} Common
+            </p>
+            <p className="flex items-center gap-1">
+              <Image
+                src="/images/rarities/uncommon.png"
+                alt="Uncommon"
+                width={16}
+                height={16}
+                className="size-5"
+              />
+              {rarityTotals.uncommon || 0} Uncom.
+            </p>
+            <p className="flex items-center gap-1">
+              <Image
+                src="/images/rarities/rare.png"
+                alt="Rare"
+                width={16}
+                height={16}
+                className="size-5"
+              />
+              {rarityTotals.rare || 0} Rare
+            </p>
+            <p className="flex items-center gap-1">
+              <Image
+                src="/images/rarities/mythic.png"
+                alt="Mythic"
+                width={16}
+                height={16}
+                className="size-5"
+              />
+              {rarityTotals.mythic || 0} Mythic
+            </p>
           </div>
         </div>
       </div>

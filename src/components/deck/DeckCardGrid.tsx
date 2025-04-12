@@ -23,6 +23,7 @@ import { useCardModal } from '@/context/CardModalContext';
 import { Button } from '@/components/ui/button';
 import { ManaSymbol } from '@/components/ManaSymbol';
 import { TextWithSymbols } from '@/components/card-modal/TextWithSymbols';
+import { calculateRarityTotals } from '@/lib/deck/utils';
 
 interface Props {
   decklist?: CardWithQuantity[];
@@ -77,19 +78,8 @@ export function DeckCardGrid({
 
     setCardsWithQuantity(sortedCards);
 
-    // Calculate rarity totals
-    const totals = sortedCards.reduce(
-      (acc, card) => {
-        const rarity = card.rarity.toLowerCase() || 'common';
-        if (!acc[rarity]) {
-          acc[rarity] = 0;
-        }
-        acc[rarity] += card.quantity || 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
+    // Calculate rarity totals using the utility function
+    const totals = calculateRarityTotals(sortedCards);
     setRarityTotals(totals);
   }, [decklist]);
 
@@ -104,35 +94,33 @@ export function DeckCardGrid({
           try {
             await updateCardQuantity(deckId, card.cardId, board, change);
 
-            // Optimistically update the UI
-            setCardsWithQuantity((prev) =>
-              prev.map((c) => {
+            // Optimistically update the UI and totals
+            setCardsWithQuantity((prev) => {
+              const updatedCards = prev.map((c) => {
                 if (c.cardId === card.cardId) {
                   return { ...c, quantity: newQuantity };
                 }
                 return c;
-              }),
-            );
-
-            // Update rarity totals
-            setRarityTotals((prev) => {
-              const rarity = card.rarity.toLowerCase() || 'common';
-              const newTotal = Math.min(
-                4,
-                Math.max(1, (prev[rarity] || 0) + change),
-              );
-              return { ...prev, [rarity]: newTotal };
+              });
+              // Recalculate totals based on the *new* card list
+              const newTotals = calculateRarityTotals(updatedCards);
+              setRarityTotals(newTotals);
+              return updatedCards; // Return the updated list for state
             });
+
+            // No need for the separate setRarityTotals block anymore
+            // toast.success('Card quantity updated'); // Optional success toast
           } catch (error) {
             toast.error('Failed to update card quantity', {
               description:
                 error instanceof Error ? error.message : 'An error occurred',
             });
+            // Revert optimistic update on error? Maybe not needed if the source data is refetched.
           }
         });
       }
     },
-    [deckId],
+    [deckId, board], // Added board dependency
   );
 
   function QuantityButton({
@@ -315,3 +303,4 @@ export function DeckCardGrid({
     </>
   );
 }
+
