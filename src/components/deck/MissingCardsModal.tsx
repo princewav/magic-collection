@@ -104,7 +104,7 @@ export function MissingCardsModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-h-[500px] max-w-lg">
         <DialogHeader>
           <DialogTitle>Missing Cards ({totalMissing})</DialogTitle>
           <DialogDescription className="flex justify-between gap-2">
@@ -113,7 +113,7 @@ export function MissingCardsModal() {
             </span>
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-[500px] space-y-3 overflow-y-auto">
+        <div className="max-h-[300px] space-y-3 overflow-y-auto">
           {loading ? (
             <p>Caricamento in corso...</p>
           ) : (
