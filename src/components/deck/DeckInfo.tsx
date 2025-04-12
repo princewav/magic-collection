@@ -77,7 +77,7 @@ export const DeckInfo = ({ deck }: Props) => {
         />
         <div
           data-role="deck-details-grid"
-          className="grid w-full grid-cols-2 gap-2"
+          className="grid w-full grid-cols-2"
         >
           <h2
             data-role="deck-name"

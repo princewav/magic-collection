@@ -258,12 +258,13 @@ export function DeckCardGrid({
                 {cardsInGroup.map((card) => (
                   <div
                     key={card.id}
-                    className="bg-card group hover:bg-accent/5 flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm"
+                    className="bg-card group hover:bg-secondary/10 flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm"
                     onClick={() => openModal(card, cardsWithQuantity)}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex w-full items-center gap-3">
+                      {/* Quantity & Image & Collected */}
                       <div className="flex items-center gap-2">
-                        <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
                           {card.quantity}x
                         </div>
                         {card.image_uris?.art_crop && (
@@ -272,34 +273,61 @@ export function DeckCardGrid({
                             alt=""
                             width={40}
                             height={40}
-                            className="h-10 w-10 rounded-sm object-cover"
+                            className="size-7 sm:size-9 rounded-sm object-cover"
                           />
                         )}
-                        {collectedCards?.find((c) => c.name === card.name)
+                        {/* {collectedCards?.find((c) => c.name === card.name)
                           ?.quantity ? (
                           <div className="bg-accent h-2 w-2 rotate-45 transform" />
-                        ) : null}
+                        ) : null} */}
                       </div>
-                      <span className="font-medium">{card.name}</span>
-                      <span className="text-muted-foreground text-sm">
-                        [{card.set.toUpperCase()}]
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {card.mana_cost && (
-                        <div className="flex items-center">
-                          <TextWithSymbols
-                            text={card.mana_cost}
-                            symbolSize={18}
-                            symbolClassName="mx-0.5"
-                          />
+                      {/* Main Content Area */}
+                      <div className="ml-2 flex w-full gap-2 sm:gap-0 sm:flex-col overflow-x-auto">
+                        {/* Row 1: Name */}
+                        <div>
+                          <span className="min-w-0 flex-1 truncate font-medium">
+                            {card.name}
+                          </span>
                         </div>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-sm">
-                          CMC: {card.cmc}
-                        </span>
+                        {/* Row 2: Set + Mana */}
+                        <div className="flex items-center gap-2 justify-between w-full sm:justify-start">
+                          <span className="text-muted-foreground inline-block font-mono text-sm">
+                            [{card.set.toUpperCase()}]
+                          </span>
+                          {card.mana_cost && (
+                            <p className="flex items-center">
+                              <TextWithSymbols
+                                text={card.mana_cost}
+                                symbolSize={18}
+                                symbolClassName="mx-0.5"
+                              />
+                            </p>
+                          )}
+                        </div>
                       </div>
+                    </div>
+                    {/* Right side: Type Line & P/T */}
+                    <div className="ml-4 flex-col items-end text-right hidden sm:flex">
+                      <span className="text-muted-foreground min-w-0 truncate text-xs">
+                        {card.type_line?.split(' — ')[0]}
+                      </span>
+                      {/* Combined second type line part and P/T */}
+                      {(card.type_line?.includes(' — ') ||
+                        (card.power != null && card.toughness != null)) && (
+                        <span className="text-muted-foreground/60 min-w-0 truncate text-xs">
+                          {card.type_line?.includes(' — ') &&
+                            card.type_line?.split(' — ')[1]}
+                          {card.type_line?.includes(' — ') &&
+                            card.power != null &&
+                            card.toughness != null &&
+                            ' - '}
+                          {card.power != null && card.toughness != null && (
+                            <span className="font-semibold">
+                              {card.power}/{card.toughness}
+                            </span>
+                          )}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
