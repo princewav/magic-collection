@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, List, Grid2X2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DeckContainerProps {
   deck: any;
@@ -35,19 +35,23 @@ export function DeckContainer({
     .reduce((a: number, b: number) => a + b, 0);
 
   const toggleLayout = () => {
-    setIsGridView(!isGridView);
-    // Optional: Add localStorage persistence here if needed
-    // const newLayout = !isGridView;
-    // localStorage.setItem(`deckLayout-global`, newLayout ? 'grid' : 'list');
+    setIsGridView((prev) => {
+      const newLayout = !prev;
+      // Save the new layout preference to localStorage
+      localStorage.setItem('deckViewLayout', newLayout ? 'grid' : 'list');
+      return newLayout;
+    });
   };
 
-  // Optional: Load layout preference from localStorage
-  // useEffect(() => {
-  //   const savedLayout = localStorage.getItem('deckLayout-global');
-  //   if (savedLayout) {
-  //     setIsGridView(savedLayout === 'grid');
-  //   }
-  // }, []);
+  // Load layout preference from localStorage on initial mount
+  useEffect(() => {
+    const savedLayout = localStorage.getItem('deckViewLayout');
+    // Only set state if a value was found in localStorage
+    if (savedLayout !== null) {
+      setIsGridView(savedLayout === 'grid');
+    }
+    // If no value is found, it defaults to the useState initial value (true/grid)
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
     <div
@@ -118,15 +122,20 @@ export function DeckContainer({
               </TabsList>
               <p
                 data-role="tab-title-with-count"
-                className="flex flex-col md:flex-row md:gap-2 md:text-lg font-semibold capitalize justify-center items-center md:items-baseline"
+                className="flex flex-col items-center justify-center font-semibold capitalize md:flex-row md:items-baseline md:gap-2 md:text-lg"
               >
                 <span data-role="tab-title">
                   {activeTab === 'maindeck' ? 'Main Deck' : 'Sideboard'}
                 </span>
-                <span data-role="tab-count" className="text-sm text-muted-foreground">
-                  ({activeTab === 'maindeck'
+                <span
+                  data-role="tab-count"
+                  className="text-muted-foreground text-sm"
+                >
+                  (
+                  {activeTab === 'maindeck'
                     ? maindeckQuantity
-                    : sideboardQuantity}{' cards'})
+                    : sideboardQuantity}
+                  {' cards'})
                 </span>
               </p>
               <Button

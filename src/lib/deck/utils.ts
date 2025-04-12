@@ -19,3 +19,65 @@ export function calculateRarityTotals(
     {} as Record<string, number>,
   );
 }
+
+export function groupCardsByType(
+  cards: CardWithQuantity[],
+): Record<string, CardWithQuantity[]> {
+  const groups: Record<string, CardWithQuantity[]> = {
+    creature: [],
+    planeswalker: [],
+    instant: [],
+    sorcery: [],
+    artifact: [],
+    enchantment: [],
+    land: [],
+    other: [],
+  };
+
+  if (!cards) {
+    return groups;
+  }
+
+  cards.forEach((card) => {
+    const typeLine = card.type_line || '';
+    const primaryType = typeLine.split(' — ')[0]?.trim().toLowerCase() || '';
+    let groupAssigned = false;
+
+    if (primaryType.includes('creature')) {
+      groups.creature.push(card);
+      groupAssigned = true;
+    } else if (primaryType.includes('planeswalker')) {
+      groups.planeswalker.push(card);
+      groupAssigned = true;
+    } else if (primaryType.includes('instant')) {
+      groups.instant.push(card);
+      groupAssigned = true;
+    } else if (primaryType.includes('sorcery')) {
+      groups.sorcery.push(card);
+      groupAssigned = true;
+    } else if (primaryType.includes('artifact')) {
+      groups.artifact.push(card);
+      groupAssigned = true;
+    } else if (primaryType.includes('enchantment')) {
+      groups.enchantment.push(card);
+      groupAssigned = true;
+    } else if (primaryType.includes('land')) {
+      groups.land.push(card);
+      groupAssigned = true;
+    }
+
+    if (!groupAssigned) {
+      // Fallback for types not explicitly handled or if type_line is missing/malformed
+      groups.other.push(card);
+    }
+  });
+
+  // Optional: Remove empty groups if desired
+  Object.keys(groups).forEach((key) => {
+    if (groups[key].length === 0) {
+      delete groups[key];
+    }
+  });
+
+  return groups;
+}
