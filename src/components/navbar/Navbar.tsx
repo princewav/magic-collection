@@ -12,8 +12,6 @@ import { ListItem } from './NavListItem';
 
 const Navbar: React.FC<{}> = () => {
   const pathname = usePathname();
-  console.log('pathname', pathname);
-
   return (
     <nav
       className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t p-1 px-4 text-xs shadow-md md:relative md:bottom-auto md:border-t-0 md:px-4 md:py-1 md:text-sm"

@@ -203,7 +203,6 @@ export function Filters({ className }: { className?: string }) {
       sortFields: newFields,
       exactColorMatch,
     });
-    console.log('sortFields', newFields);
   };
 
   // Remove sort field

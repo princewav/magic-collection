@@ -32,8 +32,6 @@ export const WishlistInfo = ({ wishlist }: Props) => {
 
   const colors = getColors();
 
-  console.log(wishlist.cards);
-
   const totalQuantity = wishlist.cards.reduce((acc, card) => {
     return acc + card.quantity;
   }, 0);

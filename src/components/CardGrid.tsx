@@ -69,7 +69,7 @@ export function CardGrid() {
           <div key={`${card.id}-${index}`} className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]">
             <div
               onClick={() => openModal(card, cards)}
-              className="cursor-pointer"
+              className="cursor-pointer h-full"
             >
               <Card card={{ ...card, quantity: 0 }} />
             </div>
