@@ -109,7 +109,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
             <div key={groupName}>
               <h2 className="text-md mb-2 font-semibold capitalize">
@@ -125,7 +125,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                   <div
                     key={card.cardId}
                     onClick={() => openModal(card, wishlist.cards)}
-                    className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between rounded-xl border p-3 shadow-sm"
+                    className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm"
                   >
                     <div className="flex items-center gap-3">
                       <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
@@ -143,25 +143,21 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                       <span className="min-w-0 flex-1 truncate font-medium">
                         {card.name}
                       </span>
+                      <span className="text-muted-foreground hidden sm:inline text-sm ">
+                        [{card.set.toUpperCase()}]
+                      </span>
                     </div>
-                    <div className="flex flex-shrink-0 items-center gap-4">
+                    <div className="flex flex-shrink-0 items-center gap-4 ml-2">
                       {card.mana_cost && (
                         <div className="flex items-center">
                           <TextWithSymbols
                             text={card.mana_cost}
-                            symbolSize={16}
+                            symbolSize={20}
                             symbolClassName="mx-0.5"
                           />
                         </div>
                       )}
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-sm">
-                          CMC: {card.cmc}
-                        </span>
-                      </div>
-                      <span className="text-muted-foreground hidden text-sm sm:inline">
-                        [{card.set.toUpperCase()}]
-                      </span>
+                      
                     </div>
                   </div>
                 ))}
