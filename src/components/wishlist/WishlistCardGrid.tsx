@@ -38,10 +38,10 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
         const isLandA = a.type_line?.toLowerCase().includes('land') || false;
         const isLandB = b.type_line?.toLowerCase().includes('land') || false;
         if (isLandA !== isLandB) return isLandA ? 1 : -1;
+        if (a.cmc !== b.cmc) return a.cmc - b.cmc;
         const colorA = (a.colors || []).join('');
         const colorB = (b.colors || []).join('');
         if (colorA !== colorB) return colorA.localeCompare(colorB);
-        if (a.cmc !== b.cmc) return a.cmc - b.cmc;
         return a.name.localeCompare(b.name);
       });
       const groups = groupCardsByType(sortedCards);
@@ -59,15 +59,20 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
 
   if (!wishlist.cards || wishlist.cards.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-lg border border-dashed">
-        <p className="text-muted-foreground">No cards in this wishlist</p>
+      <div
+        data-role="empty-state"
+        className="flex h-64 items-center justify-center rounded-lg border border-dashed"
+      >
+        <p data-role="empty-text" className="text-muted-foreground">
+          No cards in this wishlist
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
+    <div data-role="container" className="space-y-4">
+      <div data-role="layout-toggle-wrapper" className="flex justify-end">
         <Button
           variant="outline"
           size="icon"
@@ -84,10 +89,13 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
       </div>
 
       {isGridView ? (
-        <div className="space-y-6 px-6 sm:px-0">
+        <div data-role="grid-view" className="space-y-6 px-6 sm:px-0">
           {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
-            <div key={groupName}>
-              <h2 className="mb-3 text-lg font-semibold capitalize">
+            <div data-role="grid-group" key={groupName}>
+              <h2
+                data-role="group-title"
+                className="mb-3 text-lg font-semibold capitalize"
+              >
                 {capitalize(groupName)} (
                 {cardsInGroup.reduce(
                   (sum, card) => sum + (card.quantity || 0),
@@ -95,7 +103,10 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                 )}
                 )
               </h2>
-              <div className="relative justify-start gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0">
+              <div
+                data-role="card-grid"
+                className="relative justify-start gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0"
+              >
                 {cardsInGroup.map((card) => (
                   <Card
                     key={card.cardId}
@@ -109,10 +120,16 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div
+          data-role="list-view"
+          className="grid grid-cols-1 gap-4 lg:grid-cols-2"
+        >
           {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
-            <div key={groupName}>
-              <h2 className="text-md mb-2 font-semibold capitalize">
+            <div data-role="list-group" key={groupName}>
+              <h2
+                data-role="group-title"
+                className="text-md mb-2 font-semibold capitalize"
+              >
                 {capitalize(groupName)} (
                 {cardsInGroup.reduce(
                   (sum, card) => sum + (card.quantity || 0),
@@ -120,15 +137,22 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                 )}
                 )
               </h2>
-              <div className="space-y-2">
+              <div data-role="card-list" className="space-y-2">
                 {cardsInGroup.map((card) => (
                   <div
+                    data-role="card-row"
                     key={card.cardId}
                     onClick={() => openModal(card, wishlist.cards)}
                     className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
+                    <div
+                      data-role="card-info"
+                      className="flex w-full items-center gap-3"
+                    >
+                      <div
+                        data-role="card-quantity"
+                        className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold"
+                      >
                         {card.quantity}x
                       </div>
                       {card.image_uris?.art_crop && (
@@ -140,24 +164,45 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                           className="h-10 w-10 rounded-sm object-cover"
                         />
                       )}
-                      <span className="min-w-0 flex-1 truncate font-medium">
-                        {card.name}
-                      </span>
-                      <span className="text-muted-foreground hidden sm:inline text-sm ">
-                        [{card.set.toUpperCase()}]
-                      </span>
-                    </div>
-                    <div className="flex flex-shrink-0 items-center gap-4 ml-2">
-                      {card.mana_cost && (
-                        <div className="flex items-center">
-                          <TextWithSymbols
-                            text={card.mana_cost}
-                            symbolSize={20}
-                            symbolClassName="mx-0.5"
-                          />
+                      <div className="flex w-full flex-col">
+                        <div data-role="row-1" className="col-span-">
+                          <span
+                            data-role="card-name"
+                            className="min-w-0 flex-1 truncate font-medium"
+                          >
+                            {card.name}
+                          </span>
                         </div>
-                      )}
-                      
+                        <div
+                          data-role="row-2"
+                          className="flex items-center gap-2"
+                        >
+                          <span
+                            data-role="card-set"
+                            className="text-muted-foreground font-mono text-sm"
+                          >
+                            [{card.set.toUpperCase()}]
+                          </span>
+                          {card.mana_cost && (
+                            <p className="flex items-center">
+                              <TextWithSymbols
+                                text={card.mana_cost}
+                                symbolSize={18}
+                                symbolClassName="mx-0.5"
+                              />
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm">€{card.prices?.eur}</span>
+                        <span className="text-muted-foreground truncate text-sm">
+                          Tot. €
+                          {(
+                            parseFloat(card.prices?.eur || '0') * card.quantity
+                          ).toFixed(2)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
