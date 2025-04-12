@@ -43,7 +43,7 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu, className }) =>
     <div
       key={deck.id}
       className={cn(
-        'group bg-card hover:bg-card/90 border-muted relative min-w-45 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg isolate',
+        'group bg-card hover:bg-card/90 border-muted relative isolate min-w-45 overflow-hidden rounded-lg border shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg',
         className,
         isChecked
           ? 'bg-foreground/10 hover:bg-foreground/20 scale-[1.06] hover:scale-[1.07]'
@@ -52,27 +52,30 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu, className }) =>
     >
       <Checkbox
         id={`deck-${deck.id}`}
-        className="border-white/30 text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-7 cursor-pointer rounded-full border-3 shadow-sm "
+        className="text-primary focus:border-primary focus:ring-primary absolute top-2 left-2 z-10 size-7 cursor-pointer rounded-full border-3 border-white/30 shadow-sm"
         checked={isChecked}
         onCheckedChange={handleCheckboxChange}
         stroke={3}
         color="white"
       />
-      <Link href={`/decks/${type}/${deck.id}`} onContextMenu={handleContextMenu}>
+      <Link
+        href={`/decks/${type}/${deck.id}`}
+        onContextMenu={handleContextMenu}
+      >
         <div className="relative h-30 overflow-hidden">
           {deck.imageUrl ? (
             <Image
               src={deck.imageUrl}
               alt={deck.name}
               fill
-              className="object-cover"
+              className="object-cover object-[80%_20%]"
             />
           ) : (
             <div className="bg-muted flex h-full w-full items-center justify-center">
               <span className="text-muted-foreground">No image available</span>
             </div>
           )}
-          <div className="mt-2 text-white bg-black/70 absolute bottom-2 right-2 rounded-md px-2 py-1 text-sm">
+          <div className="absolute right-2 bottom-2 mt-2 rounded-md bg-black/70 px-2 py-1 text-sm text-white">
             {capitalize(deck.format || '')}
           </div>
         </div>

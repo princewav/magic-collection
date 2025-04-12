@@ -8,16 +8,23 @@ import { Grid2X2, List } from 'lucide-react';
 import { TextWithSymbols } from '@/components/card-modal/TextWithSymbols';
 import { useCardModal } from '@/context/CardModalContext';
 import CardModal from '@/components/card-modal/CardModal';
+import { groupCardsByType } from '@/lib/deck/utils';
+import { CardWithQuantity } from '@/types/card';
+import Image from 'next/image';
 
 interface Props {
   wishlist: Wishlist;
 }
 
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export const WishlistCardGrid = ({ wishlist }: Props) => {
   const [isGridView, setIsGridView] = useState(true);
+  const [groupedCards, setGroupedCards] = useState<
+    Record<string, CardWithQuantity[]>
+  >({});
   const { openModal } = useCardModal();
 
-  // Load layout preference from localStorage
   useEffect(() => {
     const savedLayout = localStorage.getItem('wishlistLayout');
     if (savedLayout) {
@@ -25,7 +32,25 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
     }
   }, []);
 
-  // Save layout preference
+  useEffect(() => {
+    if (wishlist && wishlist.cards) {
+      const sortedCards = [...wishlist.cards].sort((a, b) => {
+        const isLandA = a.type_line?.toLowerCase().includes('land') || false;
+        const isLandB = b.type_line?.toLowerCase().includes('land') || false;
+        if (isLandA !== isLandB) return isLandA ? 1 : -1;
+        const colorA = (a.colors || []).join('');
+        const colorB = (b.colors || []).join('');
+        if (colorA !== colorB) return colorA.localeCompare(colorB);
+        if (a.cmc !== b.cmc) return a.cmc - b.cmc;
+        return a.name.localeCompare(b.name);
+      });
+      const groups = groupCardsByType(sortedCards);
+      setGroupedCards(groups);
+    } else {
+      setGroupedCards({});
+    }
+  }, [wishlist]);
+
   const toggleLayout = () => {
     const newLayout = !isGridView;
     setIsGridView(newLayout);
@@ -59,49 +84,88 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
       </div>
 
       {isGridView ? (
-        <div className="relative justify-center gap-4 space-y-4 px-6 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0 sm:px-0">
-          {wishlist.cards.map((card) => (
-            <Card
-              key={card.cardId}
-              card={card}
-              onClick={() => openModal(card, wishlist.cards)}
-              className="mx-auto w-full max-w-[320px]"
-            />
+        <div className="space-y-6 px-6 sm:px-0">
+          {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
+            <div key={groupName}>
+              <h2 className="mb-3 text-lg font-semibold capitalize">
+                {capitalize(groupName)} (
+                {cardsInGroup.reduce(
+                  (sum, card) => sum + (card.quantity || 0),
+                  0,
+                )}
+                )
+              </h2>
+              <div className="relative justify-start gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0">
+                {cardsInGroup.map((card) => (
+                  <Card
+                    key={card.cardId}
+                    card={card}
+                    onClick={() => openModal(card, wishlist.cards)}
+                    className="mx-auto mb-4 w-full max-w-[320px] sm:mb-0"
+                  />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       ) : (
-        <div className="space-y-2">
-          {wishlist.cards.map((card) => (
-            <div
-              key={card.cardId}
-              onClick={() => openModal(card, wishlist.cards)}
-              className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between rounded-xl border p-3 shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
-                  {card.quantity}x
-                </div>
-                <span className="font-medium">{card.name}</span>
-                <span className="text-muted-foreground text-sm">
-                  [{card.set.toUpperCase()}]
-                </span>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
+            <div key={groupName}>
+              <h2 className="text-md mb-2 font-semibold capitalize">
+                {capitalize(groupName)} (
+                {cardsInGroup.reduce(
+                  (sum, card) => sum + (card.quantity || 0),
+                  0,
+                )}
+                )
+              </h2>
+              <div className="space-y-2">
+                {cardsInGroup.map((card) => (
+                  <div
+                    key={card.cardId}
+                    onClick={() => openModal(card, wishlist.cards)}
+                    className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between rounded-xl border p-3 shadow-sm"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
+                        {card.quantity}x
+                      </div>
+                      {card.image_uris?.art_crop && (
+                        <Image
+                          src={card.image_uris.art_crop}
+                          alt=""
+                          width={40}
+                          height={40}
+                          className="h-10 w-10 rounded-sm object-cover"
+                        />
+                      )}
+                      <span className="min-w-0 flex-1 truncate font-medium">
+                        {card.name}
+                      </span>
+                    </div>
+                    <div className="flex flex-shrink-0 items-center gap-4">
+                      {card.mana_cost && (
+                        <div className="flex items-center">
+                          <TextWithSymbols
+                            text={card.mana_cost}
+                            symbolSize={16}
+                            symbolClassName="mx-0.5"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground text-sm">
+                          CMC: {card.cmc}
+                        </span>
+                      </div>
+                      <span className="text-muted-foreground hidden text-sm sm:inline">
+                        [{card.set.toUpperCase()}]
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
-              {card.mana_cost && (
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center">
-                    <TextWithSymbols
-                      text={card.mana_cost}
-                      symbolSize={16}
-                      symbolClassName="mx-0.5"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm">
-                      CMC: {card.cmc}
-                    </span>
-                  </div>
-                </div>
-              )}
             </div>
           ))}
         </div>

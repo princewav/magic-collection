@@ -32,7 +32,7 @@ export const WishlistGrid = ({ wishlists }: WishlistGridProps) => {
   };
 
   return (
-    <div className="relative justify-center gap-6 px-6 space-y-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0 sm:px-0">
+    <div className="relative justify-start gap-6 px-6 space-y-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0 sm:px-0">
       {selectedWishlists.length > 0 && (
         <WishlistSelectionActions wishlistCount={selectedWishlists.length} />
       )}
