@@ -20,6 +20,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
+      data-role="card-container"
       className={cn(
         'bg-foreground/10 relative flex h-full w-full transform cursor-pointer flex-col items-center justify-center rounded-md p-2 shadow-md transition-transform',
         className,
@@ -27,15 +28,26 @@ export function Card({
       onClick={onClick}
     >
       {collectedQuantity !== undefined && (
-        <div className="mb-2 flex w-full justify-center space-x-3 overflow-hidden">
+        <div
+          data-role="quantity-indicators"
+          className="mb-2 flex w-full justify-center space-x-3 overflow-hidden"
+        >
           {Array.from(
             { length: Math.min(collectedQuantity, card.quantity) },
             (_, i) => (
-              <div key={i} className="bg-accent h-2 w-2 rotate-45 transform" />
+              <div
+                data-role="collected-indicator"
+                key={i}
+                className="bg-accent h-2 w-2 rotate-45 transform"
+              />
             ),
           )}
           {Array.from({ length: card.quantity - collectedQuantity }, (_, i) => (
-            <div key={i} className="h-2 w-2 rotate-45 transform bg-gray-500" />
+            <div
+              data-role="missing-indicator"
+              key={i}
+              className="h-2 w-2 rotate-45 transform bg-gray-500"
+            />
           ))}
         </div>
       )}
@@ -49,13 +61,26 @@ export function Card({
           style={{ aspectRatio: '0.72', width: '100%', height: 'auto' }}
         />
       ) : (
-        <div className="flex h-32 w-full flex-col items-center justify-center rounded-t-md bg-transparent">
-          <p className="text-center text-lg font-semibold">{card.name}</p>
-          <p className="text-sm text-gray-600">No image available</p>
-          <p className="text-sm text-gray-600">
+        <div
+          data-role="no-image-fallback"
+          className="flex h-32 w-full flex-col items-center justify-center rounded-t-md bg-transparent"
+        >
+          <p
+            data-role="card-name-fallback"
+            className="text-center text-lg font-semibold"
+          >
+            {card.name}
+          </p>
+          <p data-role="no-image-text" className="text-sm text-gray-600">
+            No image available
+          </p>
+          <p data-role="oracle-text-fallback" className="text-sm text-gray-600">
             Oracle: {card.oracle_text || 'N/A'}
           </p>
-          <p className="text-sm text-gray-600">
+          <p
+            data-role="power-toughness-fallback"
+            className="text-sm text-gray-600"
+          >
             Power/Toughness: {card.power}/{card.toughness}
           </p>
         </div>
