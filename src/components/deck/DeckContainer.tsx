@@ -25,6 +25,10 @@ export function DeckContainer({
   type,
 }: DeckContainerProps) {
   const [isGridView, setIsGridView] = useState(true);
+  const [activeTab, setActiveTab] = useState('maindeck');
+
+  const maindeckQuantity = deck.maindeck.map((card: any) => card.quantity).reduce((a: number, b: number) => a + b, 0);
+  const sideboardQuantity = deck.sideboard.map((card: any) => card.quantity).reduce((a: number, b: number) => a + b, 0);
 
   const toggleLayout = () => {
     setIsGridView(!isGridView);
@@ -75,12 +79,24 @@ export function DeckContainer({
         </div>
         <CardModalProvider>
           <DeckInfo deck={deck} />
-          <Tabs defaultValue="maindeck" className="mt-4">
+          <Tabs
+            defaultValue="maindeck"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="mt-4"
+          >
             <div className="mb-2 flex items-center justify-between">
               <TabsList>
                 <TabsTrigger value="maindeck">Main Deck</TabsTrigger>
                 <TabsTrigger value="sideboard">Sideboard</TabsTrigger>
               </TabsList>
+              <h2 className="font-semibold text-lg">
+                {activeTab === 'maindeck' ? 'Main Deck' : 'Sideboard'} (
+                {activeTab === 'maindeck'
+                  ? maindeckQuantity
+                  : sideboardQuantity}{' '}
+                cards)
+              </h2>
               <Button
                 variant="outline"
                 size="icon"
