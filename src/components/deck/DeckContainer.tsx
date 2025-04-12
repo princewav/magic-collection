@@ -27,8 +27,12 @@ export function DeckContainer({
   const [isGridView, setIsGridView] = useState(true);
   const [activeTab, setActiveTab] = useState('maindeck');
 
-  const maindeckQuantity = deck.maindeck.map((card: any) => card.quantity).reduce((a: number, b: number) => a + b, 0);
-  const sideboardQuantity = deck.sideboard.map((card: any) => card.quantity).reduce((a: number, b: number) => a + b, 0);
+  const maindeckQuantity = deck.maindeck
+    .map((card: any) => card.quantity)
+    .reduce((a: number, b: number) => a + b, 0);
+  const sideboardQuantity = deck.sideboard
+    .map((card: any) => card.quantity)
+    .reduce((a: number, b: number) => a + b, 0);
 
   const toggleLayout = () => {
     setIsGridView(!isGridView);
@@ -46,9 +50,16 @@ export function DeckContainer({
   // }, []);
 
   return (
-    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-[theme(spacing.16)_1fr_theme(spacing.16)]">
-      <div className="hidden md:flex md:flex-col md:items-center md:justify-start md:pt-4">
+    <div
+      data-role="deck-container-layout"
+      className="grid grid-cols-1 gap-4 p-4 md:grid-cols-[theme(spacing.16)_1fr_theme(spacing.16)]"
+    >
+      <div
+        data-role="back-link-desktop-container"
+        className="hidden md:flex md:flex-col md:items-center md:justify-start md:pt-4"
+      >
         <Link
+          data-role="back-link-desktop"
           href={`/decks/${type}`}
           className="flex flex-col items-center justify-center gap-1"
         >
@@ -59,19 +70,31 @@ export function DeckContainer({
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <span className="text-muted-foreground text-xs">To decks</span>
+          <span
+            data-role="back-link-text-desktop"
+            className="text-muted-foreground text-xs"
+          >
+            To decks
+          </span>
         </Link>
       </div>
 
-      <div className="container mx-auto">
-        <div className="flex justify-start md:hidden">
+      <div data-role="main-content-area" className="container mx-auto">
+        <div
+          data-role="back-link-mobile-container"
+          className="flex justify-start md:hidden"
+        >
           <Link
+            data-role="back-link-mobile"
             href={`/decks/${type}`}
             className="flex items-center justify-center gap-1"
           >
             <Button variant="outline" size="sm" className="mb-2 gap-2">
               <ArrowLeft className="h-4 w-4" />
-              <span className="text-muted-foreground text-xs">
+              <span
+                data-role="back-link-text-mobile"
+                className="text-muted-foreground text-xs"
+              >
                 To {type} decks
               </span>
             </Button>
@@ -85,19 +108,29 @@ export function DeckContainer({
             onValueChange={setActiveTab}
             className="mt-4"
           >
-            <div className="mb-2 flex items-center justify-between">
+            <div
+              data-role="tabs-header"
+              className="mb-2 flex items-center justify-between"
+            >
               <TabsList>
                 <TabsTrigger value="maindeck">Main Deck</TabsTrigger>
                 <TabsTrigger value="sideboard">Sideboard</TabsTrigger>
               </TabsList>
-              <h2 className="font-semibold text-lg">
-                {activeTab === 'maindeck' ? 'Main Deck' : 'Sideboard'} (
-                {activeTab === 'maindeck'
-                  ? maindeckQuantity
-                  : sideboardQuantity}{' '}
-                cards)
-              </h2>
+              <p
+                data-role="tab-title-with-count"
+                className="flex flex-col md:flex-row md:gap-2 md:text-lg font-semibold capitalize justify-center items-center md:items-baseline"
+              >
+                <span data-role="tab-title">
+                  {activeTab === 'maindeck' ? 'Main Deck' : 'Sideboard'}
+                </span>
+                <span data-role="tab-count" className="text-sm text-muted-foreground">
+                  ({activeTab === 'maindeck'
+                    ? maindeckQuantity
+                    : sideboardQuantity}{' cards'})
+                </span>
+              </p>
               <Button
+                data-role="layout-toggle-button"
                 variant="outline"
                 size="icon"
                 onClick={toggleLayout}
@@ -136,7 +169,7 @@ export function DeckContainer({
         </CardModalProvider>
       </div>
 
-      <div className="hidden md:block"></div>
+      <div data-role="spacer-right" className="hidden md:block"></div>
     </div>
   );
 }
