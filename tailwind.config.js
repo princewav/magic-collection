@@ -9,7 +9,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'latin-946': ['946Latin', 'sans-serif'],
+        sans: ['var(--font-geist-sans)'],
+        mono: ['var(--font-geist-mono)'],
       },
       colors: {
         text: {

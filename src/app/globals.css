@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+/* @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap'); */ /* Removed Google Font import */
 
 @font-face {
   font-family: 'Industry';
@@ -18,7 +19,7 @@
   --color-background: var(--background-50);
   --color-foreground: var(--text-900);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-geist-mono); /* Removed fallback */
   --color-sidebar-ring: var(--primary-700);
   --color-sidebar-border: var(--background-200);
   --color-sidebar-accent-foreground: var(--text-900);
@@ -59,6 +60,7 @@
 :root {
   --background: var(--background-50);
   --foreground: var(--text-900);
+  --font-mono: var(--font-geist-mono); /* Removed fallback */
   --card: var(--background-50);
   --card-foreground: var(--text-900);
   --popover: var(--background-50);
@@ -157,6 +159,7 @@
 .dark {
   --background: var(--background-950);
   --foreground: var(--text-50);
+  --font-mono: var(--font-geist-mono); /* Removed fallback */
   --card: var(--background-950);
   --card-foreground: var(--text-50);
   --popover: var(--background-950);
@@ -258,10 +261,10 @@
   body {
     @apply bg-background text-foreground;
   }
-  h1, h2 {
+  h1,
+  h2 {
     font-family: 'Industry', sans-serif;
     text-transform: uppercase;
-    letter-spacing: 0.00em;
+    letter-spacing: 0em;
   }
-
 }
