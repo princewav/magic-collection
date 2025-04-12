@@ -4,13 +4,38 @@ import { useCardModal } from '@/context/CardModalContext';
 import Image from 'next/image';
 import { Card as CardType } from '@/types/card';
 import { cn } from '@/lib/utils';
-
 interface CardProps {
   card: CardType & { quantity: number };
   collectedQuantity?: number;
   className?: string;
   onClick?: () => void;
 }
+
+const NoImageFallback = ({ card }: { card: CardType }) => (
+  <div
+    data-role="no-image-fallback"
+    className="flex h-32 w-full flex-col items-center justify-center rounded-t-md bg-transparent"
+  >
+    <p
+      data-role="card-name-fallback"
+      className="text-center text-lg font-semibold"
+    >
+      {card.name}
+    </p>
+    <p data-role="no-image-text" className="text-sm text-gray-600">
+      No image available
+    </p>
+    <p data-role="oracle-text-fallback" className="text-sm text-gray-600">
+      Oracle: {card.oracle_text || 'N/A'}
+    </p>
+    <p
+      data-role="power-toughness-fallback"
+      className="text-sm text-gray-600"
+    >
+      Power/Toughness: {card.power}/{card.toughness}
+    </p>
+  </div>
+);
 
 export function Card({
   card,
@@ -61,29 +86,7 @@ export function Card({
           style={{ aspectRatio: '0.72', width: '100%', height: 'auto' }}
         />
       ) : (
-        <div
-          data-role="no-image-fallback"
-          className="flex h-32 w-full flex-col items-center justify-center rounded-t-md bg-transparent"
-        >
-          <p
-            data-role="card-name-fallback"
-            className="text-center text-lg font-semibold"
-          >
-            {card.name}
-          </p>
-          <p data-role="no-image-text" className="text-sm text-gray-600">
-            No image available
-          </p>
-          <p data-role="oracle-text-fallback" className="text-sm text-gray-600">
-            Oracle: {card.oracle_text || 'N/A'}
-          </p>
-          <p
-            data-role="power-toughness-fallback"
-            className="text-sm text-gray-600"
-          >
-            Power/Toughness: {card.power}/{card.toughness}
-          </p>
-        </div>
+        <NoImageFallback card={card} />
       )}
     </div>
   );
