@@ -143,7 +143,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                     data-role="card-row"
                     key={card.cardId}
                     onClick={() => openModal(card, wishlist.cards)}
-                    className="hover:bg-accent/5 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm"
+                    className="hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm"
                   >
                     <div
                       data-role="card-info"
@@ -151,7 +151,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                     >
                       <div
                         data-role="card-quantity"
-                        className="bg-background/80 flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold"
                       >
                         {card.quantity}x
                       </div>
@@ -194,15 +194,20 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                           )}
                         </div>
                       </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-sm">€{card.prices?.eur}</span>
-                        <span className="text-muted-foreground truncate text-sm">
-                          Tot. €
-                          {(
-                            parseFloat(card.prices?.eur || '0') * card.quantity
-                          ).toFixed(2)}
-                        </span>
-                      </div>
+                      {card.prices?.eur && (
+                        <div className="flex flex-col items-end">
+                          <span className="text-sm font-semibold">
+                            €{card.prices?.eur}
+                          </span>
+                          <span className="text-muted-foreground truncate text-sm">
+                            Tot. €
+                            {(
+                              parseFloat(card.prices?.eur || '0') *
+                              card.quantity
+                            ).toFixed(2)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
