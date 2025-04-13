@@ -21,7 +21,6 @@ import { cn } from '@/lib/utils';
 
 function getTriggerStyleClasses(active?: boolean) {
   return cn(
-    navigationMenuTriggerStyle(),
     'inline-flex h-auto w-max flex-col items-center justify-center gap-0.5 rounded-md px-4 py-1 text-xs font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 md:flex-row md:gap-2 md:text-sm',
     'hover:bg-accent/10 focus:bg-accent/20',
     active
@@ -115,7 +114,7 @@ const Navbar: React.FC<{}> = () => {
         {/* --- Responsive Viewport --- */}
         {/* Positioned below triggers on mobile (bottom nav), above on desktop */}
         {/* Added translate-y to create separation from the navbar */}
-        <div className="absolute right-0 bottom-full left-0 flex -translate-y-26 justify-center md:top-full md:right-auto md:bottom-auto md:left-auto md:translate-y-1">
+        <div className="absolute right-0 bottom-full left-0 flex -translate-y-26 justify-center md:top-full md:right-auto md:bottom-auto md:left-auto md:translate-y-2">
           <NavigationMenuViewport className="origin-bottom-center md:origin-top-center data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 bg-popover text-popover-foreground relative mt-0 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow-lg md:w-[var(--radix-navigation-menu-viewport-width)]" />
         </div>
       </NavigationMenu>
