@@ -6,6 +6,30 @@ import React, { useEffect, useRef, useState } from 'react';
 // --- Define animation durations ---
 const ANIMATION_DURATION = 100; // ms - Match this with Tailwind duration class
 
+export function getStyleClasses(
+  active: boolean | undefined,
+  className: string | undefined,
+) {
+  return cn(
+    // hover and focus states
+    'hover:bg-accent/10',
+    'focus:bg-accent/20',
+    // layout and spacing
+    'inline-flex w-max items-center justify-center',
+    'rounded-md py-1 text-xs font-medium transition-colors',
+    'focus:outline-none disabled:pointer-events-none',
+    'px-4 disabled:opacity-50 md:text-sm',
+    // flex properties
+    'flex flex-col items-center gap-0.5',
+    'md:flex-row md:gap-2',
+    // active state
+    active
+      ? 'bg-secondary/30 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold'
+      : '',
+    className,
+  );
+}
+
 export const NavDropdown = ({
   triggerContent,
   children,
@@ -107,21 +131,7 @@ export const NavDropdown = ({
     >
       <button
         type="button"
-        className={cn(
-          // --- Existing styles ---
-          'hover:bg-accent/20',
-          'focus:bg-accent/40',
-          'inline-flex w-max items-center justify-center',
-          'rounded-md px-4 py-2 text-xs font-medium transition-colors',
-          'focus:outline-none disabled:pointer-events-none',
-          'disabled:opacity-50 md:text-sm',
-          'flex flex-col items-center gap-0.5',
-          'md:flex-row md:gap-2',
-          // --- End Existing styles ---
-          className,
-          active &&
-            'bg-secondary/40 dark:bg-primary/30 dark:hover:bg-primary/40 font-semibold',
-        )}
+        className={getStyleClasses(active, className)}
         aria-haspopup="true"
         aria-expanded={isOpen}
         aria-label={`${label} menu`}
