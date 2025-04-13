@@ -127,7 +127,7 @@ export default function CardModal() {
 
         <button
           onClick={closeModal}
-          className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-4 right-4 flex size-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
+          className="bg-foreground/30 text-background hover:bg-foreground/50 active:bg-foreground/70 absolute top-4 right-4 z-10 flex size-8 cursor-pointer items-center justify-center rounded-full transition-all duration-300 hover:scale-110"
         >
           <X size={20} strokeWidth={4} />
         </button>
