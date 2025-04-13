@@ -33,11 +33,15 @@ const Navbar: React.FC<{}> = () => {
   const pathname = usePathname();
   return (
     <nav
+      data-role="navbar-container"
       className="bg-sidebar fixed right-0 bottom-0 left-0 z-10 flex border-t p-1 px-4 text-xs shadow-md md:relative md:bottom-auto md:border-t-0 md:px-4 md:py-1 md:text-sm"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="mr-2 flex items-center py-0.5 text-xl font-bold md:mr-4 md:block md:text-2xl">
+      <div
+        data-role="logo-container"
+        className="mr-2 flex items-center py-0.5 text-xl font-bold md:mr-4 md:block md:text-2xl"
+      >
         <Link href="/" aria-label="Home">
           <Logo className="w-15" />
         </Link>
@@ -53,10 +57,15 @@ const Navbar: React.FC<{}> = () => {
               className={getTriggerStyleClasses(pathname.startsWith('/decks'))}
             >
               <Book className="text-accent h-5 w-5" aria-hidden="true" />
-              <span className="text-xs md:text-base">Decks</span>
+              <span data-role="trigger-label" className="text-xs md:text-base">
+                Decks
+              </span>
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[150px] gap-1 p-2 md:w-[180px] md:gap-2 md:p-3">
+              <ul
+                data-role="dropdown-list"
+                className="grid w-[150px] gap-1 p-2 md:w-[180px] md:gap-2 md:p-3"
+              >
                 <ListItem
                   href="/decks/paper"
                   title="Paper Decks"
@@ -78,10 +87,15 @@ const Navbar: React.FC<{}> = () => {
               )}
             >
               <ListChecks className="text-accent h-5 w-5" aria-hidden="true" />
-              <span className="text-xs md:text-base">Collect</span>
+              <span data-role="trigger-label" className="text-xs md:text-base">
+                Collect
+              </span>
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid w-[150px] gap-1 p-2 md:w-[180px] md:gap-2 md:p-3">
+              <ul
+                data-role="dropdown-list"
+                className="grid w-[150px] gap-1 p-2 md:w-[180px] md:gap-2 md:p-3"
+              >
                 <ListItem
                   href="/collection/paper"
                   title="Paper Collection"
@@ -105,7 +119,9 @@ const Navbar: React.FC<{}> = () => {
                 active={pathname.startsWith('/wishlists')}
               >
                 <Heart className="text-accent size-5" aria-hidden="true" />
-                <span className="text-xs md:text-base">Wishlists</span>
+                <span data-role="link-label" className="text-xs md:text-base">
+                  Wishlists
+                </span>
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
@@ -114,12 +130,15 @@ const Navbar: React.FC<{}> = () => {
         {/* --- Responsive Viewport --- */}
         {/* Positioned below triggers on mobile (bottom nav), above on desktop */}
         {/* Added translate-y to create separation from the navbar */}
-        <div className="absolute right-0 bottom-full left-0 flex -translate-y-26 justify-center md:top-full md:right-auto md:bottom-auto md:left-auto md:translate-y-2">
+        <div
+          data-role="viewport-positioner"
+          className="absolute right-0 bottom-full left-0 flex -translate-y-26 justify-center md:top-full md:right-auto md:bottom-auto md:left-auto md:translate-y-2"
+        >
           <NavigationMenuViewport className="origin-bottom-center md:origin-top-center data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 bg-popover text-popover-foreground relative mt-0 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow-lg md:w-[var(--radix-navigation-menu-viewport-width)]" />
         </div>
       </NavigationMenu>
 
-      <div className="flex items-center">
+      <div data-role="theme-toggle-container" className="flex items-center">
         <ThemeToggle />
       </div>
     </nav>
