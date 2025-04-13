@@ -65,7 +65,7 @@ export const WishlistListCard = ({
     <div
       data-role="card-row"
       className={cn(
-        'hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm',
+        'hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-1 px-3 shadow-sm',
         className,
       )}
     >
