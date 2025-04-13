@@ -60,6 +60,12 @@ export async function mergeWishlists(
       0,
     );
 
+    // Calculate the total price
+    const totalPrice = mergedCardsArray.reduce(
+      (sum, card) => sum + card.price * card.quantity,
+      0,
+    );
+
     // Create the new merged wishlist
     const mergedWishlist = await wishlistService.repo.create({
       id: '',
@@ -67,6 +73,7 @@ export async function mergeWishlists(
       imageUrl: validWishlists[0]?.imageUrl || null,
       colors: Array.from(allColors) as any,
       cardCount: totalCardCount,
+      totalPrice: totalPrice,
       cards: mergedCardsArray,
     });
 

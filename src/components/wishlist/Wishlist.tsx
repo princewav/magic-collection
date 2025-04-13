@@ -75,15 +75,16 @@ export const Wishlist: React.FC<WishlistProps> = ({
             </div>
           )}
         </div>
-        <div className="p-4">
+        <div className="p-4 space-y-2">
           <h3 className="font-semibold">{wishlist.name}</h3>
-          <div className="text-muted-foreground mt-1 text-sm">
-            {wishlist.cardCount} {wishlist.cardCount === 1 ? 'card' : 'cards'}
-          </div>
-          <div className="mt-2 flex gap-2">
+          <div className=" flex gap-2">
             {wishlist.colors.map((color, index) => (
               <ManaSymbol key={index} symbol={color} />
             ))}
+          </div>
+          <div className="text-muted-foreground mt-1 text-sm">
+            {wishlist.cardCount} {wishlist.cardCount === 1 ? 'card' : 'cards'} •
+            €{(wishlist.totalPrice ?? 0).toFixed(2)}
           </div>
         </div>
       </Link>

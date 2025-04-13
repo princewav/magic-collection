@@ -38,6 +38,12 @@ export async function createWishlistFromMissingCards(deckId: string) {
       0,
     );
 
+    // Calculate the total price
+    const totalPrice = missingCards.reduce((sum, card) => {
+      const price = parseFloat(card.prices?.eur ?? '0') || 0;
+      return sum + price * card.quantity;
+    }, 0);
+
     // Create the wishlist
     const wishlist = await wishlistService.repo.create({
       id: '',
@@ -45,12 +51,14 @@ export async function createWishlistFromMissingCards(deckId: string) {
       imageUrl: deck.imageUrl,
       colors: deck.colors,
       cardCount: totalCardCount,
+      totalPrice: totalPrice,
       cards: missingCards.map((card) => ({
         cardId: card.cardId,
         name: card.name,
         set: card.set,
         quantity: card.quantity,
         setNumber: parseInt(card.collector_number) || 0,
+        price: parseFloat(card.prices?.eur ?? '0') || 0,
       })),
     });
 

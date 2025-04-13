@@ -30,6 +30,7 @@ export const createWishlist = async (
       imageUrl: values.imageUrl ?? null,
       colors: values.colors,
       cardCount: 0,
+      totalPrice: 0,
       cards: [],
     });
 

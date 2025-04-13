@@ -52,10 +52,17 @@ export async function updateCardQuantity(
       0,
     );
 
+    // Calculate the total price
+    const totalPrice = updatedCards.reduce(
+      (sum, card) => sum + card.price * card.quantity,
+      0,
+    );
+
     // Update the wishlist with the new cards array
     const updatedWishlist = await wishlistService.repo.update(wishlistId, {
       cards: updatedCards,
       cardCount: totalCardCount,
+      totalPrice: totalPrice,
     });
 
     revalidatePath('/wishlists');

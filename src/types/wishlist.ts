@@ -7,6 +7,7 @@ export type WishlistCard = {
   cardId: string;
   set: string;
   setNumber: number;
+  price: number;
 };
 
 export type WishlistInfo = {
@@ -15,6 +16,7 @@ export type WishlistInfo = {
   imageUrl: string | null;
   colors: ManaColor[];
   cardCount: number;
+  totalPrice: number;
 };
 
 export type DBWishlist = WishlistInfo & {
