@@ -141,6 +141,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                     key={card.cardId}
                     card={card}
                     onClick={() => openModal(card, wishlist.cards)}
+                    wishlistId={wishlist.id}
                   />
                 ))}
               </div>
