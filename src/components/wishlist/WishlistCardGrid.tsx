@@ -1,16 +1,15 @@
 'use client';
 
 import { Wishlist } from '@/types/wishlist';
-import { Card } from '@/components/Card';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Grid2X2, List } from 'lucide-react';
-import { TextWithSymbols } from '@/components/card-modal/TextWithSymbols';
 import { useCardModal } from '@/context/CardModalContext';
 import CardModal from '@/components/card-modal/CardModal';
 import { groupCardsByType } from '@/lib/deck/utils';
 import { CardWithQuantity } from '@/types/card';
-import Image from 'next/image';
+import { WishlistGridCard } from './WishlistGridCard';
+import { WishlistListCard } from './WishlistListCard';
 
 interface Props {
   wishlist: Wishlist;
@@ -108,11 +107,10 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                 className="relative justify-start gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0"
               >
                 {cardsInGroup.map((card) => (
-                  <Card
+                  <WishlistGridCard
                     key={card.cardId}
                     card={card}
                     onClick={() => openModal(card, wishlist.cards)}
-                    className="mx-auto mb-4 w-full max-w-[320px] sm:mb-0"
                   />
                 ))}
               </div>
@@ -139,77 +137,11 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
               </h2>
               <div data-role="card-list" className="space-y-2">
                 {cardsInGroup.map((card) => (
-                  <div
-                    data-role="card-row"
+                  <WishlistListCard
                     key={card.cardId}
+                    card={card}
                     onClick={() => openModal(card, wishlist.cards)}
-                    className="hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm"
-                  >
-                    <div
-                      data-role="card-info"
-                      className="flex w-full items-center gap-3"
-                    >
-                      <div
-                        data-role="card-quantity"
-                        className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold"
-                      >
-                        {card.quantity}x
-                      </div>
-                      {card.image_uris?.art_crop && (
-                        <Image
-                          src={card.image_uris.art_crop}
-                          alt=""
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-sm object-cover"
-                        />
-                      )}
-                      <div className="flex w-full flex-col">
-                        <div data-role="row-1" className="col-span-">
-                          <span
-                            data-role="card-name"
-                            className="min-w-0 flex-1 truncate font-medium"
-                          >
-                            {card.name}
-                          </span>
-                        </div>
-                        <div
-                          data-role="row-2"
-                          className="flex items-center gap-2"
-                        >
-                          <span
-                            data-role="card-set"
-                            className="text-muted-foreground font-mono text-sm"
-                          >
-                            [{card.set.toUpperCase()}]
-                          </span>
-                          {card.mana_cost && (
-                            <p className="flex items-center">
-                              <TextWithSymbols
-                                text={card.mana_cost}
-                                symbolSize={18}
-                                symbolClassName="mx-0.5"
-                              />
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      {card.prices?.eur && (
-                        <div className="flex flex-col items-end">
-                          <span className="text-sm font-semibold">
-                            €{card.prices?.eur}
-                          </span>
-                          <span className="text-muted-foreground truncate text-sm">
-                            Tot. €
-                            {(
-                              parseFloat(card.prices?.eur || '0') *
-                              card.quantity
-                            ).toFixed(2)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  />
                 ))}
               </div>
             </div>
