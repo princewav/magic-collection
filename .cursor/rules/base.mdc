@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Next.js Code Generation Conventions for LLM
 
 ## General Principles

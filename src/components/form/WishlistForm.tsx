@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ManaColor } from '@/types/deck';
+import { ManaSymbol } from '../ManaSymbol';
 import {
   Form,
   FormControl,
@@ -18,7 +19,7 @@ import { wishlistSchema } from '@/app/wishlists/new/validation';
 import { COLOR_OPTIONS } from '@/lib/constants';
 import { z } from 'zod';
 import { Wishlist } from '@/types/wishlist';
-import { CheckIcon, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 type WishlistFormData = z.infer<typeof wishlistSchema>;
 
@@ -116,25 +117,20 @@ export const WishlistForm: React.FC<WishlistFormProps> = ({
               <FormLabel>Colors</FormLabel>
               <div className="flex flex-wrap gap-2">
                 {COLOR_OPTIONS.map((color) => (
-                  <Button
+                  <button
                     key={color.value}
                     type="button"
-                    variant={
-                      selectedColors.includes(color.value as ManaColor)
-                        ? 'default'
-                        : 'outline'
-                    }
                     onClick={() => toggleColor(color.value as ManaColor)}
-                    className="p-2"
+                    className={`flex size-7 items-center justify-center rounded-full p-1 transition-all ${
+                      selectedColors.includes(color.value as ManaColor)
+                        ? 'bg-primary/20 ring-primary ring-2'
+                        : 'hover:bg-muted'
+                    }`}
+                    title={color.name}
                   >
-                    {selectedColors.includes(color.value as ManaColor) && (
-                      <CheckIcon className="h-4 w-4" />
-                    )}
                     <span className="sr-only">{color.name}</span>
-                    <span
-                      className={`mana-symbol ms ms-${color.value.toLowerCase()}`}
-                    />
-                  </Button>
+                    <ManaSymbol symbol={color.value} size={27} />
+                  </button>
                 ))}
               </div>
               <FormMessage />
@@ -153,7 +149,6 @@ export const WishlistForm: React.FC<WishlistFormProps> = ({
           )}
         </Button>
       </form>
-      
     </Form>
   );
 };
