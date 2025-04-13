@@ -46,10 +46,16 @@ export async function updateCardQuantity(
       };
     }
 
+    // Calculate the total card count by summing quantities
+    const totalCardCount = updatedCards.reduce(
+      (sum, card) => sum + card.quantity,
+      0,
+    );
+
     // Update the wishlist with the new cards array
     const updatedWishlist = await wishlistService.repo.update(wishlistId, {
       cards: updatedCards,
-      cardCount: updatedCards.length,
+      cardCount: totalCardCount,
     });
 
     revalidatePath('/wishlists');

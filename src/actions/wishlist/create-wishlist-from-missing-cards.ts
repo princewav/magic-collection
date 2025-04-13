@@ -32,13 +32,19 @@ export async function createWishlistFromMissingCards(deckId: string) {
       count++;
     }
 
+    // Calculate the total card count by summing quantities
+    const totalCardCount = missingCards.reduce(
+      (sum, card) => sum + card.quantity,
+      0,
+    );
+
     // Create the wishlist
     const wishlist = await wishlistService.repo.create({
       id: '',
       name: finalWishlistName,
       imageUrl: deck.imageUrl,
       colors: deck.colors,
-      cardCount: missingCards.length,
+      cardCount: totalCardCount,
       cards: missingCards.map((card) => ({
         cardId: card.cardId,
         name: card.name,

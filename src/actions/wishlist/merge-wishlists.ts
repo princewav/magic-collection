@@ -53,14 +53,21 @@ export async function mergeWishlists(
       });
     });
 
+    // Calculate the total card count by summing quantities
+    const mergedCardsArray = Array.from(cardMap.values());
+    const totalCardCount = mergedCardsArray.reduce(
+      (sum, card) => sum + card.quantity,
+      0,
+    );
+
     // Create the new merged wishlist
     const mergedWishlist = await wishlistService.repo.create({
       id: '',
       name: mergedName,
       imageUrl: validWishlists[0]?.imageUrl || null,
       colors: Array.from(allColors) as any,
-      cardCount: cardMap.size,
-      cards: Array.from(cardMap.values()),
+      cardCount: totalCardCount,
+      cards: mergedCardsArray,
     });
 
     // Revalidate the wishlists path
