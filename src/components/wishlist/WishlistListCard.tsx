@@ -8,17 +8,20 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { updateCardQuantity } from '@/actions/wishlist/update-card-quantity';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface WishlistListCardProps {
   card: CardWithQuantity;
   onClick: () => void;
   wishlistId: string;
+  className?: string;
 }
 
 export const WishlistListCard = ({
   card,
   onClick,
   wishlistId,
+  className,
 }: WishlistListCardProps) => {
   const [quantity, setQuantity] = useState(card.quantity);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -61,7 +64,10 @@ export const WishlistListCard = ({
   return (
     <div
       data-role="card-row"
-      className="hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm"
+      className={cn(
+        'hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-3 shadow-sm',
+        className,
+      )}
     >
       <div data-role="card-info" className="flex w-full items-center gap-3">
         {/* Quantity Controls */}

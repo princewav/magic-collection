@@ -3,22 +3,27 @@
 import { Wishlist } from '@/types/wishlist';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Grid2X2, List } from 'lucide-react';
+import { Grid2X2, List, Target, RotateCcw } from 'lucide-react';
 import { useCardModal } from '@/context/CardModalContext';
 import CardModal from '@/components/card-modal/CardModal';
 import { groupCardsByType } from '@/lib/deck/utils';
 import { CardWithQuantity } from '@/types/card';
 import { WishlistGridCard } from './WishlistGridCard';
 import { WishlistListCard } from './WishlistListCard';
+import {
+  TrackedQuantityCounter,
+  getLocalStorageKey,
+} from './TrackedQuantityCounter';
+import { capitalize, cn } from '@/lib/utils';
 
 interface Props {
   wishlist: Wishlist;
 }
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 export const WishlistCardGrid = ({ wishlist }: Props) => {
   const [isGridView, setIsGridView] = useState(true);
+  const [showTrackedCounters, setShowTrackedCounters] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
   const [groupedCards, setGroupedCards] = useState<
     Record<string, CardWithQuantity[]>
   >({});
@@ -56,6 +61,17 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
     localStorage.setItem('wishlistLayout', newLayout ? 'grid' : 'list');
   };
 
+  const handleResetCounters = () => {
+    if (typeof window !== 'undefined' && wishlist && wishlist.cards) {
+      wishlist.cards.forEach((card) => {
+        const key = getLocalStorageKey(wishlist.id, card.cardId);
+        localStorage.removeItem(key);
+        console.log('Removed key:', key);
+      });
+      setResetTrigger((prev) => prev + 1);
+    }
+  };
+
   if (!wishlist.cards || wishlist.cards.length === 0) {
     return (
       <div
@@ -71,7 +87,40 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
 
   return (
     <div data-role="container" className="space-y-4">
-      <div data-role="layout-toggle-wrapper" className="flex justify-end">
+      <div
+        data-role="layout-toggle-wrapper"
+        className="flex items-center justify-between"
+      >
+        <div className="flex items-center gap-2">
+          {!isGridView && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowTrackedCounters((prev) => !prev)}
+              className="h-8 w-8"
+              title={
+                showTrackedCounters
+                  ? 'Hide tracked counters'
+                  : 'Show tracked counters'
+              }
+            >
+              <Target
+                className={`h-4 w-4 ${showTrackedCounters ? 'text-primary' : ''}`}
+              />
+            </Button>
+          )}
+          {!isGridView && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleResetCounters}
+              className="h-8 w-8"
+              title="Reset tracked quantities"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
         <Button
           variant="outline"
           size="icon"
@@ -137,12 +186,27 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
               </h2>
               <div data-role="card-list" className="space-y-2">
                 {cardsInGroup.map((card) => (
-                  <WishlistListCard
-                    key={card.cardId}
-                    card={card}
-                    onClick={() => openModal(card, wishlist.cards)}
-                    wishlistId={wishlist.id}
-                  />
+                  <div key={card.cardId} className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        'w-16 flex-shrink-0',
+                        !showTrackedCounters && 'hidden',
+                      )}
+                    >
+                      <TrackedQuantityCounter
+                        key={`${card.cardId}-${resetTrigger}`}
+                        wishlistId={wishlist.id}
+                        cardId={card.cardId}
+                        targetQuantity={card.quantity}
+                      />
+                    </div>
+                    <WishlistListCard
+                      card={card}
+                      onClick={() => openModal(card, wishlist.cards)}
+                      wishlistId={wishlist.id}
+                      className="flex-grow"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
