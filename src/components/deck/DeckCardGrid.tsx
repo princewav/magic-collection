@@ -12,6 +12,8 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Card } from '../Card';
+import { Deck } from '@/types/deck';
+import { sortBy } from '@/lib/sortingUtils';
 
 interface Props {
   decklist?: CardWithQuantity[];
@@ -43,18 +45,9 @@ export function DeckCardGrid({
   useEffect(() => {
     if (!decklist) return;
 
-    // Sort the cards with quantity
-    const sortedCards = [...decklist].sort((a, b) => {
-      // Then by CMC
-      if (a.cmc !== b.cmc) return a.cmc - b.cmc;
-      // Then by color
-      const colorA = (a.colors || []).join('');
-      const colorB = (b.colors || []).join('');
-      if (colorA !== colorB) return colorA.localeCompare(colorB);
-
-      // Finally by name
-      return a.name.localeCompare(b.name);
-    });
+    // Use the new sortBy utility
+    const sortFunction = sortBy(['cmc', 'color', 'name']);
+    const sortedCards = [...decklist].sort(sortFunction);
 
     setCardsWithQuantity(sortedCards);
 
@@ -289,9 +282,7 @@ export function DeckCardGrid({
                       <div className="ml-2 flex w-full gap-2 truncate sm:flex-col sm:gap-0">
                         {/* Row 1: Name */}
                         <div>
-                          <span className="min-w-0 flex-1">
-                            {card.name}
-                          </span>
+                          <span className="min-w-0 flex-1">{card.name}</span>
                         </div>
                         {/* Row 2: Set + Mana */}
                         <div className="flex w-full items-center justify-between gap-2 sm:justify-start">

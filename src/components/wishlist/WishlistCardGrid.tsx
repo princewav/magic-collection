@@ -15,6 +15,7 @@ import {
   getLocalStorageKey,
 } from './TrackedQuantityCounter';
 import { capitalize, cn } from '@/lib/utils';
+import { sortBy } from '@/lib/sortingUtils';
 
 interface Props {
   wishlist: Wishlist;
@@ -37,17 +38,10 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (wishlist && wishlist.cards) {
-      const sortedCards = [...wishlist.cards].sort((a, b) => {
-        const isLandA = a.type_line?.toLowerCase().includes('land') || false;
-        const isLandB = b.type_line?.toLowerCase().includes('land') || false;
-        if (isLandA !== isLandB) return isLandA ? 1 : -1;
-        if (a.cmc !== b.cmc) return a.cmc - b.cmc;
-        const colorA = (a.colors || []).join('');
-        const colorB = (b.colors || []).join('');
-        if (colorA !== colorB) return colorA.localeCompare(colorB);
-        return a.name.localeCompare(b.name);
-      });
+    if (wishlist?.cards) {
+      const sortFunction = sortBy(['landsLast', 'cmc', 'color', 'name']);
+      const sortedCards = [...wishlist.cards].sort(sortFunction);
+
       const groups = groupCardsByType(sortedCards);
       setGroupedCards(groups);
     } else {
