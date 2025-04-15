@@ -3,6 +3,8 @@
 import { Wishlist } from '@/types/wishlist';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Target, RotateCcw } from 'lucide-react';
 import { useCardModal } from '@/context/CardModalContext';
 import CardModal from '@/components/card-modal/CardModal';
@@ -87,30 +89,30 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
         className="flex items-center justify-between"
       >
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setShowTrackedCounters((prev) => !prev)}
-            className="h-8 w-8"
-            title={
-              showTrackedCounters
-                ? 'Hide tracked counters'
-                : 'Show tracked counters'
-            }
-          >
-            <Target
-              className={`h-4 w-4 ${showTrackedCounters ? 'text-primary' : ''}`}
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="tracked-counters-switch"
+              checked={showTrackedCounters}
+              onCheckedChange={setShowTrackedCounters}
+              aria-label={
+                showTrackedCounters
+                  ? 'Hide tracked counters'
+                  : 'Show tracked counters'
+              }
             />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleResetCounters}
-            className="h-8 w-8"
-            title="Reset tracked quantities"
-          >
-            <RotateCcw className="h-4 w-4" />
-          </Button>
+            <Label htmlFor="tracked-counters-switch">Tracked</Label>
+          </div>
+          {showTrackedCounters && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleResetCounters}
+              className="h-8 w-8"
+              title="Reset tracked quantities"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
