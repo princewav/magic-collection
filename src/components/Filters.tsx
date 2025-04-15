@@ -23,7 +23,6 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
 import { updateUrlWithFilters, getFiltersFromUrl } from '@/lib/url-params';
-import { STANDARD_SETS } from '@/lib/constants';
 
 export function Filters({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -38,7 +37,7 @@ export function Filters({ className }: { className?: string }) {
     filters.rarities || [],
   );
   const [selectedSets, setSelectedSets] = useState<string[]>(
-    filters.sets || STANDARD_SETS,
+    filters.sets || [],
   );
   const [sortFields, setSortFields] = useState<SortField[]>(
     filters.sortFields || [],
