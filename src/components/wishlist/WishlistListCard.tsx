@@ -149,10 +149,14 @@ export const WishlistListCard = ({
         {/* Card Price */}
         {card.prices?.eur && (
           <div className="flex flex-col items-end" onClick={onClick}>
-            <span className="text-sm font-semibold">€{card.prices?.eur}</span>
-            <span className="text-muted-foreground truncate text-sm">
+            <span className="text-muted-foreground text-sm">
+              €{card.prices?.eur}
+            </span>
+            <span className="truncate text-sm ">
               Tot. €
-              {(parseFloat(card.prices?.eur || '0') * quantity).toFixed(2)}
+              <span className="font-semibold">
+                {(parseFloat(card.prices?.eur || '0') * quantity).toFixed(2)}
+              </span>
             </span>
           </div>
         )}

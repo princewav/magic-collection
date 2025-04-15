@@ -53,6 +53,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
     const newLayout = !isGridView;
     setIsGridView(newLayout);
     localStorage.setItem('wishlistLayout', newLayout ? 'grid' : 'list');
+    return 0;
   };
 
   const handleResetCounters = () => {
@@ -65,6 +66,9 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
       setResetTrigger((prev) => prev + 1);
     }
   };
+
+  // Define the within-group sorting function using totalPrice and name as tie-breaker
+  const sortByTotalPrice = sortBy(['totalPrice']); 
 
   if (!wishlist.cards || wishlist.cards.length === 0) {
     return (
@@ -132,82 +136,90 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
 
       {isGridView ? (
         <div data-role="grid-view" className="space-y-6 px-6 sm:px-0">
-          {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
-            <div data-role="grid-group" key={groupName}>
-              <h2
-                data-role="group-title"
-                className="mb-3 text-lg font-semibold capitalize"
-              >
-                {capitalize(groupName)} (
-                {cardsInGroup.reduce(
-                  (sum, card) => sum + (card.quantity || 0),
-                  0,
-                )}
-                )
-              </h2>
-              <div
-                data-role="card-grid"
-                className="relative justify-start gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0"
-              >
-                {cardsInGroup.map((card) => (
-                  <WishlistGridCard
-                    key={card.cardId}
-                    card={card}
-                    onClick={() => openModal(card, wishlist.cards)}
-                  />
-                ))}
+          {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => {
+            // Sort cards within the group by total price
+            const sortedCardsInGroup = [...cardsInGroup].sort(sortByTotalPrice); 
+            return (
+              <div data-role="grid-group" key={groupName}>
+                <h2
+                  data-role="group-title"
+                  className="mb-3 text-lg font-semibold capitalize"
+                >
+                  {capitalize(groupName)} (
+                  {cardsInGroup.reduce(
+                    (sum, card) => sum + (card.quantity || 0),
+                    0,
+                  )}
+                  )
+                </h2>
+                <div
+                  data-role="card-grid"
+                  className="relative justify-start gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0"
+                >
+                  {sortedCardsInGroup.map((card) => (
+                    <WishlistGridCard
+                      key={card.cardId}
+                      card={card}
+                      onClick={() => openModal(card, wishlist.cards)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div data-role="list-view" className="lg:columns-2 lg:gap-x-4">
-          {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
-            <div
-              key={groupName}
-              className="mb-3 break-inside-avoid space-y-2"
-              data-role="list-group-wrapper"
-            >
-              <h2
-                data-role="group-title"
-                className="text-md mb-1 font-semibold capitalize"
+          {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => {
+            // Sort cards within the group by total price
+            const sortedCardsInGroup = [...cardsInGroup].sort(sortByTotalPrice);
+            return (
+              <div
+                key={groupName}
+                className="mb-3 break-inside-avoid space-y-2"
+                data-role="list-group-wrapper"
               >
-                {capitalize(groupName)} (
-                {cardsInGroup.reduce(
-                  (sum, card) => sum + (card.quantity || 0),
-                  0,
-                )}
-                )
-              </h2>
-              {cardsInGroup.map((card) => (
-                <div
-                  key={card.cardId}
-                  className="flex items-center gap-3"
-                  data-role="list-item-wrapper"
+                <h2
+                  data-role="group-title"
+                  className="text-md mb-1 font-semibold capitalize"
                 >
+                  {capitalize(groupName)} (
+                  {cardsInGroup.reduce(
+                    (sum, card) => sum + (card.quantity || 0),
+                    0,
+                  )}
+                  )
+                </h2>
+                {sortedCardsInGroup.map((card) => (
                   <div
-                    className={cn(
-                      'w-16 flex-shrink-0',
-                      !showTrackedCounters && 'hidden',
-                    )}
+                    key={card.cardId}
+                    className="flex items-center gap-3"
+                    data-role="list-item-wrapper"
                   >
-                    <TrackedQuantityCounter
-                      key={`${card.cardId}-${resetTrigger}`}
+                    <div
+                      className={cn(
+                        'w-16 flex-shrink-0',
+                        !showTrackedCounters && 'hidden',
+                      )}
+                    >
+                      <TrackedQuantityCounter
+                        key={`${card.cardId}-${resetTrigger}`}
+                        wishlistId={wishlist.id}
+                        cardId={card.cardId}
+                        targetQuantity={card.quantity}
+                      />
+                    </div>
+                    <WishlistListCard
+                      card={card}
+                      onClick={() => openModal(card, wishlist.cards)}
                       wishlistId={wishlist.id}
-                      cardId={card.cardId}
-                      targetQuantity={card.quantity}
+                      className="flex-grow"
                     />
                   </div>
-                  <WishlistListCard
-                    card={card}
-                    onClick={() => openModal(card, wishlist.cards)}
-                    wishlistId={wishlist.id}
-                    className="flex-grow"
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            );
+          })}
         </div>
       )}
       <CardModal />

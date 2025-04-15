@@ -43,6 +43,14 @@ const compareByName: CardComparator = (a, b) => {
   return a.name.localeCompare(b.name);
 };
 
+const compareByTotalPrice: CardComparator = (a, b) => {
+  const priceA = parseFloat(a.prices?.eur ?? '0') || 0;
+  const priceB = parseFloat(b.prices?.eur ?? '0') || 0;
+  const totalPriceA = (a.quantity ?? 1) * priceA;
+  const totalPriceB = (b.quantity ?? 1) * priceB;
+  return totalPriceB - totalPriceA; // Descending order
+};
+
 // --- Strategy Map ---
 
 const sortingStrategies: Record<string, CardComparator> = {
@@ -50,6 +58,7 @@ const sortingStrategies: Record<string, CardComparator> = {
   cmc: compareByCmc,
   color: compareByColor,
   name: compareByName,
+  totalPrice: compareByTotalPrice,
   // Add other strategies like 'price' here if the data is available
   // price: compareByPrice,
 };
