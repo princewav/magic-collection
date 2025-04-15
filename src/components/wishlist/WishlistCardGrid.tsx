@@ -167,15 +167,16 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
           ))}
         </div>
       ) : (
-        <div
-          data-role="list-view"
-          className="grid grid-cols-1 gap-4 lg:grid-cols-2"
-        >
+        <div data-role="list-view" className="lg:columns-2 lg:gap-x-4">
           {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
-            <div data-role="list-group" key={groupName}>
+            <div
+              key={groupName}
+              className="mb-3 break-inside-avoid space-y-2"
+              data-role="list-group-wrapper"
+            >
               <h2
                 data-role="group-title"
-                className="text-md mb-2 font-semibold capitalize"
+                className="text-md mb-1 font-semibold capitalize"
               >
                 {capitalize(groupName)} (
                 {cardsInGroup.reduce(
@@ -184,31 +185,33 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                 )}
                 )
               </h2>
-              <div data-role="card-list" className="space-y-2">
-                {cardsInGroup.map((card) => (
-                  <div key={card.cardId} className="flex items-center gap-3">
-                    <div
-                      className={cn(
-                        'w-16 flex-shrink-0',
-                        !showTrackedCounters && 'hidden',
-                      )}
-                    >
-                      <TrackedQuantityCounter
-                        key={`${card.cardId}-${resetTrigger}`}
-                        wishlistId={wishlist.id}
-                        cardId={card.cardId}
-                        targetQuantity={card.quantity}
-                      />
-                    </div>
-                    <WishlistListCard
-                      card={card}
-                      onClick={() => openModal(card, wishlist.cards)}
+              {cardsInGroup.map((card) => (
+                <div
+                  key={card.cardId}
+                  className="flex items-center gap-3"
+                  data-role="list-item-wrapper"
+                >
+                  <div
+                    className={cn(
+                      'w-16 flex-shrink-0',
+                      !showTrackedCounters && 'hidden',
+                    )}
+                  >
+                    <TrackedQuantityCounter
+                      key={`${card.cardId}-${resetTrigger}`}
                       wishlistId={wishlist.id}
-                      className="flex-grow"
+                      cardId={card.cardId}
+                      targetQuantity={card.quantity}
                     />
                   </div>
-                ))}
-              </div>
+                  <WishlistListCard
+                    card={card}
+                    onClick={() => openModal(card, wishlist.cards)}
+                    wishlistId={wishlist.id}
+                    className="flex-grow"
+                  />
+                </div>
+              ))}
             </div>
           ))}
         </div>
