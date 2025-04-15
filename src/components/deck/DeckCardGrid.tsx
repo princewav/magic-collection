@@ -243,10 +243,14 @@ export function DeckCardGrid({
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div data-role="list-view" className="lg:columns-2 lg:gap-x-4">
           {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => (
-            <div key={groupName}>
-              <h2 className="text-md mb-2 text-center font-semibold capitalize">
+            <div
+              key={groupName}
+              className="mb-3 break-inside-avoid"
+              data-role="list-group-wrapper"
+            >
+              <h2 className="text-md mb-1 text-center font-semibold capitalize">
                 {capitalize(groupName)} (
                 {cardsInGroup.reduce(
                   (sum, card) => sum + (card.quantity || 0),
@@ -254,11 +258,11 @@ export function DeckCardGrid({
                 )}
                 )
               </h2>
-              <div className="space-y-2">
+              <div data-role="card-list">
                 {cardsInGroup.map((card) => (
                   <div
                     key={card.id}
-                    className="bg-card group hover:bg-secondary/10 flex cursor-pointer items-center justify-between rounded-lg border p-3 shadow-sm"
+                    className="bg-card group hover:bg-secondary/10 mb-2 flex cursor-pointer items-center justify-between overflow-x-auto rounded-lg border p-2 shadow-sm"
                     onClick={() => openModal(card, cardsWithQuantity)}
                   >
                     <div className="flex w-full items-center gap-3">
@@ -273,7 +277,7 @@ export function DeckCardGrid({
                             alt=""
                             width={40}
                             height={40}
-                            className="size-7 sm:size-9 rounded-sm object-cover"
+                            className="size-7 rounded-sm object-cover sm:size-9"
                           />
                         )}
                         {/* {collectedCards?.find((c) => c.name === card.name)
@@ -282,15 +286,15 @@ export function DeckCardGrid({
                         ) : null} */}
                       </div>
                       {/* Main Content Area */}
-                      <div className="ml-2 flex w-full gap-2 sm:gap-0 sm:flex-col overflow-x-auto">
+                      <div className="ml-2 flex w-full gap-2 truncate sm:flex-col sm:gap-0">
                         {/* Row 1: Name */}
                         <div>
-                          <span className="min-w-0 flex-1 truncate font-medium">
+                          <span className="min-w-0 flex-1">
                             {card.name}
                           </span>
                         </div>
                         {/* Row 2: Set + Mana */}
-                        <div className="flex items-center gap-2 justify-between w-full sm:justify-start">
+                        <div className="flex w-full items-center justify-between gap-2 sm:justify-start">
                           <span className="text-muted-foreground inline-block font-mono text-sm">
                             [{card.set.toUpperCase()}]
                           </span>
@@ -298,7 +302,7 @@ export function DeckCardGrid({
                             <p className="flex items-center">
                               <TextWithSymbols
                                 text={card.mana_cost}
-                                symbolSize={18}
+                                symbolSize={16}
                                 symbolClassName="mx-0.5"
                               />
                             </p>
@@ -307,7 +311,7 @@ export function DeckCardGrid({
                       </div>
                     </div>
                     {/* Right side: Type Line & P/T */}
-                    <div className="ml-4 flex-col items-end text-right hidden sm:flex">
+                    <div className="ml-4 hidden flex-col items-end text-right sm:flex">
                       <span className="text-muted-foreground min-w-0 truncate text-xs">
                         {card.type_line?.split(' — ')[0]}
                       </span>
