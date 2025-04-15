@@ -45,8 +45,20 @@ export async function removeCardFromWishlist(
       return { success: true, message: 'Card not found in wishlist.' };
     }
 
+    // Recalculate card count and total price
+    const totalCardCount = updatedCards.reduce(
+      (sum, card) => sum + card.quantity,
+      0,
+    );
+    const totalPrice = updatedCards.reduce(
+      (sum, card) => sum + card.price * card.quantity,
+      0,
+    );
+
     const updatedWishlist = await wishlistService.repo.update(wishlistId, {
       cards: updatedCards,
+      cardCount: totalCardCount,
+      totalPrice: totalPrice,
     });
 
     if (!updatedWishlist) {
@@ -64,6 +76,8 @@ export async function removeCardFromWishlist(
     );
     // Revalidate the specific wishlist page path
     revalidatePath(`/wishlists/${wishlistId}`);
+    // Also revalidate the main wishlists page
+    revalidatePath('/wishlists');
 
     return { success: true };
   } catch (error) {

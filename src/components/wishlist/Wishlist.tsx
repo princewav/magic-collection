@@ -75,16 +75,20 @@ export const Wishlist: React.FC<WishlistProps> = ({
             </div>
           )}
         </div>
-        <div className="p-4 space-y-2">
+        <div className="space-y-2 p-4">
           <h3 className="font-semibold">{wishlist.name}</h3>
-          <div className=" flex gap-2">
+          <div className="flex gap-2">
             {wishlist.colors.map((color, index) => (
               <ManaSymbol key={index} symbol={color} />
             ))}
           </div>
           <div className="text-muted-foreground mt-1 text-sm">
             {wishlist.cardCount} {wishlist.cardCount === 1 ? 'card' : 'cards'} •
-            €{(wishlist.totalPrice ?? 0).toFixed(2)}
+            €
+            {typeof wishlist.totalPrice === 'number' &&
+            isFinite(wishlist.totalPrice)
+              ? wishlist.totalPrice.toFixed(2)
+              : '0.00'}
           </div>
         </div>
       </Link>
