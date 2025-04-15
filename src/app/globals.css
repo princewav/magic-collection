@@ -268,3 +268,22 @@
     letter-spacing: 0em;
   }
 }
+
+/* Recharts Tooltip Cursor Styling */
+.recharts-tooltip-cursor {
+  fill: rgba(
+    200,
+    200,
+    200,
+    0.4
+  ); /* Light grey, low opacity background in dark mode */
+}
+
+.dark .recharts-tooltip-cursor {
+  fill: rgba(
+    200,
+    200,
+    200,
+    0.2
+  ); /* Light grey, low opacity background in dark mode */
+}

@@ -1,6 +1,7 @@
 import { loadWishlistById } from '@/actions/wishlist/load-wishlists';
 import { WishlistInfo } from '@/components/wishlist/WishlistInfo';
 import { WishlistCardGrid } from '@/components/wishlist/WishlistCardGrid';
+import { WishlistPriceChart } from '@/components/wishlist/WishlistPriceChart';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,9 @@ export default async function WishlistPage({ params }: WishlistPageProps) {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <span className="text-muted-foreground text-xs text-center truncate">To wishlists</span>
+          <span className="text-muted-foreground truncate text-center text-xs">
+            To wishlists
+          </span>
         </Link>
       </div>
 
@@ -54,6 +57,7 @@ export default async function WishlistPage({ params }: WishlistPageProps) {
         </div>
         <WishlistInfo wishlist={wishlist} />
         <WishlistCardGrid wishlist={wishlist} />
+        <WishlistPriceChart wishlist={wishlist} />
       </main>
 
       <div className="hidden md:block"></div>
