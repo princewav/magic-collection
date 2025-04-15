@@ -4,8 +4,9 @@ import CsvImportButton from '@/components/CsvImportButton';
 import { parseCSVandInsert } from '@/actions/parse-csv';
 import { Filters } from '@/components/Filters';
 import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
-import { CollectionWrapper } from '@/components/CollectionWrapper';
 import { CardsProvider } from '@/context/CardsContext';
+import { CardContainer } from '@/components/CardContainer';
+import { getFiltersFromSearchParams } from '@/lib/url-params';
 
 export const metadata: Metadata = {
   title: 'Collection',
@@ -16,45 +17,56 @@ type Props = {
   params: Promise<{
     type: 'paper' | 'arena';
   }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function CollectionPage({ params }: Props) {
+export default async function CollectionPage({ params, searchParams }: Props) {
   const { type } = await params;
+  const { filters /*, page, deduplicate */ } = getFiltersFromSearchParams(
+    await searchParams,
+  );
   const collectionCards = await loadCardsInCollection(type);
 
-  const quantity = collectionCards.reduce(
+  const totalQuantity = collectionCards.reduce(
     (acc, card) => acc + card.quantity,
     0,
   );
+  const totalUnique = collectionCards.length;
+  const pageSize = 50;
 
-  // Get first 100 cards for initial load - the rest can be loaded later if needed
   const initialCardIds = collectionCards
-    .slice(0, 100)
+    .slice(0, pageSize)
     .map((card) => card.cardId);
-  const cards = await loadCardsById(initialCardIds);
+  const initialCardsData = await loadCardsById(initialCardIds);
 
-  // Map collection quantities to cards
-  const cardsWithQuantity = cards.map((card) => ({
+  const initialCardsWithQuantity = initialCardsData.map((card) => ({
     ...card,
     quantity:
       collectionCards.find((c) => c.cardId === card.cardId)?.quantity || 0,
   }));
 
-  // Only show cards that are actually in the collection (quantity > 0)
-  const collectedCards = cardsWithQuantity.filter((card) => card.quantity > 0);
-
   return (
-    <CardsProvider initialCards={cards} initialTotal={cards.length}>
+    <CardsProvider
+      initialCards={initialCardsWithQuantity}
+      initialTotal={totalUnique}
+      initialCollectionType={type}
+    >
       <main className="flex flex-col p-4">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-4xl font-bold">
-            {capitalize(type)} collection: {collectionCards.length} unique cards
-            ({quantity} total)
+            {capitalize(type)} collection: {totalUnique} unique cards (
+            {totalQuantity} total)
           </h1>
           <CsvImportButton collectionType={type} parseCsv={parseCSVandInsert} />
         </div>
         <Filters className="mb-4" />
-        <CollectionWrapper initialCards={collectedCards} />
+        <CardContainer
+          filters={filters}
+          collectionType={type}
+          page={1}
+          pageSize={pageSize}
+          deduplicate={false}
+        />
       </main>
     </CardsProvider>
   );
