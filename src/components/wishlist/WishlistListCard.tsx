@@ -12,11 +12,8 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 import {
   ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { Trash2 } from 'lucide-react';
 import { CardContextMenuContent } from './CardContextMenuContent';
 
 interface WishlistListCardProps {

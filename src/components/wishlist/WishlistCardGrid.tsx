@@ -8,7 +8,6 @@ import { useCardModal } from '@/context/CardModalContext';
 import CardModal from '@/components/card-modal/CardModal';
 import { groupCardsByType } from '@/lib/deck/utils';
 import { CardWithQuantity } from '@/types/card';
-import { WishlistGridCard } from './WishlistGridCard';
 import { WishlistListCard } from './WishlistListCard';
 import {
   TrackedQuantityCounter,
