@@ -9,12 +9,22 @@ import { useState } from 'react';
 import { updateCardQuantity } from '@/actions/wishlist/update-card-quantity';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import React from 'react';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import { Trash2 } from 'lucide-react';
+import { CardContextMenuContent } from './CardContextMenuContent';
 
 interface WishlistListCardProps {
   card: CardWithQuantity;
   onClick: () => void;
   wishlistId: string;
   className?: string;
+  onRemoveCard: (wishlistId: string, cardId: string) => void;
 }
 
 export const WishlistListCard = ({
@@ -22,6 +32,7 @@ export const WishlistListCard = ({
   onClick,
   wishlistId,
   className,
+  onRemoveCard,
 }: WishlistListCardProps) => {
   const [quantity, setQuantity] = useState(card.quantity);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -62,105 +73,116 @@ export const WishlistListCard = ({
   };
 
   return (
-    <div
-      data-role="card-row"
-      className={cn(
-        'hover:bg-secondary/10 bg-card flex cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-1 px-3 shadow-sm',
-        className,
-      )}
-    >
-      <div data-role="card-info" className="flex w-full items-center gap-3">
-        {/* Quantity Controls */}
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
         <div
-          data-role="card-quantity-controls"
-          className="flex flex-col items-center"
+          data-role="card-row"
+          className={cn(
+            'hover:bg-secondary/10 bg-card flex grow cursor-pointer items-center justify-between overflow-x-auto rounded-xl border p-1 px-3 shadow-sm',
+            className,
+          )}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-5 w-5"
-            onClick={(e) => handleQuantityButtonClick(e, quantity + 1)}
-            disabled={isUpdating}
-          >
-            <ChevronUp className="h-3 w-3" />
-          </Button>
-
-          <div
-            data-role="card-quantity"
-            className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold"
-          >
-            {quantity}x
-          </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-5 w-5"
-            onClick={(e) =>
-              handleQuantityButtonClick(e, quantity > 1 ? quantity - 1 : 1)
-            }
-            disabled={isUpdating || quantity <= 1}
-          >
-            <ChevronDown className="h-3 w-3" />
-          </Button>
-        </div>
-
-        {/* Card Image */}
-        {card.image_uris?.art_crop && (
-          <Image
-            src={card.image_uris.art_crop}
-            alt=""
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-sm object-cover"
-            onClick={onClick}
-          />
-        )}
-
-        {/* Card Details */}
-        <div className="flex flex-grow flex-col" onClick={onClick}>
-          <div data-role="row-1">
-            <span
-              data-role="card-name"
-              className="min-w-0 truncate font-medium"
+          <div data-role="card-info" className="flex w-full items-center gap-3">
+            {/* Quantity Controls */}
+            <div
+              data-role="card-quantity-controls"
+              className="flex flex-col items-center"
             >
-              {card.name}
-            </span>
-          </div>
-          <div data-role="row-2" className="flex items-center gap-2">
-            <span
-              data-role="card-set"
-              className="text-muted-foreground font-mono text-sm"
-            >
-              [{card.set.toUpperCase()}]
-            </span>
-            {card.mana_cost && (
-              <p className="flex items-center">
-                <TextWithSymbols
-                  text={card.mana_cost}
-                  symbolSize={18}
-                  symbolClassName="mx-0.5"
-                />
-              </p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5"
+                onClick={(e) => handleQuantityButtonClick(e, quantity + 1)}
+                disabled={isUpdating}
+              >
+                <ChevronUp className="h-3 w-3" />
+              </Button>
+
+              <div
+                data-role="card-quantity"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold"
+              >
+                {quantity}x
+              </div>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5"
+                onClick={(e) =>
+                  handleQuantityButtonClick(e, quantity > 1 ? quantity - 1 : 1)
+                }
+                disabled={isUpdating || quantity <= 1}
+              >
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </div>
+
+            {/* Card Image */}
+            {card.image_uris?.art_crop && (
+              <Image
+                src={card.image_uris.art_crop}
+                alt=""
+                width={40}
+                height={40}
+                className="h-10 w-10 rounded-sm object-cover"
+                onClick={onClick}
+              />
+            )}
+
+            {/* Card Details */}
+            <div className="flex flex-grow flex-col" onClick={onClick}>
+              <div data-role="row-1">
+                <span
+                  data-role="card-name"
+                  className="min-w-0 truncate font-medium"
+                >
+                  {card.name}
+                </span>
+              </div>
+              <div data-role="row-2" className="flex items-center gap-2">
+                <span
+                  data-role="card-set"
+                  className="text-muted-foreground font-mono text-sm"
+                >
+                  [{card.set.toUpperCase()}]
+                </span>
+                {card.mana_cost && (
+                  <p className="flex items-center">
+                    <TextWithSymbols
+                      text={card.mana_cost}
+                      symbolSize={18}
+                      symbolClassName="mx-0.5"
+                    />
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Card Price */}
+            {card.prices?.eur && (
+              <div className="flex flex-col items-end" onClick={onClick}>
+                <span className="text-muted-foreground text-sm">
+                  €{card.prices?.eur}
+                </span>
+                <span className="truncate text-sm">
+                  Tot. €
+                  <span className="font-semibold">
+                    {(parseFloat(card.prices?.eur || '0') * quantity).toFixed(
+                      2,
+                    )}
+                  </span>
+                </span>
+              </div>
             )}
           </div>
         </div>
-
-        {/* Card Price */}
-        {card.prices?.eur && (
-          <div className="flex flex-col items-end" onClick={onClick}>
-            <span className="text-muted-foreground text-sm">
-              €{card.prices?.eur}
-            </span>
-            <span className="truncate text-sm ">
-              Tot. €
-              <span className="font-semibold">
-                {(parseFloat(card.prices?.eur || '0') * quantity).toFixed(2)}
-              </span>
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
+      </ContextMenuTrigger>
+      <CardContextMenuContent
+        wishlistId={wishlistId}
+        cardId={card.cardId}
+        onRemoveCard={onRemoveCard}
+      />
+    </ContextMenu>
   );
 };

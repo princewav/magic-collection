@@ -16,6 +16,8 @@ import {
 } from './TrackedQuantityCounter';
 import { capitalize, cn } from '@/lib/utils';
 import { sortBy } from '@/lib/sortingUtils';
+import { removeCardFromWishlist } from '@/actions/wishlist/remove-card-from-wishlist';
+import { toast } from 'sonner';
 
 interface Props {
   wishlist: Wishlist;
@@ -67,8 +69,29 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
     }
   };
 
+  const handleRemoveCard = (wishlistId: string, cardId: string) => {
+    console.log(`Remove card ${cardId} from wishlist ${wishlistId}`);
+    // TODO: Implement actual card removal logic here
+    // This will likely involve updating the wishlist state/data
+    // and potentially making an API call.
+    // No need to close context menu here anymore, it closes automatically.
+
+    // Call the server action
+    toast.promise(removeCardFromWishlist(wishlistId, cardId), {
+      loading: 'Removing card...',
+      success: (result) => {
+        // Optional: Check result.message for cases like 'Card not found' if needed
+        return 'Card removed from wishlist.';
+      },
+      error: (err) => {
+        // err should be the { success: false, message: ... } object from the action
+        return err.message || 'Failed to remove card.';
+      },
+    });
+  };
+
   // Define the within-group sorting function using totalPrice and name as tie-breaker
-  const sortByTotalPrice = sortBy(['totalPrice']); 
+  const sortByTotalPrice = sortBy(['totalPrice']);
 
   if (!wishlist.cards || wishlist.cards.length === 0) {
     return (
@@ -138,7 +161,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
         <div data-role="grid-view" className="space-y-6 px-6 sm:px-0">
           {Object.entries(groupedCards).map(([groupName, cardsInGroup]) => {
             // Sort cards within the group by total price
-            const sortedCardsInGroup = [...cardsInGroup].sort(sortByTotalPrice); 
+            const sortedCardsInGroup = [...cardsInGroup].sort(sortByTotalPrice);
             return (
               <div data-role="grid-group" key={groupName}>
                 <h2
@@ -161,6 +184,8 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                       key={card.cardId}
                       card={card}
                       onClick={() => openModal(card, wishlist.cards)}
+                      wishlistId={wishlist.id}
+                      onRemoveCard={handleRemoveCard}
                     />
                   ))}
                 </div>
@@ -213,7 +238,7 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
                       card={card}
                       onClick={() => openModal(card, wishlist.cards)}
                       wishlistId={wishlist.id}
-                      className="flex-grow"
+                      onRemoveCard={handleRemoveCard}
                     />
                   </div>
                 ))}
