@@ -183,10 +183,11 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                 </div>
 
                 <Separator className="my-6" />
+                <h3 className="mb-2 font-semibold">Deck Image</h3>
 
                 {mainDeck ? (
                   <Tabs defaultValue="url" className="w-full">
-                    <TabsList className="mb-4">
+                    <TabsList className="mb-2">
                       <TabsTrigger className="cursor-pointer" value="url">
                         URL
                       </TabsTrigger>
