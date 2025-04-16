@@ -2,12 +2,16 @@ import fs from 'fs';
 import { extractMtgCardData, Card } from '@/types/card';
 import { cardService } from '../services/CardService';
 import logger from '@/lib/logger';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function fetchCards(): Promise<Card[]> {
-  const filePath = new URL(
-    '../../../data/default-cards-20250412091330.json',
-    import.meta.url,
-  );
+  const dataPath = 'data/Unique Artwork 2025-04-16.json';
+  const filePath = path.join(__dirname, '../../..', dataPath);
+  console.log(filePath);
   const rawData = fs.readFileSync(filePath, 'utf-8');
   const cards = JSON.parse(rawData);
   return cards
