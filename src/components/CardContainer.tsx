@@ -43,5 +43,5 @@ export function CardContainer({
     }
   }, [filters, collectionType, updateFilters]);
 
-  return <CardGrid />;
+  return <CardGrid collectionType={collectionType}/>;
 }

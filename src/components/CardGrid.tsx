@@ -1,18 +1,60 @@
 'use client';
 
 import { useCards } from '@/context/CardsContext';
+import { useCollection } from '@/context/CollectionContext';
 import { Card as CardType } from '@/types/card';
 import { Card } from './Card';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useCardModal } from '@/context/CardModalContext';
 
-export function CardGrid() {
-  const { cards, isLoading, loadNextPage, total } = useCards();
+export function CardGrid({
+  collectionType,
+}: {
+  collectionType: 'paper' | 'arena' | undefined;
+}) {
+  const {
+    cards: generalCards,
+    isLoading: generalLoading,
+    loadNextPage: loadNextGeneralPage,
+    total: generalTotal,
+  } = useCards();
+  const {
+    collectedCards,
+    isLoading: collectionLoading,
+    loadNextPage: loadNextCollectionPage,
+    total: collectionTotal,
+  } = useCollection();
   const { openModal } = useCardModal();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+
+  console.log('[CardGrid] Props:', { collectionType });
+  console.log('[CardGrid] General Context:', {
+    generalCards: generalCards.length,
+    generalLoading,
+    generalTotal,
+  });
+  console.log('[CardGrid] Collection Context:', {
+    collectedCards: collectedCards.length,
+    collectionLoading,
+    collectionTotal,
+  });
+
+  const cards = collectionType ? collectedCards : generalCards;
+  const isLoading = collectionType ? collectionLoading : generalLoading;
+  const total = collectionType ? collectionTotal : generalTotal;
+  const loadNextPage = collectionType
+    ? loadNextCollectionPage
+    : loadNextGeneralPage;
+
+  console.log('[CardGrid] Selected Context:', {
+    cards: cards.length,
+    isLoading,
+    total,
+    usingCollection: !!collectionType,
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -22,6 +64,7 @@ export function CardGrid() {
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
       if (target.isIntersecting && !isLoading && cards.length < total) {
+        console.log('[CardGrid] Loading next page...');
         loadNextPage();
       }
     },
@@ -56,6 +99,12 @@ export function CardGrid() {
   }
 
   if (!cards.length && !isLoading) {
+    console.log('[CardGrid] No cards found:', {
+      cards: cards.length,
+      isLoading,
+      total,
+      usingCollection: !!collectionType,
+    });
     return (
       <div className="flex h-64 items-center justify-center">
         <p className="text-lg text-gray-500">No cards found</p>
@@ -66,12 +115,20 @@ export function CardGrid() {
     <div className="relative">
       <div className="flex flex-wrap justify-center gap-4">
         {cards.map((card: CardType, index: number) => (
-          <div key={`${card.id}-${index}`} className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]">
+          <div
+            key={`${card.id}-${index}`}
+            className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]"
+          >
             <div
               onClick={() => openModal(card, cards)}
-              className="cursor-pointer h-full"
+              className="h-full cursor-pointer"
             >
-              <Card card={{ ...card, quantity: 0 }} />
+              <Card
+                card={{
+                  ...card,
+                  quantity: collectionType ? (card as any).quantity || 0 : 0,
+                }}
+              />
             </div>
           </div>
         ))}

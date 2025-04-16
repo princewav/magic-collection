@@ -5,6 +5,7 @@ import { parseCSVandInsert } from '@/actions/parse-csv';
 import { Filters } from '@/components/Filters';
 import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
 import { CardsProvider } from '@/context/CardsContext';
+import { CollectionProvider } from '@/context/CollectionContext';
 import { CardContainer } from '@/components/CardContainer';
 import { getFiltersFromSearchParams } from '@/lib/url-params';
 
@@ -13,12 +14,10 @@ export const metadata: Metadata = {
   description: 'View your card collection.',
 };
 
-type Props = {
-  params: Promise<{
-    type: 'paper' | 'arena';
-  }>;
+interface Props {
+  params: Promise<{ type: 'paper' | 'arena' }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
+}
 
 export default async function CollectionPage({ params, searchParams }: Props) {
   const { type } = await params;
@@ -46,28 +45,33 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   }));
 
   return (
-    <CardsProvider
-      initialCards={initialCardsWithQuantity}
-      initialTotal={totalUnique}
-      initialCollectionType={type}
-    >
-      <main className="flex flex-col p-4">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-4xl font-bold">
-            {capitalize(type)} collection: {totalUnique} unique cards (
-            {totalQuantity} total)
-          </h1>
-          <CsvImportButton collectionType={type} parseCsv={parseCSVandInsert} />
-        </div>
-        <Filters className="mb-4" />
-        <CardContainer
-          filters={filters}
-          collectionType={type}
-          page={1}
-          pageSize={pageSize}
-          deduplicate={false}
-        />
-      </main>
-    </CardsProvider>
+    <CollectionProvider collectionType={type}>
+      <CardsProvider
+        initialCards={initialCardsWithQuantity}
+        initialTotal={totalUnique}
+        initialCollectionType={type}
+      >
+        <main className="flex flex-col p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h1 className="text-4xl font-bold">
+              {capitalize(type)} collection: {totalUnique} unique cards (
+              {totalQuantity} total)
+            </h1>
+            <CsvImportButton
+              collectionType={type}
+              parseCsv={parseCSVandInsert}
+            />
+          </div>
+          <Filters className="mb-4" />
+          <CardContainer
+            filters={filters}
+            collectionType={type}
+            page={1}
+            pageSize={pageSize}
+            deduplicate={false}
+          />
+        </main>
+      </CardsProvider>
+    </CollectionProvider>
   );
 }

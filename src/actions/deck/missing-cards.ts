@@ -84,7 +84,7 @@ export async function getMissingCards(
 }
 
 function formatCardsToText(cards: { name: string; quantity: number }[]) {
-  return cards.map((card) => `${card.name} x${card.quantity}`).join('\n');
+  return cards.map((card) => `${card.quantity}x ${card.name}`).join('\n');
 }
 
 export async function downloadMissingCards(deckId: string) {
