@@ -18,7 +18,7 @@ interface EditDeckClientProps {
 
 export function EditDeckClient({ deck, id, decklist }: EditDeckClientProps) {
   const router = useRouter();
-  const {type} = useParams();
+  const { type } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDeckUpdate = async (values: z.infer<typeof deckSchema>) => {
@@ -48,12 +48,20 @@ export function EditDeckClient({ deck, id, decklist }: EditDeckClientProps) {
   };
 
   return (
-    <main className="mx-auto flex md:max-w-4xl flex-col p-4">
+    <main className="mx-auto flex flex-col p-4 md:max-w-4xl">
       <h1 className="mb-2 text-xl font-bold">Edit Deck</h1>
       <DeckForm
         onSubmit={handleDeckUpdate}
         isSubmitting={isSubmitting}
         isEdit={true}
+        initialData={{
+          name: deck.name,
+          description: deck.description,
+          format: deck.format,
+          imageUrl: deck.imageUrl,
+          type: deck.type,
+          decklist: decklist,
+        }}
         mainDeck={deck.maindeck}
         decklist={decklist}
       />

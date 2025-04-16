@@ -1,9 +1,12 @@
 import * as z from 'zod';
 
 export const deckSchema = z.object({
-  name: z.string().min(3, {
-    message: 'Deck name must be at least 3 characters.',
-  }),
+  name: z
+    .string()
+    .min(3, {
+      message: 'Deck name must be at least 3 characters.',
+    })
+    .transform((val) => val.trim()),
   description: z.string().optional(),
   imageUrl: z
     .string()
