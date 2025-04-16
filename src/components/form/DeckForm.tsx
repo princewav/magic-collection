@@ -75,11 +75,11 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="md:col-span-2">
             <CardTitle>Deck Details</CardTitle>
           </div>
-          <div className="col-span-1">
+          <div className="md:col-span-1">
             <CardTitle>Deck List</CardTitle>
           </div>
         </div>
@@ -87,8 +87,8 @@ export const DeckForm: React.FC<DeckFormProps> = ({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-2 space-y-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="space-y-4 md:col-span-2">
                 <FormField
                   control={form.control}
                   name="name"
@@ -293,20 +293,20 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                   </div>
                 )}
               </div>
-              <div className="col-span-1">
+              <div className="md:col-span-1">
                 <FormField
                   control={form.control}
                   name="decklist"
                   render={({ field }) => (
-                    <FormItem className="h-full relative">
+                    <FormItem>
                       <FormControl>
                         <Textarea
                           placeholder="Paste your decklist here..."
                           {...field}
-                          className="h-full w-full absolute inset-0 resize-none overflow-y-auto"
+                          className="w-full resize-none md:min-h-[500px]"
                         />
                       </FormControl>
-                      <FormMessage className="-top-5 absolute" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
