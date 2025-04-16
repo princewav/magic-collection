@@ -34,16 +34,15 @@ import { useRouter } from 'next/navigation';
 
 interface DeckFormData {
   name: string;
-  decklist?: string;
+  decklist: string;
   description?: string;
   format: string;
   imageUrl?: string | null;
-  colors: ManaColor[];
   type: 'paper' | 'arena';
 }
 
 interface DeckFormProps {
-  onSubmit: (data: DeckFormData) => Promise<void>; 
+  onSubmit: (data: DeckFormData) => Promise<void>;
   isSubmitting: boolean;
   initialData?: DeckFormData;
   isEdit?: boolean;
@@ -60,31 +59,18 @@ export const DeckForm: React.FC<DeckFormProps> = ({
   decklist,
 }) => {
   const router = useRouter();
-  const [selectedColors, setSelectedColors] = useState<ManaColor[]>(
-    initialData?.colors || [],
-  );
   const form = useForm<DeckFormData>({
     resolver: zodResolver(deckSchema),
-    defaultValues:  {
+    defaultValues: {
       name: '',
       description: '',
       format: 'standard',
       imageUrl: null,
-      colors: [],
       type: 'paper',
       decklist: decklist || '',
       ...initialData,
     },
   });
-
-  const toggleColor = (color: ManaColor) => {
-    const newColors = selectedColors.includes(color)
-      ? selectedColors.filter((c) => c !== color)
-      : [...selectedColors, color];
-
-    setSelectedColors(newColors);
-    form.setValue('colors', newColors as ManaColor[]);
-  };
 
   return (
     <Card>
@@ -102,7 +88,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-2">
+              <div className="col-span-2 space-y-4">
                 <FormField
                   control={form.control}
                   name="name"
@@ -116,8 +102,6 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     </FormItem>
                   )}
                 />
-
-                <Separator className="my-6" />
 
                 <FormField
                   control={form.control}
@@ -307,52 +291,14 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                     />
                   </div>
                 )}
-
-                <Separator className="my-6" />
-
-                <FormField
-                  control={form.control}
-                  name="colors"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Colors</FormLabel>
-                      <div className="flex flex-wrap gap-2">
-                        {COLOR_OPTIONS.map((color) => (
-                          <button
-                            type="button"
-                            key={color.value}
-                            onClick={() =>
-                              toggleColor(color.value as ManaColor)
-                            }
-                            className={`${color.bgClass} ${
-                              color.textClass
-                            } flex items-center gap-2 rounded-md border-2 px-4 py-2 ${
-                              selectedColors.includes(color.value as ManaColor)
-                                ? `${color.borderClass} border-2`
-                                : 'border-transparent'
-                            }`}
-                          >
-                            {selectedColors.includes(
-                              color.value as ManaColor,
-                            ) && <CheckIcon size={16} />}
-                            {color.name}
-                          </button>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
               <div className="col-span-1">
-                <p className="text-muted-foreground mb-1 text-sm">
-                  Optional: You can also import a deck list later.
-                </p>
                 <FormField
                   control={form.control}
                   name="decklist"
                   render={({ field }) => (
                     <FormItem className="mt-4 h-11/12">
+                      <FormLabel>Deck List</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Paste your decklist here..."
@@ -367,7 +313,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
               </div>
             </div>
             <Separator className="my-6" />
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-end gap-4">
               <Button
                 type="button"
                 variant="outline"

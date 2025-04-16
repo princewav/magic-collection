@@ -2,8 +2,9 @@ import { z } from 'zod';
 import { parseDeckList, ParsedCard } from '@/lib/deck/list-parser';
 import { cardService } from '@/db/services/CardService';
 import { deckService } from '@/db/services/DeckService';
-import { Deck, DeckCard } from '@/types/deck';
+import { Deck, DeckCard, ManaColor } from '@/types/deck';
 import { CardWithQuantity } from '@/types/card';
+import { loadCardsById } from '@/actions/load-cards';
 
 type ImportDeckResult = {
   success: boolean;
@@ -52,9 +53,39 @@ export async function importDeckList(
       convertDeckCards(sideboard),
     ]);
 
+    // Get all unique card IDs from both main deck and sideboard
+    const allCardIds = [
+      ...new Set([
+        ...mainDeckCards.map((card) => card.cardId),
+        ...sideboardCards.map((card) => card.cardId),
+      ]),
+    ];
+
+    // Load full card details to get color identities
+    const cardDetails = await loadCardsById(allCardIds);
+
+    // Create a set to store unique colors
+    const colorSet = new Set<ManaColor>();
+
+    // Add colors from each card's color_identity
+    cardDetails.forEach((card) => {
+      if (card.color_identity) {
+        card.color_identity.forEach((color) => {
+          if (['W', 'U', 'B', 'R', 'G', 'C'].includes(color)) {
+            colorSet.add(color as ManaColor);
+          }
+        });
+      }
+    });
+
+    // Convert the set to an array and sort it
+    const deckColors = Array.from(colorSet).sort();
+
+    // Update the deck with both the cards and the detected colors
     await deckService.repo.update(deckId, {
       maindeck: mainDeckCards,
       sideboard: sideboardCards,
+      colors: deckColors,
     });
 
     return { success: true, errors };

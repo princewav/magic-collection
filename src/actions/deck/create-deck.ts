@@ -25,7 +25,7 @@ export const createDeck = async (values: z.infer<typeof deckSchema>) => {
       type: values.type,
       imageUrl: values.imageUrl ?? null,
       format: values.format ?? undefined,
-      colors: values.colors,
+      colors: [],
       maindeck: [],
       sideboard: [],
       maybeboard: [],

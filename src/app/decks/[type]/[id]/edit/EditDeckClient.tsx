@@ -53,7 +53,6 @@ export function EditDeckClient({ deck, id, decklist }: EditDeckClientProps) {
       <DeckForm
         onSubmit={handleDeckUpdate}
         isSubmitting={isSubmitting}
-        initialData={deck}
         isEdit={true}
         mainDeck={deck.maindeck}
         decklist={decklist}

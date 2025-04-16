@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import React, { useCallback } from 'react';
 import Image from 'next/image';
@@ -20,7 +20,11 @@ interface DeckProps {
   className?: string;
 }
 
-export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu, className }) => {
+export const Deck: React.FC<DeckProps> = ({
+  deck,
+  onContextMenu,
+  className,
+}) => {
   const { selectedDecks, toggleDeckSelection } = useDeckSelection();
   const isChecked = selectedDecks.includes(deck.id);
 
@@ -82,9 +86,10 @@ export const Deck: React.FC<DeckProps> = ({ deck, onContextMenu, className }) =>
         <div className="p-4">
           <h3 className="font-semibold">{deck.name}</h3>
           <div className="mt-2 flex gap-2">
-            {deck.colors.map((color, index) => (
-              <ManaSymbol key={index} symbol={color} />
-            ))}
+            {deck.colors &&
+              deck.colors.map((color, index) => (
+                <ManaSymbol key={index} symbol={color} />
+              ))}
           </div>
         </div>
       </Link>
