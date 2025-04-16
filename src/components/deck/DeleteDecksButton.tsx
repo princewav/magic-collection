@@ -44,12 +44,8 @@ export const DeleteDecksButton: React.FC<DeleteDecksButtonProps> = ({
     }
   }, [selectedDecks]);
   return (
-    <Button
-      variant="destructive"
-      onClick={handleDeleteSelectedDecks}
-      className="absolute -top-25 right-0"
-    >
-      <Trash className="mr-2 h-4 w-4" /> Delete Selected ({deckCount})
+    <Button variant="destructive" onClick={handleDeleteSelectedDecks}>
+      <Trash className="h-4 w-4" /> Delete Selected ({deckCount})
     </Button>
   );
 };

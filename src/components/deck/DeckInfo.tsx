@@ -57,28 +57,29 @@ export const DeckInfo = ({ deck }: Props) => {
       data-role="deck-info-container"
       className="bg-foreground/10 relative flex items-center justify-between overflow-hidden rounded-md p-4 shadow-md"
     >
-      <Image
-        src={deck.imageUrl || '/placeholder-deck.jpg'}
-        alt={deck.name}
-        width={1500}
-        height={1000}
-        className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-15 md:hidden"
-      />
+      {deck.imageUrl && (
+        <Image
+          src={deck.imageUrl}
+          alt={deck.name}
+          width={1500}
+          height={1000}
+          className="absolute inset-0 -z-10 rounded-md object-cover object-center opacity-15 md:hidden"
+        />
+      )}
       <div
         data-role="deck-details"
         className="flex w-full items-center space-x-4"
       >
-        <Image
-          src={deck.imageUrl || '/placeholder-deck.jpg'}
-          alt={deck.name}
-          width={150}
-          height={100}
-          className="hidden rounded-md md:block"
-        />
-        <div
-          data-role="deck-details-grid"
-          className="grid w-full grid-cols-2"
-        >
+        {deck.imageUrl && (
+          <Image
+            src={deck.imageUrl}
+            alt={deck.name}
+            width={150}
+            height={100}
+            className="hidden rounded-md md:block"
+          />
+        )}
+        <div data-role="deck-details-grid" className="grid w-full grid-cols-2">
           <h2
             data-role="deck-name"
             className="drop-shadow-black col-span-2 text-2xl font-semibold drop-shadow-xl"
@@ -112,7 +113,7 @@ export const DeckInfo = ({ deck }: Props) => {
           </div>
           <div
             data-role="col-2"
-            className="flex flex-col items-start justify-end text-sm h-full"
+            className="flex h-full flex-col items-start justify-end text-sm"
           >
             <p className="flex items-center gap-1">
               <Image

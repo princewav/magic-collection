@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react';
 import { Deck } from '@/components/deck/Deck';
-import { useDeckSelection } from '@/context/DeckSelectionContext';
 import { Deck as DeckType } from '@/types/deck';
-import { DeleteDecksButton } from './DeleteDecksButton';
 import { DeckContextMenu } from './DeckContextMenu';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +16,6 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
     y: number;
     deckId: string;
   } | null>(null);
-  const { selectedDecks } = useDeckSelection();
 
   const handleContextMenu = (
     e: React.MouseEvent<Element, MouseEvent>,
@@ -39,9 +36,7 @@ export const DeckGrid = ({ decks }: DeckGridProps) => {
         'justify-start sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0 sm:px-0',
       )}
     >
-      {selectedDecks.length > 0 && (
-        <DeleteDecksButton deckCount={selectedDecks.length} />
-      )}
+      
       {decks.map((deck) => (
         <Deck
           key={deck.id}

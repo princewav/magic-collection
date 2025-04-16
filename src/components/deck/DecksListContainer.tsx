@@ -3,7 +3,8 @@
 import { DeckGrid } from '@/components/deck/DeckGrid';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { DeckSelectionProvider } from '@/context/DeckSelectionContext';
+import { DeleteDecksButton } from './DeleteDecksButton';
+import { useDeckSelection } from '@/context/DeckSelectionContext';
 
 interface DecksListContainerProps {
   decks: any[];
@@ -11,11 +12,16 @@ interface DecksListContainerProps {
 }
 
 export function DecksListContainer({ decks, type }: DecksListContainerProps) {
+  const { selectedDecks } = useDeckSelection();
+  console.log(selectedDecks);
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="flex items-center text-2xl font-bold">{type} decks</h1>
-        <div>
+        <div className="flex items-center gap-2">
+          {selectedDecks.length > 0 && (
+            <DeleteDecksButton deckCount={selectedDecks.length} />
+          )}
           <Button asChild>
             <Link href="/decks/new">Add Deck</Link>
           </Button>
@@ -28,9 +34,7 @@ export function DecksListContainer({ decks, type }: DecksListContainerProps) {
           </p>
         </div>
       ) : (
-        <DeckSelectionProvider>
-          <DeckGrid decks={decks} />
-        </DeckSelectionProvider>
+        <DeckGrid decks={decks} />
       )}
     </div>
   );

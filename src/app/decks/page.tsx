@@ -13,6 +13,7 @@ export default async function DecksPage() {
       <div className="mb-4 flex items-center justify-between">
         <h1 className="flex items-center font-bold text-2xl">Decks</h1>
         <div>
+          
           <Button asChild>
             <Link href="/decks/new">Add Deck</Link>
           </Button>

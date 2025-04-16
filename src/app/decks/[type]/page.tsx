@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { loadDecks } from '@/actions/deck/load-decks';
 import { DecksListContainer } from '@/components/deck/DecksListContainer';
 import { DecksListSkeleton } from '@/components/deck/DecksListSkeleton';
+import { DeckSelectionProvider } from '@/context/DeckSelectionContext';
 
 type Props = {
   params: Promise<{
@@ -21,7 +22,9 @@ export default async function DecksPage({ params }: Props) {
 
   return (
     <Suspense fallback={<DecksListSkeleton />}>
-      <DecksListContainer decks={decks} type={type} />
+      <DeckSelectionProvider>
+        <DecksListContainer decks={decks} type={type} />
+      </DeckSelectionProvider>
     </Suspense>
   );
 }
