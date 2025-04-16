@@ -37,7 +37,7 @@ export default function NewDeckPage({}: NewDeckPageProps) {
 
   return (
     <main className="mx-auto flex max-w-4xl flex-col p-4">
-      <h1 className="mb-6 text-xl font-bold">Create New Deck</h1>
+      <h1 className="mb-2 text-xl font-bold uppercase">Create New Deck</h1>
       <DeckForm onSubmit={handleDeckCreation} isSubmitting={isSubmitting} />
     </main>
   );

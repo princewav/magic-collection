@@ -93,7 +93,7 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="relative">
                       <FormLabel>Deck Name</FormLabel>
                       <FormControl>
                         <Input placeholder="My Awesome Deck" {...field} />
@@ -297,16 +297,15 @@ export const DeckForm: React.FC<DeckFormProps> = ({
                   control={form.control}
                   name="decklist"
                   render={({ field }) => (
-                    <FormItem className="mt-4 h-11/12">
-                      <FormLabel>Deck List</FormLabel>
+                    <FormItem className="h-full relative">
                       <FormControl>
                         <Textarea
                           placeholder="Paste your decklist here..."
                           {...field}
-                          className="h-full w-full"
+                          className="h-full w-full absolute inset-0 resize-none overflow-y-auto"
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="-top-5 absolute" />
                     </FormItem>
                   )}
                 />

@@ -36,7 +36,7 @@
   --color-ring: var(--primary-700);
   --color-input: var(--background-200);
   --color-border: var(--background-200);
-  --color-destructive-foreground: var(--text-50);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive: var(--accent-500);
   --color-accent-foreground: var(--text-900);
   --color-accent: var(--accent-600);
@@ -75,7 +75,7 @@
   --accent-muted: var(--accent-700);
   --accent-foreground: var(--text-900);
   --destructive: var(--accent-500);
-  --destructive-foreground: var(--text-50);
+  --destructive-foreground: #ef4444;
   --border: var(--background-200);
   --input: var(--background-200);
   --ring: var(--primary-700);
@@ -174,7 +174,7 @@
   --accent-muted: var(--accent-800);
   --accent-foreground: var(--text-50);
   --destructive: var(--accent-700);
-  --destructive-foreground: var(--text-50);
+  --destructive-foreground: #ff6b5d;
   --border: var(--background-800);
   --input: var(--background-800);
   --ring: var(--primary-700);
@@ -191,6 +191,7 @@
   --sidebar-accent-foreground: var(--text-50);
   --sidebar-border: var(--background-800);
   --sidebar-ring: var(--primary-700);
+  
 
   /* Dark theme color variables */
   --text-50: #070c13;
