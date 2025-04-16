@@ -53,9 +53,12 @@ export default async function CollectionPage({ params, searchParams }: Props) {
       >
         <main className="flex flex-col p-4">
           <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-4xl font-bold">
-              {capitalize(type)} collection: {totalUnique} unique cards (
-              {totalQuantity} total)
+            <h1 className="text-2xl font-bold">
+              {capitalize(type)} collection:{' '}
+              <span className="font-normal normal-case">
+                {totalUnique} unique cards (
+                {totalQuantity} total)
+              </span>
             </h1>
             <CsvImportButton
               collectionType={type}
