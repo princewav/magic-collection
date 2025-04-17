@@ -26,11 +26,11 @@ export class CardFilteringService {
     if (filters.colors && filters.colors.length > 0) {
       if (filters.exactColorMatch) {
         query.$and = [
-          { colors: { $all: filters.colors } },
-          { colors: { $size: filters.colors.length } },
+          { color_identity: { $all: filters.colors } },
+          { color_identity: { $size: filters.colors.length } },
         ];
       } else {
-        query.colors = { $in: filters.colors };
+        query.color_identity = { $in: filters.colors };
       }
     }
 
@@ -52,7 +52,7 @@ export class CardFilteringService {
   private _needsCustomSorting(filters: FilterOptions): boolean {
     return (
       filters.sortFields?.some(
-        (f) => f.field === 'colors' || f.field === 'rarity',
+        (f) => f.field === 'color_identity' || f.field === 'rarity',
       ) ?? false
     );
   }
@@ -71,18 +71,18 @@ export class CardFilteringService {
       });
     }
 
-    if (filters.sortFields?.some((f) => f.field === 'colors')) {
+    if (filters.sortFields?.some((f) => f.field === 'color_identity')) {
       stages.push({
         $addFields: {
-          _colorsArray: { $ifNull: ['$colors', []] },
+          _colorIdentityArray: { $ifNull: ['$color_identity', []] },
         },
       });
       stages.push({
         $addFields: {
-          _colorsArray: {
+          _colorIdentityArray: {
             $cond: {
-              if: { $isArray: '$_colorsArray' },
-              then: '$_colorsArray',
+              if: { $isArray: '$_colorIdentityArray' },
+              then: '$_colorIdentityArray',
               else: [],
             },
           },
@@ -93,10 +93,16 @@ export class CardFilteringService {
           _colorCategory: {
             $switch: {
               branches: [
-                { case: { $eq: [{ $size: '$_colorsArray' }, 0] }, then: 'C' },
-                { case: { $gt: [{ $size: '$_colorsArray' }, 1] }, then: 'M' },
+                {
+                  case: { $eq: [{ $size: '$_colorIdentityArray' }, 0] },
+                  then: 'C',
+                },
+                {
+                  case: { $gt: [{ $size: '$_colorIdentityArray' }, 1] },
+                  then: 'M',
+                },
               ],
-              default: { $arrayElemAt: ['$_colorsArray', 0] },
+              default: { $arrayElemAt: ['$_colorIdentityArray', 0] },
             },
           },
         },
@@ -124,7 +130,8 @@ export class CardFilteringService {
           case 'rarity':
             sortStage._rarityIndex = sortDirection;
             break;
-          case 'colors':
+          case 'color_identity':
+          case 'colors': // Support both for backward compatibility
             sortStage._colorIndex = sortDirection;
             break;
           case 'collector_number': // Ensure collector_number uses the numeric field
@@ -214,10 +221,10 @@ export class CardFilteringService {
       if (filters.sortFields?.some((f) => f.field === 'rarity')) {
         projectFields._rarityIndex = 0;
       }
-      if (filters.sortFields?.some((f) => f.field === 'colors')) {
+      if (filters.sortFields?.some((f) => f.field === 'color_identity')) {
         projectFields._colorIndex = 0;
         projectFields._colorCategory = 0;
-        projectFields._colorsArray = 0;
+        projectFields._colorIdentityArray = 0;
       }
     }
 
