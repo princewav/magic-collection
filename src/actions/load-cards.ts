@@ -129,10 +129,22 @@ export async function loadMoreCollectionCards(
     db.collection('collection-cards');
 
   const pipeline: any[] = [];
+
   // Stage 1: Initial Match
   pipeline.push({ $match: { collectionType } });
 
-  // Stage 2: Lookup Card Details
+  // Stage 2: Group by cardId and sum quantities
+  pipeline.push({
+    $group: {
+      _id: '$cardId',
+      quantity: { $sum: '$quantity' },
+      // Keep one instance of each field we need
+      cardId: { $first: '$cardId' },
+      collectionType: { $first: '$collectionType' },
+    },
+  });
+
+  // Stage 3: Lookup Card Details
   pipeline.push({
     $lookup: {
       from: 'cards',
@@ -142,27 +154,27 @@ export async function loadMoreCollectionCards(
     },
   });
 
-  // Stage 3: Unwind
+  // Stage 4: Unwind
   pipeline.push({
     $unwind: { path: '$cardDetails', preserveNullAndEmptyArrays: false },
   });
 
-  // Stage 4: Post-lookup match (filters)
+  // Stage 5: Post-lookup match (filters)
   if (Object.keys(filters).length > 0) {
     const matchStage = buildMatchStage(filters);
     pipeline.push(matchStage);
   }
 
-  // Stage 5: Sort
+  // Stage 6: Sort
   const sortStage = buildSortStage(filters.sortFields);
   pipeline.push(sortStage);
 
-  // Stage 6: Pagination
+  // Stage 7: Pagination
   const skip = (page - 1) * pageSize;
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: pageSize });
 
-  // Stage 7: Project
+  // Stage 8: Project
   pipeline.push({
     $project: {
       _id: { $toString: '$_id' },
@@ -202,9 +214,17 @@ export async function loadMoreCollectionCards(
   try {
     const results = await collectionCardsRepo.aggregate(pipeline).toArray();
 
-    // Get total count
+    // Get total count with the same grouping logic
     const countPipeline = [
       { $match: { collectionType } },
+      // Group by cardId to count unique cards
+      {
+        $group: {
+          _id: '$cardId',
+          cardId: { $first: '$cardId' },
+          quantity: { $sum: '$quantity' },
+        },
+      },
       {
         $lookup: {
           from: 'cards',
