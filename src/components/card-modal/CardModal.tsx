@@ -178,7 +178,7 @@ export default function CardModal() {
                 </div>
               )}
               <div className="flex flex-row justify-between md:flex-col md:space-y-1">
-                <h2 className="p-2 pb-0 text-left text-xl font-bold md:text-2xl">
+                <h2 className="p-2 pb-0 text-left text-xl font-bold md:text-2xl normal-case">
                   {currentFace?.name}
                 </h2>
                 {currentFace?.mana_cost && (

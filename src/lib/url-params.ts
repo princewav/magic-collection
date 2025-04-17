@@ -11,7 +11,8 @@ export function updateUrlWithFilters(
   // Clear existing filter parameters
   const searchParams = url.searchParams;
   Array.from(searchParams.keys()).forEach((key) => {
-    if (key !== 'page') {
+    if (key !== 'page' && key !== 'type') {
+      // Preserve the collection type parameter
       searchParams.delete(key);
     }
   });
@@ -49,8 +50,10 @@ export function updateUrlWithFilters(
     searchParams.set('sort', sortParam);
   }
 
-  // Add deduplicate option
-  searchParams.set('dedupe', deduplicate.toString());
+  // Add deduplicate option only for the main cards view
+  if (!url.pathname.includes('/collection/')) {
+    searchParams.set('dedupe', deduplicate.toString());
+  }
 
   // Update URL without refreshing the page
   window.history.pushState({}, '', url.toString());
@@ -130,7 +133,15 @@ export function getFiltersFromUrl(): {
   }
 
   const params = new URLSearchParams(window.location.search);
-  return parseSearchParams(params);
+  const isCollectionPage = window.location.pathname.includes('/collection/');
+  const result = parseSearchParams(params);
+
+  // Force deduplicate to false for collection pages
+  if (isCollectionPage) {
+    result.deduplicate = false;
+  }
+
+  return result;
 }
 
 // Server-side function accepting Next.js searchParams object
@@ -142,9 +153,6 @@ export function getFiltersFromSearchParams(searchParams: {
     get: (name: string): string | null => {
       const value = searchParams[name];
       if (Array.isArray(value)) {
-        // Handle array case if necessary, maybe join or take first?
-        // For this specific parser, it seems single values are expected.
-        // Returning the first element for simplicity, adjust if needed.
         return value[0] ?? null;
       }
       return value ?? null;

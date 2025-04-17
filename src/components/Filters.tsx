@@ -78,38 +78,39 @@ export function Filters({
   });
 
   useEffect(() => {
-    if (!collectionType) {
-      const { filters: urlFilters, deduplicate: urlDeduplicate } =
-        getFiltersFromUrl();
+    const { filters: urlFilters, deduplicate: urlDeduplicate } =
+      getFiltersFromUrl();
 
-      if (Object.keys(urlFilters).length > 0) {
-        const newFilters = {
-          ...contextFilters,
-          ...urlFilters,
-        };
+    if (Object.keys(urlFilters).length > 0) {
+      const newFilters = {
+        ...contextFilters,
+        ...urlFilters,
+      };
 
-        if (urlFilters.colors) setSelectedColors(urlFilters.colors);
-        if (urlFilters.cmcRange) setCmcRange(urlFilters.cmcRange);
-        if (urlFilters.rarities) setSelectedRarities(urlFilters.rarities);
-        if (urlFilters.sets) setSelectedSets(urlFilters.sets);
-        if (urlFilters.sortFields) setSortFields(urlFilters.sortFields);
-        if (urlFilters.exactColorMatch !== undefined)
-          setExactColorMatch(urlFilters.exactColorMatch);
+      if (urlFilters.colors) setSelectedColors(urlFilters.colors);
+      if (urlFilters.cmcRange) setCmcRange(urlFilters.cmcRange);
+      if (urlFilters.rarities) setSelectedRarities(urlFilters.rarities);
+      if (urlFilters.sets) setSelectedSets(urlFilters.sets);
+      if (urlFilters.sortFields) setSortFields(urlFilters.sortFields);
+      if (urlFilters.exactColorMatch !== undefined)
+        setExactColorMatch(urlFilters.exactColorMatch);
 
-        updateContextFilters(newFilters);
+      updateContextFilters(newFilters);
 
-        if (urlDeduplicate !== undefined && urlDeduplicate !== deduplicate) {
-          toggleDeduplicate();
-        }
+      if (
+        !collectionType &&
+        urlDeduplicate !== undefined &&
+        urlDeduplicate !== deduplicate
+      ) {
+        toggleDeduplicate();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collectionType]);
 
   useEffect(() => {
-    if (!collectionType) {
-      updateUrlWithFilters(prepareFilters(), deduplicate);
-    }
+    const currentFilters = prepareFilters();
+    updateUrlWithFilters(currentFilters, collectionType ? false : deduplicate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedColors,
