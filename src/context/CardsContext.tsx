@@ -8,11 +8,10 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { Card } from '@/types/card';
+import { Card, CardWithOptionalQuantity } from '@/types/card';
 import { loadFilteredCards, FilterOptions } from '@/actions/card/load-cards';
 import { fetchCollectionCards } from '@/actions/load-cards';
 
-type CardWithOptionalQuantity = Card & { quantity?: number };
 
 interface CardsContextType {
   cards: CardWithOptionalQuantity[];

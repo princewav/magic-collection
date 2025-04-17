@@ -2,7 +2,7 @@
 
 import { useCards } from '@/context/CardsContext';
 import { useCollection } from '@/context/CollectionContext';
-import { Card as CardType } from '@/types/card';
+import { Card as CardType, CardWithQuantity, CardWithOptionalQuantity } from '@/types/card';
 import { Card } from './Card';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -80,7 +80,7 @@ export function CardGrid({
   return (
     <div className="relative">
       <div className="flex flex-wrap justify-center gap-4">
-        {cards.map((card: CardType, index: number) => (
+        {cards.map((card, index) => (
           <div
             key={`${card.id}-${index}`}
             className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]"
@@ -89,12 +89,14 @@ export function CardGrid({
               onClick={() => openModal(card, cards)}
               className="h-full cursor-pointer"
             >
-              <Card
-                card={{
-                  ...card,
-                  quantity: collectionType ? (card).quantity || 0 : 0,
-                }}
-              />
+              {card.quantity !== undefined ? (
+                <Card
+                  card={card as CardWithQuantity}
+                  collectedQuantity={card.quantity || 0}
+                />
+              ) : (
+                <Card card={{ ...card, quantity: 0 }} />
+              )}
             </div>
           </div>
         ))}

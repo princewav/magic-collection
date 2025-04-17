@@ -173,6 +173,7 @@ export type CollectionCard = {
 };
 
 export type CardWithQuantity = Card & { quantity: number };
+export type CardWithOptionalQuantity = Card & { quantity?: number };
 
 export enum Rarity {
   COMMON = 'common',
