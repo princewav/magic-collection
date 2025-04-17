@@ -4,8 +4,9 @@ import Image from 'next/image';
 import { Wishlist } from '@/types/wishlist';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Edit, Heart } from 'lucide-react';
+import { Edit, Heart, Clipboard } from 'lucide-react';
 import { ManaSymbol } from '@/components/ManaSymbol';
+import { toast } from 'sonner';
 
 interface Props {
   wishlist: Wishlist;
@@ -39,6 +40,14 @@ export const WishlistInfo = ({ wishlist }: Props) => {
   const totalPrice = wishlist.cards.reduce((acc, card) => {
     return acc + parseFloat(card.prices.eur || '0') * card.quantity;
   }, 0);
+
+  const handleCopyToClipboard = () => {
+    const formattedCards = wishlist.cards
+      .map((card) => `${card.quantity}x ${card.name}`)
+      .join('\n');
+    navigator.clipboard.writeText(formattedCards);
+    toast.success('Wishlist copied to clipboard');
+  };
 
   return (
     <div className="bg-foreground/10 relative mb-4 flex min-w-[370px] items-center justify-between overflow-hidden rounded-md p-4 shadow-md">
@@ -81,12 +90,22 @@ export const WishlistInfo = ({ wishlist }: Props) => {
         </div>
       </div>
       <div className="flex flex-col items-end justify-between space-y-2">
-        <Link href={`/wishlists/${wishlist.id}/edit`}>
-          <Button className="">
-            <Edit className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:block">Edit Wishlist</span>
+        <div className="flex flex-col items-end justify-between space-y-2">
+          <Button
+            variant="outline"
+            onClick={handleCopyToClipboard}
+            className="md:w-40"
+          >
+            <Clipboard className="h-4 w-4" />
+            <span className="hidden md:block">Copy List</span>
           </Button>
-        </Link>
+          <Link href={`/wishlists/${wishlist.id}/edit`}>
+            <Button className="md:w-40">
+              <Edit className="h-4 w-4" />
+              <span className="hidden md:block">Edit Wishlist</span>
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
