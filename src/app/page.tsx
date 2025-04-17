@@ -7,6 +7,7 @@ import { getFiltersFromSearchParams } from '@/lib/url-params';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CardModalProvider } from '@/context/CardModalContext';
 import { CardsProvider } from '@/context/CardsContext';
+import { CollectionProvider } from '@/context/CollectionContext';
 
 export const metadata: Metadata = {
   title: 'MTG Collection',
@@ -35,18 +36,20 @@ export default async function Page({ searchParams }: PageProps) {
   return (
     <CardModalProvider>
       <CardsProvider initialCards={[]} initialTotal={0}>
-        <div className="min-h-screen px-4 pt-2 pb-4">
-          <Filters className="mb-4" />
-          <Suspense fallback={<CardGridSkeleton />}>
-            <CardContainer
-              filters={filters}
-              page={page}
-              pageSize={pageSize}
-              deduplicate={deduplicate}
-            />
-          </Suspense>
-          <CardModal />
-        </div>
+        <CollectionProvider collectionType="paper">
+          <div className="min-h-screen px-4 pt-2 pb-4">
+            <Filters className="mb-4" />
+            <Suspense fallback={<CardGridSkeleton />}>
+              <CardContainer
+                filters={filters}
+                page={page}
+                pageSize={pageSize}
+                deduplicate={deduplicate}
+              />
+            </Suspense>
+            <CardModal />
+          </div>
+        </CollectionProvider>
       </CardsProvider>
     </CardModalProvider>
   );

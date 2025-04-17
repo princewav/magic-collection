@@ -83,7 +83,7 @@ export function CardGrid({
         {cards.map((card, index) => (
           <div
             key={`${card.id}-${index}`}
-            className="w-full sm:w-[min(100%,350px)] md:w-[min(100%,300px)] lg:w-[min(100%,280px)]"
+            className="w-72 sm:w-[min(100%,275px)]"
           >
             <div
               onClick={() => openModal(card, cards)}

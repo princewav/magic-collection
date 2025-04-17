@@ -20,7 +20,7 @@ import Image from 'next/image';
 
 function getTriggerStyleClasses(active?: boolean) {
   return cn(
-    'inline-flex h-auto w-max flex-col items-center justify-center gap-0.5 rounded-md px-4 py-1 md:py-2 text-xs font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 md:flex-row md:gap-2 md:text-sm',
+    'inline-flex h-auto w-max flex-col items-center justify-center gap-0.5 rounded-md px-3 py-1 md:py-2 text-xs font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 md:flex-row md:gap-2 md:text-sm',
     'hover:bg-accent/10 focus:bg-accent/20',
     active
       ? 'bg-secondary/30 font-semibold dark:bg-primary/10 dark:hover:bg-primary/20'
@@ -41,7 +41,7 @@ const Navbar: React.FC<{}> = () => {
         <Logo className="w-15 md:mr-4" />
       </Link>
       <NavigationMenu className="justify-around md:justify-start md:gap-2">
-        <NavigationMenuList className="flex justify-around gap-8 md:w-auto md:justify-start md:gap-2">
+        <NavigationMenuList className="flex justify-around gap-4 sm:gap-8  md:w-auto md:justify-start md:gap-2">
           <NavigationMenuItem>
             <NavigationMenuTrigger
               className={cn(

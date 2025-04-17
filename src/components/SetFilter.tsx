@@ -30,7 +30,7 @@ export function SetFilter({ selectedSets, onSetChange }: SetFilterProps) {
 
   return (
     <div className="grid grid-rows-[auto_1fr] gap-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
         <h3 className="text-xs font-medium md:text-sm">Sets</h3>
         {selectedSets.length > 0 && (
           <button
