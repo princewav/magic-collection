@@ -52,23 +52,9 @@ export function CollectionProvider({
     exactColorMatch: false,
   });
 
-  console.log('[CollectionContext] State:', {
-    collectedCards: collectedCards.length,
-    isLoading,
-    error,
-    page,
-    total,
-    currentFilters,
-    collectionType,
-  });
 
   const fetchCollectedCards = useCallback(
     async (pageNum = 1) => {
-      console.log('[CollectionContext] Fetching cards:', {
-        pageNum,
-        currentFilters,
-        collectionType,
-      });
       setIsLoading(true);
       try {
         const { cards, total } = await fetchCollectionCards(
@@ -76,11 +62,6 @@ export function CollectionProvider({
           currentFilters,
           pageNum,
         );
-
-        console.log('[CollectionContext] Fetched data:', {
-          cards: cards.length,
-          total,
-        });
 
         if (pageNum === 1) {
           setCollectedCards(cards);
@@ -105,19 +86,16 @@ export function CollectionProvider({
 
   // Initial load
   useEffect(() => {
-    console.log('[CollectionContext] Initial load');
     fetchCollectedCards(1);
   }, [fetchCollectedCards]);
 
   const loadNextPage = useCallback(() => {
-    console.log('[CollectionContext] Loading next page:', page + 1);
     const nextPage = page + 1;
     setPage(nextPage);
     fetchCollectedCards(nextPage);
   }, [page, fetchCollectedCards]);
 
   const applyFilter = useCallback((filterOptions: FilterOptions) => {
-    console.log('[CollectionContext] Applying filters:', filterOptions);
     setCurrentFilters(filterOptions);
     setPage(1);
     // Filters will be applied on the next fetchCollectedCards call triggered by the useEffect

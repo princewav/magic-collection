@@ -56,8 +56,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
             <h1 className="text-2xl font-bold">
               {capitalize(type)} collection:{' '}
               <span className="font-normal normal-case">
-                {totalUnique} unique cards (
-                {totalQuantity} total)
+                {totalUnique} unique cards ({totalQuantity} total)
               </span>
             </h1>
             <CsvImportButton
@@ -65,7 +64,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
               parseCsv={parseCSVandInsert}
             />
           </div>
-          <Filters className="mb-4" />
+          <Filters className="mb-4" collectionType={type} />
           <CardContainer
             filters={filters}
             collectionType={type}

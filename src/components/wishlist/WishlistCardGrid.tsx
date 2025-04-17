@@ -49,7 +49,6 @@ export const WishlistCardGrid = ({ wishlist }: Props) => {
       wishlist.cards.forEach((card) => {
         const key = getLocalStorageKey(wishlist.id, card.cardId);
         localStorage.removeItem(key);
-        console.log('Removed key:', key);
       });
       setResetTrigger((prev) => prev + 1);
     }

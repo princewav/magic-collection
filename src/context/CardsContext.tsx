@@ -86,14 +86,7 @@ export function CardsProvider({
       try {
         let result: { cards: CardWithOptionalQuantity[]; total: number };
 
-        console.log('[CardsContext] loadCards', {
-          page,
-          currentCollectionType,
-          currentFilters,
-        });
-
         if (currentCollectionType) {
-          console.log('[CardsContext] Using fetchCollectionCards');
           result = await fetchCollectionCards(
             currentCollectionType,
             currentFilters,
@@ -101,7 +94,6 @@ export function CardsProvider({
             pageSize,
           );
         } else {
-          console.log('[CardsContext] Using loadFilteredCards');
           result = await loadFilteredCards(
             currentFilters,
             page,

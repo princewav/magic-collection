@@ -13,7 +13,7 @@ interface DecksListContainerProps {
 
 export function DecksListContainer({ decks, type }: DecksListContainerProps) {
   const { selectedDecks } = useDeckSelection();
-  console.log(selectedDecks);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-4 flex items-center justify-between">
