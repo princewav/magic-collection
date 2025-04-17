@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import React from 'react';
+import CardModal from '@/components/card-modal/CardModal';
 // const inter = Inter({ subsets: ['latin'] }); // Remove Inter usage
 
 export const metadata: Metadata = {
@@ -35,9 +36,12 @@ export default function RootLayout({
       >
         <React.StrictMode>
           <ThemeProvider>
-            <Navbar />
-            <CardModalProvider>{children}</CardModalProvider>
-            <Toaster />
+            <CardModalProvider>
+              <Navbar />
+              {children}
+              <CardModal />
+              <Toaster />
+            </CardModalProvider>
           </ThemeProvider>
         </React.StrictMode>
       </body>

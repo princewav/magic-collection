@@ -28,10 +28,7 @@ const NoImageFallback = ({ card }: { card: CardType }) => (
     <p data-role="oracle-text-fallback" className="text-sm text-gray-600">
       Oracle: {card.oracle_text || 'N/A'}
     </p>
-    <p
-      data-role="power-toughness-fallback"
-      className="text-sm text-gray-600"
-    >
+    <p data-role="power-toughness-fallback" className="text-sm text-gray-600">
       Power/Toughness: {card.power}/{card.toughness}
     </p>
   </div>
@@ -43,6 +40,16 @@ export function Card({
   className,
   onClick,
 }: CardProps) {
+  const { openModal } = useCardModal();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      openModal(card);
+    }
+  };
+
   return (
     <div
       data-role="card-container"
@@ -50,7 +57,7 @@ export function Card({
         'bg-foreground/10 relative flex h-full w-full transform cursor-pointer flex-col items-center justify-center rounded-md p-2 shadow-md transition-transform',
         className,
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {collectedQuantity !== undefined && (
         <div
