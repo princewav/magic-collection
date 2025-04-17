@@ -208,12 +208,6 @@ export async function loadMoreCollectionCards(
   page: number = 1,
   pageSize: number = 50,
 ) {
-  console.log('Starting loadMoreCollectionCards with:', {
-    collectionType,
-    filters,
-    page,
-    pageSize,
-  });
 
   const db: Db = DB;
   const collectionCardsRepo: Collection<CollectionCard> =
@@ -251,7 +245,6 @@ export async function loadMoreCollectionCards(
 
   // Stage 5: Add color sorting stages
   const colorStages = buildColorSortStages();
-  console.log('Color sorting stages:', JSON.stringify(colorStages, null, 2));
   pipeline.push(...colorStages);
 
   // Stage 5.1: Add rarity sorting stage if needed
@@ -268,13 +261,11 @@ export async function loadMoreCollectionCards(
   // Stage 6: Post-lookup match (filters)
   if (Object.keys(filters).length > 0) {
     const matchStage = buildMatchStage(filters);
-    console.log('Match stage:', JSON.stringify(matchStage, null, 2));
     pipeline.push(matchStage);
   }
 
   // Stage 7: Sort
   const sortStage = buildSortStage(filters.sortFields);
-  console.log('Sort stage:', JSON.stringify(sortStage, null, 2));
   pipeline.push(sortStage);
 
   // Stage 8: Pagination
@@ -322,21 +313,8 @@ export async function loadMoreCollectionCards(
     },
   });
 
-  console.log('Complete pipeline:', JSON.stringify(pipeline, null, 2));
-
   try {
     const results = await collectionCardsRepo.aggregate(pipeline).toArray();
-    console.log('Query results count:', results.length);
-    console.log(
-      'First 3 results with color info:',
-      results.slice(0, 3).map((r) => ({
-        name: r.cardDetails.name,
-        colorIdentity: r.cardDetails.color_identity,
-        _colorCategory: r._colorCategory,
-        _colorIndex: r._colorIndex,
-        _colorIdentityArray: r._colorIdentityArray,
-      })),
-    );
 
     // Get total count with the same grouping logic
     const countPipeline = [
@@ -374,15 +352,6 @@ export async function loadMoreCollectionCards(
       };
     });
 
-    console.log('Processed results count:', processedResults.length);
-    console.log(
-      'First 3 processed results:',
-      processedResults.slice(0, 3).map((r) => ({
-        name: r.name,
-        colorIdentity: r.color_identity,
-        quantity: r.quantity,
-      })),
-    );
 
     return {
       cards: processedResults,
