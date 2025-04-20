@@ -5,9 +5,17 @@ import { z } from 'zod';
 import { deckService } from '@/db/services/DeckService';
 import { revalidatePath } from 'next/cache';
 import { importDeckList } from './import-list';
+import { getServerSession } from 'next-auth/next';
+import { authConfig } from '@/auth/auth.config';
 
 export const createDeck = async (values: z.infer<typeof deckSchema>) => {
   try {
+    // Get the current user's session
+    const session = await getServerSession(authConfig);
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+
     // Check for existing decks with the same name
     let deckName = values.name;
     let existingDecks = await deckService.repo.findBy({ name: deckName });
@@ -21,6 +29,7 @@ export const createDeck = async (values: z.infer<typeof deckSchema>) => {
 
     const deck = await deckService.repo.create({
       id: '',
+      userId: session.user.id,
       name: deckName, // Use the unique deck name
       type: values.type,
       imageUrl: values.imageUrl ?? null,

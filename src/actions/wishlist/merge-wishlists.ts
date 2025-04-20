@@ -75,6 +75,7 @@ export async function mergeWishlists(
       cardCount: totalCardCount,
       totalPrice: totalPrice,
       cards: mergedCardsArray,
+      userId: ''
     });
 
     // Revalidate the wishlists path

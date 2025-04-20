@@ -4,12 +4,27 @@ import { wishlistService } from '@/db/services/WishlistService';
 import { loadDeckById } from '@/actions/deck/load-decks';
 import { getMissingCards } from '@/actions/deck/missing-cards';
 import { revalidatePath } from 'next/cache';
+import { getServerSession } from 'next-auth/next';
+import { authConfig } from '@/auth/auth.config';
 
 export async function createWishlistFromMissingCards(deckId: string) {
   try {
+    // Get the current user's session
+    const session = await getServerSession(authConfig);
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+
     const deck = await loadDeckById(deckId);
     if (!deck) {
       throw new Error('Deck not found');
+    }
+
+    // Ensure the deck belongs to the current user
+    if (deck.userId !== session.user.id) {
+      throw new Error(
+        'Unauthorized: You can only create wishlists from your own decks',
+      );
     }
 
     const missingCards = await getMissingCards(deckId);
@@ -47,6 +62,7 @@ export async function createWishlistFromMissingCards(deckId: string) {
     // Create the wishlist
     const wishlist = await wishlistService.repo.create({
       id: '',
+      userId: session.user.id, // Use the current user's ID
       name: finalWishlistName,
       imageUrl: deck.imageUrl,
       colors: deck.colors,

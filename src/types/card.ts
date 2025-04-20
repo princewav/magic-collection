@@ -140,6 +140,7 @@ export function extractMtgCardData(sourceObj: unknown & Card): Card {
 
 export type CollectionCard = {
   id: string;
+  userId: string;
   binderName: string;
   binderType: string;
   name: string;

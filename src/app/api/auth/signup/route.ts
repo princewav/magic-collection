@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
-import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { userService } from '@/db/services/UserService';
 
 // Create a validation schema
 const userSchema = z.object({
@@ -26,47 +25,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, password } = validation.data;
+    const userData = validation.data;
 
-    // Connect to MongoDB
-    const client = new MongoClient(process.env.MONGODB_URI!);
-    await client.connect();
+    try {
+      // Create the user using UserService
+      const newUser = await userService.createUser(userData);
 
-    const db = client.db('magic-collection');
-    const usersCollection = db.collection('users');
-
-    // Check if user already exists
-    const existingUser = await usersCollection.findOne({ email });
-
-    if (existingUser) {
-      await client.close();
+      // Return success
       return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 },
+        {
+          success: true,
+          user: newUser,
+        },
+        { status: 201 },
       );
+    } catch (error: any) {
+      if (error.message === 'User with this email already exists') {
+        return NextResponse.json({ error: error.message }, { status: 409 });
+      }
+      throw error; // Re-throw for general error handling
     }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the user
-    const insertResult = await usersCollection.insertOne({
-      name,
-      email,
-      password: hashedPassword,
-      createdAt: new Date(),
-    });
-
-    await client.close();
-
-    // Return success
-    return NextResponse.json(
-      {
-        success: true,
-        user: { id: insertResult.insertedId.toString(), name, email },
-      },
-      { status: 201 },
-    );
   } catch (error) {
     console.error('Signup error:', error);
     return NextResponse.json(

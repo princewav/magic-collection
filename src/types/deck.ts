@@ -11,6 +11,7 @@ export type DeckCard = {
 export type ManaColor = 'W' | 'U' | 'B' | 'R' | 'G' | 'C';
 export type DeckInfo = {
   id: string;
+  userId: string;
   name: string;
   imageUrl: string | null; // Keep as null if it doesn't exist
   colors: ManaColor[];

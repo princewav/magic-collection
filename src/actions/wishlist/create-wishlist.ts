@@ -4,11 +4,19 @@ import { wishlistSchema } from '@/app/wishlists/new/validation';
 import { z } from 'zod';
 import { wishlistService } from '@/db/services/WishlistService';
 import { revalidatePath } from 'next/cache';
+import { getServerSession } from 'next-auth/next';
+import { authConfig } from '@/auth/auth.config';
 
 export const createWishlist = async (
   values: z.infer<typeof wishlistSchema>,
 ) => {
   try {
+    // Get the current user's session
+    const session = await getServerSession(authConfig);
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+
     // Check for existing wishlists with the same name
     let wishlistName = values.name;
     let existingWishlists = await wishlistService.repo.findBy({
@@ -26,6 +34,7 @@ export const createWishlist = async (
 
     const wishlist = await wishlistService.repo.create({
       id: '',
+      userId: session.user.id,
       name: wishlistName,
       imageUrl: values.imageUrl ?? null,
       colors: values.colors,

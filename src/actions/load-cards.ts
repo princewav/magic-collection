@@ -12,6 +12,8 @@ import { FilterOptions } from '@/actions/card/load-cards';
 import { SortField } from '@/components/SortOptions';
 import { DB } from '@/db/db';
 import { Collection, Db } from 'mongodb';
+import { getServerSession } from 'next-auth/next';
+import { authConfig } from '@/auth/auth.config';
 
 const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
 
@@ -42,8 +44,14 @@ export async function loadCardDetailsByNames(names: string[]): Promise<Card[]> {
 export async function loadCardsInCollection(
   type: 'paper' | 'arena',
 ): Promise<CollectionCard[]> {
+  // Get the current user's session
+  const session = await getServerSession(authConfig);
+  if (!session?.user?.id) {
+    throw new Error('User not authenticated');
+  }
+
   // This might only be needed for initial count, aggregation handles fetching
-  const cards = await collectionCardService.getByType(type);
+  const cards = await collectionCardService.getByType(session.user.id, type);
   if (!cards) {
     throw new Error('Failed to load cards in collection: ' + type);
   }
@@ -208,7 +216,6 @@ export async function loadMoreCollectionCards(
   page: number = 1,
   pageSize: number = 50,
 ) {
-
   const db: Db = DB;
   const collectionCardsRepo: Collection<CollectionCard> =
     db.collection('collection-cards');
@@ -351,7 +358,6 @@ export async function loadMoreCollectionCards(
         quantity: result.quantity,
       };
     });
-
 
     return {
       cards: processedResults,

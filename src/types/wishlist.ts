@@ -12,6 +12,7 @@ export type WishlistCard = {
 
 export type WishlistInfo = {
   id: string;
+  userId: string;
   name: string;
   imageUrl: string | null;
   colors: ManaColor[];

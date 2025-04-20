@@ -4,6 +4,17 @@ import { collectionCardService } from '@/db/services/CollectionCardService';
 import { Card, CollectionCard } from '@/types/card';
 import { loadCardsById } from '@/actions/load-cards';
 import { DBDeck } from '@/types/deck';
+import { getServerSession } from 'next-auth/next';
+import { authConfig } from '@/auth/auth.config';
+
+// Helper function to get current user ID
+async function getCurrentUserId(): Promise<string> {
+  const session = await getServerSession(authConfig);
+  if (!session?.user?.id) {
+    throw new Error('User not authenticated');
+  }
+  return session.user.id;
+}
 
 async function loadDeckCards(deck: DBDeck): Promise<Deck> {
   const processCardSection = async (
@@ -58,8 +69,9 @@ async function loadDeckCards(deck: DBDeck): Promise<Deck> {
 
 export async function loadDeckById(id: string): Promise<Deck | null> {
   try {
-    const decks = await deckService.repo.get([id]);
-    const deck = decks?.[0];
+    const userId = await getCurrentUserId();
+    // Use findById method that now requires userId
+    const deck = await deckService.findById(userId, id);
     if (!deck) {
       return null;
     }
@@ -75,7 +87,9 @@ export async function loadCollectionCardsById(
   cardIds: string[],
 ): Promise<CollectionCard[]> {
   try {
-    const cards = await collectionCardService.getByCardId(cardIds);
+    const userId = await getCurrentUserId();
+    // Pass userId to getByCardId
+    const cards = await collectionCardService.getByCardId(userId, cardIds);
     return cards ? cards : [];
   } catch (e) {
     console.error(e);
@@ -87,7 +101,9 @@ export async function loadCollectionCardsByName(
   cardNames: string[],
 ): Promise<CollectionCard[]> {
   try {
-    const cards = await collectionCardService.getByCardNames(cardNames);
+    const userId = await getCurrentUserId();
+    // Pass userId to getByCardNames
+    const cards = await collectionCardService.getByCardNames(userId, cardNames);
     return cards ? cards : [];
   } catch (e) {
     console.error(e);
@@ -97,11 +113,16 @@ export async function loadCollectionCardsByName(
 
 export async function loadDecks(type?: 'paper' | 'arena'): Promise<Deck[]> {
   try {
+    const userId = await getCurrentUserId();
+
     if (type) {
-      const decks = await deckService.findByType(type);
+      // Pass userId to findByType
+      const decks = await deckService.findByType(userId, type);
       return await Promise.all(decks.map(loadDeckCards));
     }
-    const decks = await deckService.repo.getAll();
+
+    // If no type specified, use findByUserId
+    const decks = await deckService.findByUserId(userId);
     return await Promise.all(decks.map(loadDeckCards));
   } catch (e) {
     console.error(e);
