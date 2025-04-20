@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, Heart, ListChecks, ChevronDown, LogOut } from 'lucide-react';
+import { Book, Heart, ListChecks } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
@@ -13,12 +13,11 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { useSession, signOut } from 'next-auth/react';
-import { Button } from '@/components/ui/button';
+import { useSession } from 'next-auth/react';
+import { UserMenu } from './UserMenu';
 
 function getTriggerStyleClasses(active?: boolean) {
   return cn(
@@ -190,23 +189,7 @@ const Navbar: React.FC<{}> = () => {
       </NavigationMenu>
       <div className="flex items-center gap-2 md:ml-auto">
         <ThemeToggle />
-        {session ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => signOut({ callbackUrl: '/auth/signout' })}
-            className="h-9 w-9"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="sr-only">Sign out</span>
-          </Button>
-        ) : (
-          <Link href="/auth/login">
-            <Button variant="ghost" size="sm">
-              Sign in
-            </Button>
-          </Link>
-        )}
+        <UserMenu session={session} />
       </div>
     </nav>
   );
