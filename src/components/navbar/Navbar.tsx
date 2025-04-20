@@ -188,7 +188,7 @@ const Navbar: React.FC<{}> = () => {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:ml-auto">
         <ThemeToggle />
         {session ? (
           <Button
