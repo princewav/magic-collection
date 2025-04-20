@@ -26,15 +26,29 @@ export const authConfig: NextAuthOptions = {
   providers: [], // This will be passed from auth.ts
   pages: {
     signIn: '/auth/login',
+    error: '/auth/error',
   },
+  session: {
+    strategy: 'jwt',
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
   callbacks: {
-    jwt({ token, user }: { token: JWT; user: any }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({ token, user, account }) {
+      // Initial sign in
+      if (account && user) {
+        console.log('JWT callback - initial signin', { user });
+        return {
+          ...token,
+          id: user.id,
+        };
       }
+
+      // Return previous token if the access token has not expired yet
       return token;
     },
-    session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token }) {
+      console.log('Session callback', { token, session });
       if (token && session.user) {
         session.user.id = token.id as string;
       }

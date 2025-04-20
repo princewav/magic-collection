@@ -1,47 +1,54 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export default function AuthErrorPage() {
+export default function ErrorPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const error = searchParams.get('error');
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    if (!error) {
-      router.push('/auth/login');
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      switch (errorParam) {
+        case 'Configuration':
+          setError('There is a problem with the server configuration.');
+          break;
+        case 'AccessDenied':
+          setError('You do not have access to this resource.');
+          break;
+        case 'Verification':
+          setError('The verification failed or token has expired.');
+          break;
+        case 'CredentialsSignin':
+          setError('The credentials you provided are invalid.');
+          break;
+        default:
+          setError('An unknown error occurred during authentication.');
+          break;
+      }
+    } else {
+      setError('An unknown error occurred during authentication.');
     }
-  }, [error, router]);
+  }, [searchParams]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md space-y-8 rounded-lg border p-6 shadow-lg">
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="bg-card mx-auto w-full max-w-md rounded-lg border p-6 shadow-sm">
         <div className="text-center">
-          <h2 className="text-destructive text-3xl font-bold">Error</h2>
-          <p className="text-muted-foreground mt-2 text-sm">
-            {error === 'OAuthSignin' &&
-              'Error during sign in. Please try again.'}
-            {error === 'OAuthCallback' &&
-              'Error during OAuth callback. Please try again.'}
-            {error === 'OAuthCreateAccount' &&
-              'Error creating account. Please try again.'}
-            {error === 'EmailCreateAccount' &&
-              'Error creating account. Please try again.'}
-            {error === 'Callback' && 'Error during callback. Please try again.'}
-            {error === 'OAuthAccountNotLinked' &&
-              'Email already in use with different provider.'}
-            {error === 'EmailSignin' && 'Check your email address.'}
-            {error === 'CredentialsSignin' &&
-              'Sign in failed. Check the details you provided are correct.'}
-            {error === 'Default' && 'An error occurred. Please try again.'}
-          </p>
+          <h2 className="text-destructive text-3xl font-bold">
+            Authentication Error
+          </h2>
+          <p className="text-muted-foreground mt-2 text-sm">{error}</p>
         </div>
-        <div className="mt-8">
-          <Button className="w-full" onClick={() => router.push('/auth/login')}>
-            Back to Login
+        <div className="mt-6 space-y-4">
+          <Button asChild className="w-full">
+            <Link href="/auth/login">Try Again</Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link href="/">Go to Homepage</Link>
           </Button>
         </div>
       </div>

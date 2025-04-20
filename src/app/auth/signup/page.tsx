@@ -4,16 +4,15 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Github, Mail } from 'lucide-react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,26 +22,39 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Use the credentials provider to sign in
-      const response = await signIn('credentials', {
+      // Call our API to create a new user
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      toast.success('Account created successfully');
+
+      // Sign in the user after successful signup
+      const signInResponse = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
 
-      console.log('Sign-in response:', response);
+      console.log('Sign-in response:', signInResponse);
 
-      if (!response?.ok) {
-        throw new Error(response?.error || 'Invalid credentials');
+      if (!signInResponse?.ok) {
+        throw new Error('Error signing in after registration');
       }
 
       // Redirect on success
-      toast.success('Signed in successfully');
-      window.location.href = callbackUrl; // Use window.location to ensure full page reload
+      window.location.href = '/'; // Use window.location to ensure full page reload
     } catch (error: any) {
-      console.error('Login failed:', error);
-      toast.error(error.message || 'Invalid credentials');
-    } finally {
+      console.error('Signup failed:', error);
+      toast.error(error.message || 'Failed to create account');
       setIsLoading(false);
     }
   };
@@ -51,13 +63,23 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="bg-card w-full max-w-md rounded-lg border p-6 shadow-sm">
         <div className="text-center">
-          <h2 className="text-3xl font-bold">Welcome back</h2>
+          <h2 className="text-3xl font-bold">Create an account</h2>
           <p className="text-muted-foreground mt-2 text-sm">
-            Sign in to your account to continue
+            Sign up to get started
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="John Doe"
+              required
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -80,7 +102,7 @@ export default function LoginPage() {
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign in with Email'}
+            {isLoading ? 'Creating account...' : 'Sign up with Email'}
           </Button>
         </form>
 
@@ -99,7 +121,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => signIn('github', { callbackUrl })}
+            onClick={() => signIn('github', { callbackUrl: '/' })}
           >
             <Github className="mr-2 h-4 w-4" />
             Continue with GitHub
@@ -107,7 +129,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => signIn('google', { callbackUrl })}
+            onClick={() => signIn('google', { callbackUrl: '/' })}
           >
             <Mail className="mr-2 h-4 w-4" />
             Continue with Google
@@ -116,12 +138,12 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center text-sm">
           <p className="text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            Already have an account?{' '}
             <Link
-              href="/auth/signup"
+              href="/auth/login"
               className="text-primary font-medium hover:underline"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </div>
