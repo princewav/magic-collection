@@ -1,5 +1,5 @@
 import type { Metadata } from 'next/types';
-// import { Inter } from 'next/font/google'; // Remove Inter
+import { Inter } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import './globals.css';
@@ -10,11 +10,13 @@ import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import React from 'react';
 import CardModal from '@/components/card-modal/CardModal';
-// const inter = Inter({ subsets: ['latin'] }); // Remove Inter usage
+import { AuthProvider } from '@/components/providers/AuthProvider';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'MTG Card Viewer',
-  description: 'View MTG Cards',
+  title: 'Magic Collection',
+  description: 'Manage your Magic: The Gathering collection',
 };
 
 export default function RootLayout({
@@ -26,16 +28,21 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(GeistSans.variable, GeistMono.variable)} // Add Geist variables
+      className={cn(GeistSans.variable, GeistMono.variable)}
     >
       <body
         className={cn(
-          // inter.className, // Remove Inter className
+          inter.className,
           'bg-background text-foreground mb-20 min-h-screen md:mb-0',
         )}
       >
-        <React.StrictMode>
-          <ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <CardModalProvider>
               <Navbar />
               {children}
@@ -43,7 +50,7 @@ export default function RootLayout({
               <Toaster />
             </CardModalProvider>
           </ThemeProvider>
-        </React.StrictMode>
+        </AuthProvider>
       </body>
     </html>
   );

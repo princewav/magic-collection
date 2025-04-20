@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, Heart, ListChecks, ChevronDown } from 'lucide-react';
+import { Book, Heart, ListChecks, ChevronDown, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useSession, signOut } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
 
 function getTriggerStyleClasses(active?: boolean) {
   return cn(
@@ -30,6 +32,8 @@ function getTriggerStyleClasses(active?: boolean) {
 
 const Navbar: React.FC<{}> = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
   return (
     <nav
       data-role="navbar-container"
@@ -41,7 +45,7 @@ const Navbar: React.FC<{}> = () => {
         <Logo className="w-15 md:mr-4" />
       </Link>
       <NavigationMenu className="justify-around md:justify-start md:gap-2">
-        <NavigationMenuList className="flex justify-around gap-4 sm:gap-8  md:w-auto md:justify-start md:gap-2">
+        <NavigationMenuList className="flex justify-around gap-4 sm:gap-8 md:w-auto md:justify-start md:gap-2">
           <NavigationMenuItem>
             <NavigationMenuTrigger
               className={cn(
@@ -66,9 +70,7 @@ const Navbar: React.FC<{}> = () => {
                     asChild
                     className="flex flex-row items-center gap-2"
                   >
-                    <Link
-                      href="/decks/paper"
-                    >
+                    <Link href="/decks/paper">
                       <Image
                         src="/images/card-w.png"
                         alt=""
@@ -87,9 +89,7 @@ const Navbar: React.FC<{}> = () => {
                     asChild
                     className="flex flex-row items-center gap-2"
                   >
-                    <Link
-                      href="/decks/arena"
-                    >
+                    <Link href="/decks/arena">
                       <Image
                         src="/images/arena-w.png"
                         alt=""
@@ -134,9 +134,7 @@ const Navbar: React.FC<{}> = () => {
                     asChild
                     className="flex flex-row items-center gap-2"
                   >
-                    <Link
-                      href="/collection/paper"
-                    >
+                    <Link href="/collection/paper">
                       <Image
                         src="/images/card-w.png"
                         alt=""
@@ -155,9 +153,7 @@ const Navbar: React.FC<{}> = () => {
                     asChild
                     className="flex flex-row items-center gap-2"
                   >
-                    <Link
-                      href="/collection/arena"
-                    >
+                    <Link href="/collection/arena">
                       <Image
                         src="/images/arena-w.png"
                         alt=""
@@ -192,11 +188,25 @@ const Navbar: React.FC<{}> = () => {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <div
-        data-role="theme-toggle-container"
-        className="flex items-center md:ml-auto"
-      >
+      <div className="flex items-center gap-2">
         <ThemeToggle />
+        {session ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => signOut({ callbackUrl: '/auth/signout' })}
+            className="h-9 w-9"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="sr-only">Sign out</span>
+          </Button>
+        ) : (
+          <Link href="/auth/login">
+            <Button variant="ghost" size="sm">
+              Sign in
+            </Button>
+          </Link>
+        )}
       </div>
     </nav>
   );
