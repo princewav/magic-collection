@@ -10,7 +10,9 @@ export function middleware(request: NextRequest) {
   if (isProtectedRoute) {
     const token = request.cookies.get('next-auth.session-token');
     if (!token) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      const url = new URL('/auth/login', request.url);
+      url.searchParams.set('callbackUrl', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
     }
   }
 

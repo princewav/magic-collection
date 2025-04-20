@@ -3,8 +3,12 @@
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Github, Mail } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md space-y-8 rounded-lg border p-6 shadow-lg">
@@ -18,7 +22,7 @@ export default function LoginPage() {
           <Button
             className="w-full"
             variant="outline"
-            onClick={() => signIn('github', { callbackUrl: '/' })}
+            onClick={() => signIn('github', { callbackUrl })}
           >
             <Github className="mr-2 h-4 w-4" />
             Continue with GitHub
@@ -26,7 +30,7 @@ export default function LoginPage() {
           <Button
             className="w-full"
             variant="outline"
-            onClick={() => signIn('google', { callbackUrl: '/' })}
+            onClick={() => signIn('google', { callbackUrl })}
           >
             <Mail className="mr-2 h-4 w-4" />
             Continue with Google
