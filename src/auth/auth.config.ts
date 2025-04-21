@@ -4,10 +4,19 @@ import { MongoClient } from 'mongodb';
 import { JWT } from 'next-auth/jwt';
 import { Session } from 'next-auth';
 
+const dbName = process.env.MONGODB_DB || 'magic';
+
 // Create a client promise for the adapter
 const clientPromise = Promise.resolve(
   new MongoClient(process.env.MONGODB_URI!),
-);
+).then((client) => {
+  return client.connect().then(() => client);
+});
+
+// Create adapter with options to specify the database name
+const adapter = MongoDBAdapter(clientPromise, {
+  databaseName: dbName,
+});
 
 // Extend the Session type to include the id
 declare module 'next-auth' {
@@ -32,7 +41,7 @@ declare module 'next-auth/jwt' {
 }
 
 export const authConfig: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  adapter,
   providers: [], // This will be passed from auth.ts
   pages: {
     signIn: '/auth/login',
