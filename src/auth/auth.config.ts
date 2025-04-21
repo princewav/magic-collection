@@ -21,6 +21,16 @@ declare module 'next-auth' {
   }
 }
 
+// Add custom properties to JWT
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  }
+}
+
 export const authConfig: NextAuthOptions = {
   adapter: MongoDBAdapter(clientPromise),
   providers: [], // This will be passed from auth.ts
@@ -30,11 +40,12 @@ export const authConfig: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       // Initial sign in
       if (account && user) {
         return {
@@ -43,12 +54,29 @@ export const authConfig: NextAuthOptions = {
         };
       }
 
+      // Handle session update
+      if (trigger === 'update' && session) {
+        // Update the JWT with the session data
+        return {
+          ...token,
+          ...session,
+        };
+      }
+
       // Return previous token if the access token has not expired yet
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
+        // Copy properties from token to session
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+
+        // If the token has an image, add it to the session
+        if (token.image) {
+          session.user.image = token.image;
+        }
       }
       return session;
     },

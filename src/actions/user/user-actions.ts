@@ -27,11 +27,19 @@ export async function updateUserProfile(userData: UserUpdateInput) {
       throw new Error('Failed to update user profile');
     }
 
-    // Force refresh of the session and related pages
+    // Force revalidation of all routes to refresh session
     revalidatePath('/', 'layout');
-    revalidatePath('/profile');
 
-    return { success: true };
+    // Return the updated user for the client to update session
+    return {
+      success: true,
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        image: updatedUser.image || null,
+      },
+    };
   } catch (error) {
     console.error('Error updating user profile:', error);
     throw error;
@@ -78,8 +86,19 @@ export async function updateProfileImage(formData: FormData) {
       throw new Error('Failed to update profile image');
     }
 
-    revalidatePath('/profile');
-    return { success: true, imageUrl };
+    // Force revalidation of all routes to refresh session
+    revalidatePath('/', 'layout');
+
+    return {
+      success: true,
+      imageUrl,
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        image: imageUrl,
+      },
+    };
   } catch (error) {
     console.error('Error updating profile image:', error);
     throw error;
@@ -147,7 +166,9 @@ export async function updateUserPassword(
       throw new Error('Failed to update password');
     }
 
-    revalidatePath('/profile');
+    // Force revalidation of all routes to refresh session
+    revalidatePath('/', 'layout');
+
     return { success: true };
   } catch (error) {
     console.error('Error updating password:', error);

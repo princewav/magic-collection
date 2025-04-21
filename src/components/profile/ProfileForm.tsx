@@ -72,23 +72,33 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         email: data.email,
       };
 
-      await updateUserProfile(updateData);
+      const result = await updateUserProfile(updateData);
 
       // If there's a new image, update it
+      let imageResult = null;
       if (image) {
         const formData = new FormData();
         formData.append('profileImage', image);
-        await updateProfileImage(formData);
+        imageResult = await updateProfileImage(formData);
       }
 
-      // Simply trigger a session update without passing custom data
-      // This will fetch the latest data from the server
-      await update();
+      // Update the session with the response from the server
+      // This is the key part from the NextAuth.js docs
+      if (result.success) {
+        const sessionData = {
+          ...result.user,
+          name: data.name,
+          email: data.email,
+          ...(imageResult?.imageUrl ? { image: imageResult.imageUrl } : {}),
+        };
 
-      toast.success('Profile updated successfully');
+        await update(sessionData);
 
-      // Refresh the router to update UI
-      router.refresh();
+        toast.success('Profile updated successfully');
+
+        // For a complete refresh, use window.location
+        window.location.href = window.location.pathname;
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');

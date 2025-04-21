@@ -56,7 +56,9 @@ export default function PasswordForm() {
       await updateUserPassword(data.currentPassword, data.newPassword);
       toast.success('Password updated successfully');
       reset();
-      router.refresh();
+
+      // Force a full page refresh to ensure everything updates
+      window.location.href = window.location.pathname;
     } catch (error: any) {
       console.error('Error updating password:', error);
       toast.error(error.message || 'Failed to update password');
