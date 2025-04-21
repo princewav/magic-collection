@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { CardModalProvider } from '@/context/CardModalContext';
 import { CardsProvider } from '@/context/CardsContext';
 import { CollectionProvider } from '@/context/CollectionContext';
+import { ViewToggleContainer } from '@/components/ViewToggleContainer';
 
 export const metadata: Metadata = {
   title: 'MTG Collection',
@@ -38,6 +39,12 @@ export default async function Page({ searchParams }: PageProps) {
       <CardsProvider initialCards={[]} initialTotal={0}>
         <CollectionProvider collectionType="paper">
           <div className="min-h-screen px-4 pt-2 pb-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Card Explorer</h1>
+              <div className="flex items-center">
+                <ViewToggleContainer />
+              </div>
+            </div>
             <Filters className="mb-4" />
             <Suspense fallback={<CardGridSkeleton />}>
               <CardContainer

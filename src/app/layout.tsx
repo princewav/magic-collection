@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import React from 'react';
 import CardModal from '@/components/card-modal/CardModal';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { SettingsProvider } from '@/context/SettingsContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -43,12 +44,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <CardModalProvider>
-              <Navbar />
-              {children}
-              <CardModal />
-              <Toaster />
-            </CardModalProvider>
+            <SettingsProvider>
+              <CardModalProvider>
+                <Navbar />
+                {children}
+                <CardModal />
+                <Toaster />
+              </CardModalProvider>
+            </SettingsProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

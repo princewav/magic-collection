@@ -8,6 +8,7 @@ import { CardsProvider } from '@/context/CardsContext';
 import { CollectionProvider } from '@/context/CollectionContext';
 import { CardContainer } from '@/components/CardContainer';
 import { getFiltersFromSearchParams } from '@/lib/url-params';
+import { ViewToggleContainer } from '@/components/ViewToggleContainer';
 
 export const metadata: Metadata = {
   title: 'Collection',
@@ -59,10 +60,13 @@ export default async function CollectionPage({ params, searchParams }: Props) {
                 {totalUnique} unique cards ({totalQuantity} total)
               </span>
             </h1>
-            <CsvImportButton
-              collectionType={type}
-              parseCsv={parseCSVandInsert}
-            />
+            <div className="flex items-center gap-4">
+              <ViewToggleContainer />
+              <CsvImportButton
+                collectionType={type}
+                parseCsv={parseCSVandInsert}
+              />
+            </div>
           </div>
           <Filters className="mb-4" collectionType={type} />
           <CardContainer

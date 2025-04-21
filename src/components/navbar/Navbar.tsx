@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, Heart, ListChecks } from 'lucide-react';
+import { Book, Heart, ListChecks, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
@@ -195,7 +195,6 @@ const Navbar: React.FC<{}> = () => {
         </NavigationMenuList>
       </NavigationMenu>
       <div className="flex items-center gap-2 md:ml-auto">
-        <ThemeToggle />
         <UserMenu session={session} />
       </div>
     </nav>

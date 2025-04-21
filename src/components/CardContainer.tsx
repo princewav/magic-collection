@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { CardGrid } from '@/components/CardGrid';
+import { CardView } from '@/components/CardView';
 import { useCards } from '@/context/CardsContext';
 
 interface CardContainerProps {
@@ -43,5 +43,5 @@ export function CardContainer({
     }
   }, [filters, collectionType, updateFilters]);
 
-  return <CardGrid collectionType={collectionType}/>;
+  return <CardView collectionType={collectionType} />;
 }
