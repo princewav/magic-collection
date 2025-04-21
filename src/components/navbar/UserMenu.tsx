@@ -2,7 +2,7 @@
 
 import { LogOut, Settings, User } from 'lucide-react';
 import { Session } from 'next-auth';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -14,12 +14,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
 
 interface UserMenuProps {
   session: Session | null;
 }
 
-export function UserMenu({ session }: UserMenuProps) {
+export function UserMenu({ session: initialSession }: UserMenuProps) {
+  // Use useSession with default behavior
+  const { data: updatedSession } = useSession();
+
+  // Use the most up-to-date session
+  const session = updatedSession || initialSession;
+
+  // Fallback for when not authenticated
   if (!session) {
     return (
       <Link href="/auth/login">
@@ -30,6 +38,15 @@ export function UserMenu({ session }: UserMenuProps) {
     );
   }
 
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .toUpperCase();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,11 +56,7 @@ export function UserMenu({ session }: UserMenuProps) {
               src={session.user?.image || ''}
               alt={session.user?.name || 'User avatar'}
             />
-            <AvatarFallback>
-              {session.user?.name
-                ? session.user.name.charAt(0).toUpperCase()
-                : 'U'}
-            </AvatarFallback>
+            <AvatarFallback>{getInitials(session.user?.name)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
