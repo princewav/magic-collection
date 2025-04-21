@@ -37,7 +37,6 @@ export const authConfig: NextAuthOptions = {
     async jwt({ token, user, account }) {
       // Initial sign in
       if (account && user) {
-        console.log('JWT callback - initial signin', { user });
         return {
           ...token,
           id: user.id,
@@ -48,7 +47,6 @@ export const authConfig: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      console.log('Session callback', { token, session });
       if (token && session.user) {
         session.user.id = token.id as string;
       }

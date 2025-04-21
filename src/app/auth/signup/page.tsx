@@ -44,8 +44,6 @@ export default function SignupPage() {
         redirect: false,
       });
 
-      console.log('Sign-in response:', signInResponse);
-
       if (!signInResponse?.ok) {
         throw new Error('Error signing in after registration');
       }

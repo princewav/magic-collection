@@ -30,8 +30,6 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      console.log('Sign-in response:', response);
-
       if (!response?.ok) {
         throw new Error(response?.error || 'Invalid credentials');
       }

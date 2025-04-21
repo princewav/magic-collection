@@ -23,7 +23,6 @@ export const providers = [
       try {
         // Check if credentials are provided
         if (!credentials?.email || !credentials?.password) {
-          console.log('Missing credentials');
           return null;
         }
 
@@ -35,11 +34,8 @@ export const providers = [
 
         // If authentication failed, return null
         if (!userProfile) {
-          console.log('Authentication failed');
           return null;
         }
-
-        console.log('Authentication successful', userProfile);
 
         // Return the user object in the format NextAuth expects
         return {
