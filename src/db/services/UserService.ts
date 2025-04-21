@@ -75,7 +75,7 @@ export class UserService extends BaseService<User> {
 
       // Return user without password
       const { password, ...userProfile } = newUser;
-      return userProfile as UserProfile;
+      return userProfile;
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;

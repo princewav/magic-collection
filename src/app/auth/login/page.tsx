@@ -41,7 +41,18 @@ export default function LoginPage() {
       window.location.href = callbackUrl; // Use window.location to ensure full page reload
     } catch (error: any) {
       console.error('Login failed:', error);
-      toast.error(error.message || 'Invalid credentials');
+
+      // Provide more descriptive error messages
+      let errorMessage = 'An error occurred during sign in';
+
+      if (error.message === 'CredentialsSignin') {
+        errorMessage =
+          'Invalid email or password. Please check your credentials and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

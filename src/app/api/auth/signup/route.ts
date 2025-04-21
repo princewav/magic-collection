@@ -12,44 +12,24 @@ const userSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
+  const body = await req.json();
+  const validation = userSchema.safeParse(body);
 
-    // Validate request body
-    const validation = userSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: validation.error.format() },
-        { status: 400 },
-      );
-    }
-
-    const userData = validation.data;
-
-    try {
-      // Create the user using UserService
-      const newUser = await userService.createUser(userData);
-
-      // Return success
-      return NextResponse.json(
-        {
-          success: true,
-          user: newUser,
-        },
-        { status: 201 },
-      );
-    } catch (error: any) {
-      if (error.message === 'User with this email already exists') {
-        return NextResponse.json({ error: error.message }, { status: 409 });
-      }
-      throw error; // Re-throw for general error handling
-    }
-  } catch (error) {
-    console.error('Signup error:', error);
+  if (!validation.success) {
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
+      { error: 'Validation failed', details: validation.error.format() },
+      { status: 400 },
     );
+  }
+
+  try {
+    const newUser = await userService.createUser(validation.data);
+    return NextResponse.json(
+      { success: true, user: newUser },
+      { status: 201 },
+    );
+  } catch (error: any) {
+    const status = error.message === 'User with this email already exists' ? 409 : 500;
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status });
   }
 }
