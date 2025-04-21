@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
-import { Github, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -105,14 +105,6 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-3">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => signIn('github', { callbackUrl })}
-          >
-            <Github className="mr-2 h-4 w-4" />
-            Continue with GitHub
-          </Button>
           <Button
             variant="outline"
             className="w-full"
