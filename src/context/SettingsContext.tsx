@@ -12,6 +12,7 @@ import { useTheme } from 'next-themes';
 type ThemeOption = 'light' | 'dark' | 'system';
 type LayoutOption = 'grid' | 'list';
 type CollectionTypeOption = 'paper' | 'arena' | 'both';
+type LanguageOption = 'en' | 'es' | 'fr' | 'de';
 
 interface SettingsContextType {
   theme: ThemeOption;
@@ -20,6 +21,8 @@ interface SettingsContextType {
   setLayout: (layout: LayoutOption) => void;
   collectionType: CollectionTypeOption;
   setCollectionType: (type: CollectionTypeOption) => void;
+  language: LanguageOption;
+  setLanguage: (language: LanguageOption) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -36,6 +39,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   const [layout, setLayout] = useState<LayoutOption>('grid');
   const [collectionType, setCollectionType] =
     useState<CollectionTypeOption>('both');
+  const [language, setLanguageState] = useState<LanguageOption>('en');
 
   // Initialize from localStorage on client side
   useEffect(() => {
@@ -50,6 +54,9 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       'collectionType',
     ) as CollectionTypeOption;
     if (savedCollectionType) setCollectionType(savedCollectionType);
+
+    const savedLanguage = localStorage.getItem('language') as LanguageOption;
+    if (savedLanguage) setLanguageState(savedLanguage);
   }, [nextTheme]);
 
   // Functions to update settings
@@ -68,6 +75,11 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     localStorage.setItem('collectionType', newType);
   };
 
+  const updateLanguage = (newLanguage: LanguageOption) => {
+    setLanguageState(newLanguage);
+    localStorage.setItem('language', newLanguage);
+  };
+
   return (
     <SettingsContext.Provider
       value={{
@@ -77,6 +89,8 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setLayout: updateLayout,
         collectionType,
         setCollectionType: updateCollectionType,
+        language,
+        setLanguage: updateLanguage,
       }}
     >
       {children}

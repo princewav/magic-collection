@@ -16,12 +16,14 @@ import {
   MoonIcon,
   SunIcon,
   ComputerIcon,
+  GlobeIcon,
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 
 type ThemeOption = 'light' | 'dark' | 'system';
 type LayoutOption = 'grid' | 'list';
+type LanguageOption = 'en' | 'es' | 'fr' | 'de';
 
 // Since we don't have the actual RadioGroup components yet, let's create a simpler approach
 function RadioOption({
@@ -69,6 +71,8 @@ export default function SettingsPage() {
     setLayout,
     collectionType,
     setCollectionType,
+    language,
+    setLanguage,
   } = useSettings();
   const [mounted, setMounted] = useState(false);
 
@@ -80,6 +84,13 @@ export default function SettingsPage() {
   if (!mounted) {
     return null;
   }
+
+  const languageOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Español' },
+    { value: 'fr', label: 'Français' },
+    { value: 'de', label: 'Deutsch' },
+  ];
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -119,6 +130,26 @@ export default function SettingsPage() {
               label="System"
               icon={<ComputerIcon className="h-4 w-4" />}
             />
+          </CardContent>
+        </Card>
+
+        {/* Language Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Language</CardTitle>
+            <CardDescription>Choose your preferred language</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {languageOptions.map((option) => (
+              <RadioOption
+                key={option.value}
+                id={`language-${option.value}`}
+                checked={language === option.value}
+                onChange={() => setLanguage(option.value as LanguageOption)}
+                label={option.label}
+                icon={<GlobeIcon className="h-4 w-4" />}
+              />
+            ))}
           </CardContent>
         </Card>
 
