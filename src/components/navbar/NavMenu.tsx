@@ -256,7 +256,7 @@ export function NavMenu({
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b px-3 py-1 text-xs">
+                <div className="border-b px-3 py-1 text-xs text-muted-foreground">
                   Manage your decks
                 </div>
                 <ul className="py-1">
@@ -274,7 +274,7 @@ export function NavMenu({
                       />
                       <div>
                         <div className="text-sm font-medium">Paper Decks</div>
-                        <div className="text-xs">Physical card collections</div>
+                        <div className="text-xs text-muted-foreground">Physical card collections</div>
                       </div>
                     </Link>
                   </li>
@@ -292,7 +292,7 @@ export function NavMenu({
                       />
                       <div>
                         <div className="text-sm font-medium">Arena Decks</div>
-                        <div className="text-xs">Digital card collections</div>
+                        <div className="text-xs text-muted-foreground">Digital card collections</div>
                       </div>
                     </Link>
                   </li>
@@ -337,7 +337,7 @@ export function NavMenu({
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b px-3 py-1 text-xs">
+                <div className="border-b px-3 py-1 text-xs text-muted-foreground">
                   Manage your collection
                 </div>
                 <ul className="py-1">
@@ -357,7 +357,7 @@ export function NavMenu({
                         <div className="text-sm font-medium">
                           Paper Collection
                         </div>
-                        <div className="text-xs">Physical cards</div>
+                        <div className="text-xs text-muted-foreground">Physical cards</div>
                       </div>
                     </Link>
                   </li>
@@ -377,7 +377,7 @@ export function NavMenu({
                         <div className="text-sm font-medium">
                           Arena Collection
                         </div>
-                        <div className="text-xs">Digital cards</div>
+                        <div className="text-xs text-muted-foreground">Digital cards</div>
                       </div>
                     </Link>
                   </li>
