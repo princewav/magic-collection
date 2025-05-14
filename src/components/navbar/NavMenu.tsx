@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 type AnimatedDropdownProps = {
   trigger: React.ReactNode | ((isOpen: boolean) => React.ReactNode);
   content: React.ReactNode;
-  align?: 'left' | 'right';
+  align?: 'left' | 'right' | 'center';
   className?: string;
   hoverDelay?: number;
   leaveDelay?: number;
@@ -30,7 +30,7 @@ const AnimatedDropdown = ({
   align = 'left',
   className,
   hoverDelay = 150,
-  leaveDelay = 50,
+  leaveDelay = 0,
 }: AnimatedDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -57,7 +57,7 @@ const AnimatedDropdown = ({
         if (!isOpenRef.current) {
           setIsVisible(false);
         }
-      }, 300);
+      }, 150);
     }
 
     return () => {
@@ -160,12 +160,12 @@ const AnimatedDropdown = ({
         role="button"
         aria-haspopup="true"
         aria-expanded={isOpen}
-        className="relative cursor-pointer flex items-center h-full"
+        className="relative flex h-full cursor-pointer items-center"
       >
         {triggerElement}
         <div
           className={cn(
-            'absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-blue-400 transition-all duration-300 h-fullease-out',
+            'h-fullease-out absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-blue-400 transition-all duration-300',
             isHoveringTriggerArea || isOpen
               ? 'w-1/2 opacity-100'
               : 'w-0 opacity-0',
@@ -175,7 +175,11 @@ const AnimatedDropdown = ({
       <div
         className={cn(
           'absolute top-full z-50 mt-1 min-w-[220px]',
-          align === 'left' ? 'left-0' : 'right-0',
+          align === 'left'
+            ? 'left-0'
+            : align === 'right'
+              ? 'right-0'
+              : 'left-1/2 -translate-x-1/2',
           className,
         )}
         style={{
@@ -189,22 +193,22 @@ const AnimatedDropdown = ({
           className={cn(
             'overflow-hidden rounded-md border border-slate-700 bg-slate-900/95 shadow-lg backdrop-blur-sm',
             isOpen
-              ? align === 'left'
-                ? 'animate-slide-in-left'
-                : 'animate-slide-in-right'
-              : align === 'left'
-                ? 'animate-slide-out-left'
-                : 'animate-slide-out-right',
+              ? align === 'right'
+                ? 'animate-slide-in-right'
+                : 'animate-slide-in-left'
+              : align === 'right'
+                ? 'animate-slide-out-right'
+                : 'animate-slide-out-left',
           )}
           style={{
-            transformOrigin: align === 'left' ? 'top left' : 'top right',
+            transformOrigin: align === 'right' ? 'top right' : 'top left',
             animation: isOpen
-              ? align === 'left'
-                ? 'var(--animate-slide-in-left)'
-                : 'var(--animate-slide-in-right)'
-              : align === 'left'
-                ? 'var(--animate-slide-out-left)'
-                : 'var(--animate-slide-out-right)',
+              ? align === 'right'
+                ? 'var(--animate-slide-in-right)'
+                : 'var(--animate-slide-in-left)'
+              : align === 'right'
+                ? 'var(--animate-slide-out-right)'
+                : 'var(--animate-slide-out-left)',
           }}
         >
           {content}
