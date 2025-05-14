@@ -24,12 +24,38 @@ interface NavButtonProps {
   onClick: () => void;
 }
 
+const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
+  ({ label, icon, isActive, onClick }, ref) => (
+    <button
+      ref={ref}
+      className={cn(
+        'hover:bg-secondary/30 focus:bg-accent/20 flex flex-col items-center justify-center gap-1 py-2 transition-all duration-300',
+        isActive
+          ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
+          : '',
+      )}
+      onClick={onClick}
+    >
+      {icon}
+      <span className="text-xs">{label}</span>
+    </button>
+  ),
+);
+NavButton.displayName = 'NavButton';
+
 export default function MobileNavbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [activeDropdown, setActiveDropdown] = React.useState<string | null>(
     null,
   );
+
+  const dropdownContainerRefs = React.useRef<{
+    [key: string]: HTMLDivElement | null;
+  }>({});
+  const decksButtonRef = React.useRef<HTMLButtonElement>(null);
+  const collectButtonRef = React.useRef<HTMLButtonElement>(null);
+  const wishlistLinkRef = React.useRef<HTMLAnchorElement>(null);
 
   const toggleDropdown = (name: string) => {
     if (activeDropdown === name) {
@@ -56,20 +82,44 @@ export default function MobileNavbar() {
     </Link>
   );
 
-  const NavButton = ({ label, icon, isActive, onClick }: NavButtonProps) => (
-    <button
-      className={cn(
-        'hover:bg-secondary/30 focus:bg-accent/20 py-2 duration-300 flex flex-col items-center justify-center gap-1 transition-all',
-        isActive
-          ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
-          : '',
-      )}
-      onClick={onClick}
-    >
-      {icon}
-      <span className="text-xs">{label}</span>
-    </button>
-  );
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!activeDropdown) return;
+
+      const activePanel = dropdownContainerRefs.current[activeDropdown];
+
+      const isClickInsidePanel =
+        activePanel && activePanel.contains(event.target as Node);
+      const isClickOnDecksButton =
+        decksButtonRef.current &&
+        decksButtonRef.current.contains(event.target as Node);
+      const isClickOnCollectButton =
+        collectButtonRef.current &&
+        collectButtonRef.current.contains(event.target as Node);
+      const isClickOnWishlistLink =
+        wishlistLinkRef.current &&
+        wishlistLinkRef.current.contains(event.target as Node);
+
+      if (
+        !isClickInsidePanel &&
+        !isClickOnDecksButton &&
+        !isClickOnCollectButton &&
+        !isClickOnWishlistLink
+      ) {
+        setActiveDropdown(null);
+      }
+    };
+
+    if (activeDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeDropdown]);
 
   const dropdownMenus = [
     {
@@ -110,9 +160,12 @@ export default function MobileNavbar() {
       {dropdownMenus.map((menu) => (
         <div
           key={menu.id}
+          ref={(el) => {
+            dropdownContainerRefs.current[menu.id] = el;
+          }}
           className={cn(
-            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 h-0 overflow-hidden border-t transition-all duration-300',
-            activeDropdown === menu.id ? 'h-32' : 'max-h-0',
+            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 max-h-0 overflow-hidden border-t opacity-0 transition-all duration-300',
+            activeDropdown === menu.id ? 'h-32 max-h-32 opacity-100' : '',
           )}
         >
           <div className="space-y-1 p-2">
@@ -133,6 +186,7 @@ export default function MobileNavbar() {
       <div className="bg-background fixed right-0 bottom-0 left-0 z-50 flex border-t">
         <div className="grid w-full grid-cols-3">
           <NavButton
+            ref={decksButtonRef}
             label="Decks"
             icon={<Book className="text-accent h-5 w-5" aria-hidden="true" />}
             isActive={pathname.includes('/decks')}
@@ -140,6 +194,7 @@ export default function MobileNavbar() {
           />
 
           <NavButton
+            ref={collectButtonRef}
             label="Collect"
             icon={
               <ListChecks className="text-accent h-5 w-5" aria-hidden="true" />
@@ -149,6 +204,7 @@ export default function MobileNavbar() {
           />
 
           <Link
+            ref={wishlistLinkRef}
             href="/wishlists"
             className={cn(
               'flex flex-col items-center justify-center gap-1 py-2',
