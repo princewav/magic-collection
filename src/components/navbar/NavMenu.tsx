@@ -36,16 +36,16 @@ const AnimatedDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isHoveringTriggerArea, setIsHoveringTriggerArea] = useState(false);
-  
+
   const enterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const isOpenRef = useRef(isOpen);
   useEffect(() => {
     isOpenRef.current = isOpen;
   }, [isOpen]);
-  
+
   useEffect(() => {
     if (isOpen) {
       if (hideTimeoutRef.current) {
