@@ -164,8 +164,8 @@ export default function MobileNavbar() {
             dropdownContainerRefs.current[menu.id] = el;
           }}
           className={cn(
-            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 max-h-0 overflow-hidden border-t opacity-0 transition-all duration-300',
-            activeDropdown === menu.id ? 'h-32 max-h-32 opacity-100' : '',
+            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 max-h-0 overflow-hidden border-t opacity-0 transition-all duration-300 h-32',
+            activeDropdown === menu.id ? ' max-h-32 opacity-100' : '',
           )}
         >
           <div className="space-y-1 p-2">

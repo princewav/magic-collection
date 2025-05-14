@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
+
 import { cn } from '@/lib/utils';
 import { Book, Heart, ListChecks } from 'lucide-react';
 import { Session } from 'next-auth';
@@ -277,6 +270,7 @@ export function NavMenu({
                         alt="Paper Collection"
                         width={20}
                         height={20}
+                        className="dark:brightness-130"
                       />
                       <div>
                         <div className="text-sm font-medium">Paper Decks</div>
@@ -294,6 +288,7 @@ export function NavMenu({
                         alt="Arena Collection"
                         width={20}
                         height={20}
+                        className="dark:brightness-130"
                       />
                       <div>
                         <div className="text-sm font-medium">Arena Decks</div>
@@ -342,7 +337,7 @@ export function NavMenu({
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b px-3 py-2 text-xs">
+                <div className="border-b px-3 py-1 text-xs">
                   Manage your collection
                 </div>
                 <ul className="py-1">
@@ -356,6 +351,7 @@ export function NavMenu({
                         alt="Paper Collection"
                         width={20}
                         height={20}
+                        className="dark:brightness-130"
                       />
                       <div>
                         <div className="text-sm font-medium">
@@ -375,6 +371,7 @@ export function NavMenu({
                         alt="Arena Collection"
                         width={20}
                         height={20}
+                        className="dark:brightness-130"
                       />
                       <div>
                         <div className="text-sm font-medium">
