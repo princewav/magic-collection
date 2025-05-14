@@ -149,7 +149,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Collection Type Settings */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Collection Type</CardTitle>
             <CardDescription>
@@ -214,7 +214,7 @@ export default function SettingsPage() {
               display cards from both collections.
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
