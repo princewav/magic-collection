@@ -149,7 +149,7 @@ const AnimatedDropdown = ({
 
   return (
     <div
-      className="relative"
+      className="relative flex items-center"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -160,12 +160,12 @@ const AnimatedDropdown = ({
         role="button"
         aria-haspopup="true"
         aria-expanded={isOpen}
-        className="relative cursor-pointer"
+        className="relative cursor-pointer flex items-center h-full"
       >
         {triggerElement}
         <div
           className={cn(
-            'absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-blue-400 transition-all duration-300 ease-out',
+            'absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-blue-400 transition-all duration-300 h-fullease-out',
             isHoveringTriggerArea || isOpen
               ? 'w-1/2 opacity-100'
               : 'w-0 opacity-0',
@@ -229,7 +229,7 @@ export function NavMenu({
             trigger={(isOpen) => (
               <button
                 className={cn(
-                  'flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
+                  'flex h-full items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
                   pathname.includes('/decks')
                     ? 'bg-slate-800 hover:bg-slate-700/90'
                     : 'hover:bg-slate-800/70 focus:bg-slate-800',
@@ -302,7 +302,7 @@ export function NavMenu({
             trigger={(isOpen) => (
               <button
                 className={cn(
-                  'flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
+                  'flex h-full items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
                   pathname.includes('/collection')
                     ? 'bg-slate-800 hover:bg-slate-700/90'
                     : 'hover:bg-slate-800/70 focus:bg-slate-800',
