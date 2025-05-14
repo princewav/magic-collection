@@ -1,6 +1,5 @@
 'use client';
 
-
 import { cn } from '@/lib/utils';
 import { Book, Heart, ListChecks } from 'lucide-react';
 import { Session } from 'next-auth';
@@ -256,7 +255,7 @@ export function NavMenu({
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b px-3 py-1 text-xs text-muted-foreground">
+                <div className="text-muted-foreground border-b px-3 py-1 text-xs">
                   Manage your decks
                 </div>
                 <ul className="py-1">
@@ -266,15 +265,17 @@ export function NavMenu({
                       className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
                       <Image
-                        src="/images/card-accent.png"
+                        src="/images/card-w.png"
                         alt="Paper Collection"
                         width={20}
                         height={20}
-                        className="dark:brightness-130"
+                        className="invert dark:invert-0"
                       />
                       <div>
                         <div className="text-sm font-medium">Paper Decks</div>
-                        <div className="text-xs text-muted-foreground">Physical card collections</div>
+                        <div className="text-muted-foreground text-xs">
+                          Physical card collections
+                        </div>
                       </div>
                     </Link>
                   </li>
@@ -284,15 +285,17 @@ export function NavMenu({
                       className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
                       <Image
-                        src="/images/arena-accent.png"
+                        src="/images/arena-w.png"
                         alt="Arena Collection"
                         width={20}
                         height={20}
-                        className="dark:brightness-130"
+                        className="invert dark:invert-0"
                       />
                       <div>
                         <div className="text-sm font-medium">Arena Decks</div>
-                        <div className="text-xs text-muted-foreground">Digital card collections</div>
+                        <div className="text-muted-foreground text-xs">
+                          Digital card collections
+                        </div>
                       </div>
                     </Link>
                   </li>
@@ -337,7 +340,7 @@ export function NavMenu({
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b px-3 py-1 text-xs text-muted-foreground">
+                <div className="text-muted-foreground border-b px-3 py-1 text-xs">
                   Manage your collection
                 </div>
                 <ul className="py-1">
@@ -347,17 +350,19 @@ export function NavMenu({
                       className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
                       <Image
-                        src="/images/card-accent.png"
+                        src="/images/card-w.png"
                         alt="Paper Collection"
                         width={20}
                         height={20}
-                        className="dark:brightness-130"
+                        className="invert dark:invert-0"
                       />
                       <div>
                         <div className="text-sm font-medium">
                           Paper Collection
                         </div>
-                        <div className="text-xs text-muted-foreground">Physical cards</div>
+                        <div className="text-muted-foreground text-xs">
+                          Physical cards
+                        </div>
                       </div>
                     </Link>
                   </li>
@@ -367,17 +372,19 @@ export function NavMenu({
                       className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
                       <Image
-                        src="/images/arena-accent.png"
+                        src="/images/arena-w.png"
                         alt="Arena Collection"
                         width={20}
                         height={20}
-                        className="dark:brightness-130"
+                        className="invert dark:invert-0"
                       />
                       <div>
                         <div className="text-sm font-medium">
                           Arena Collection
                         </div>
-                        <div className="text-xs text-muted-foreground">Digital cards</div>
+                        <div className="text-muted-foreground text-xs">
+                          Digital cards
+                        </div>
                       </div>
                     </Link>
                   </li>
