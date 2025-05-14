@@ -50,8 +50,8 @@ export function UserMenu({ session: initialSession }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+        <Button variant="outline" className="relative rounded-full border-2" size="icon">
+          <Avatar>
             <AvatarImage
               src={session.user?.image || ''}
               alt={session.user?.name || 'User avatar'}
@@ -60,7 +60,7 @@ export function UserMenu({ session: initialSession }: UserMenuProps) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56 mb-4" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm leading-none font-medium">

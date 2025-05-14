@@ -12,6 +12,7 @@ import React from 'react';
 import CardModal from '@/components/card-modal/CardModal';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { SettingsProvider } from '@/context/SettingsContext';
+import MobileNavbar from '@/components/navbar/MobileNavbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -46,7 +47,12 @@ export default function RootLayout({
           >
             <SettingsProvider>
               <CardModalProvider>
-                <Navbar />
+                <header className="sticky top-0 z-40 w-full border-b border-slate-800">
+                  <Navbar />
+                </header>
+
+                {/* Mobile Navigation */}
+                <MobileNavbar />
                 {children}
                 <CardModal />
                 <Toaster />
