@@ -15,7 +15,7 @@ const Navbar: React.FC<{}> = () => {
   return (
     <nav
       data-role="navbar-container"
-      className="relative right-0 bottom-auto left-0 z-10 justify-start border-t-0 p-1 px-4 py-1 text-sm shadow-md hidden md:flex"
+      className="relative right-0 bottom-auto left-0 z-10 justify-start border-t-0 p-1 px-4 py-1 text-sm shadow-md bg-background/80 backdrop-blur-md hidden md:flex items-center"
       role="navigation"
       aria-label="Main navigation"
     >

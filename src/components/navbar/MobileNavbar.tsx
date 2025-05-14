@@ -42,7 +42,7 @@ export default function MobileNavbar() {
   const NavLink = ({ href, icon, alt = '', label, onClick }: NavLinkProps) => (
     <Link
       href={href}
-      className="hover:bg-accent/10 focus:bg-accent/20 flex items-center gap-2 rounded-md p-3 text-sm leading-none font-medium whitespace-nowrap"
+      className="hover:bg-secondary/30 focus:bg-accent/20 flex items-center gap-2 rounded-md p-3 text-sm leading-none font-medium whitespace-nowrap"
       onClick={onClick}
     >
       <Image
@@ -50,7 +50,7 @@ export default function MobileNavbar() {
         alt={alt}
         width={15}
         height={15}
-        className="invert-75 md:h-[15px] md:w-[15px] dark:invert-0"
+        className="md:h-[15px] md:w-[15px]"
       />
       {label}
     </Link>
@@ -59,9 +59,9 @@ export default function MobileNavbar() {
   const NavButton = ({ label, icon, isActive, onClick }: NavButtonProps) => (
     <button
       className={cn(
-        'flex flex-col items-center justify-center gap-1 hover:bg-accent/10 focus:bg-accent/20 transition-all duration-300',
+        'hover:bg-secondary/30 focus:bg-accent/20 py-2 duration-300 flex flex-col items-center justify-center gap-1 transition-all',
         isActive
-          ? 'bg-secondary/30 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold'
+          ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
           : '',
       )}
       onClick={onClick}
@@ -77,12 +77,12 @@ export default function MobileNavbar() {
       links: [
         {
           href: '/decks/paper',
-          icon: '/images/card-w.png',
+          icon: '/images/card-accent.png',
           label: 'Paper Decks',
         },
         {
           href: '/decks/arena',
-          icon: '/images/arena-w.png',
+          icon: '/images/arena-accent.png',
           label: 'Arena Decks',
         },
       ],
@@ -92,12 +92,12 @@ export default function MobileNavbar() {
       links: [
         {
           href: '/collection/paper',
-          icon: '/images/card-w.png',
+          icon: '/images/card-accent.png',
           label: 'Paper Collection',
         },
         {
           href: '/collection/arena',
-          icon: '/images/arena-w.png',
+          icon: '/images/arena-accent.png',
           label: 'Arena Collection',
         },
       ],
@@ -111,8 +111,8 @@ export default function MobileNavbar() {
         <div
           key={menu.id}
           className={cn(
-            'bg-sidebar fixed right-0 bottom-16 left-0 z-40 overflow-hidden border-t transition-all duration-300',
-            activeDropdown === menu.id ? 'max-h-32' : 'max-h-0',
+            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 h-0 overflow-hidden border-t transition-all duration-300',
+            activeDropdown === menu.id ? 'h-32' : 'max-h-0',
           )}
         >
           <div className="space-y-1 p-2">
@@ -131,7 +131,7 @@ export default function MobileNavbar() {
 
       {/* Bottom Navigation Bar */}
       <div className="bg-background fixed right-0 bottom-0 left-0 z-50 flex border-t">
-        <div className="grid h-16 w-full grid-cols-3">
+        <div className="grid w-full grid-cols-3">
           <NavButton
             label="Decks"
             icon={<Book className="text-accent h-5 w-5" aria-hidden="true" />}
@@ -144,18 +144,16 @@ export default function MobileNavbar() {
             icon={
               <ListChecks className="text-accent h-5 w-5" aria-hidden="true" />
             }
-            isActive={
-              pathname.includes('/collection')
-            }
+            isActive={pathname.includes('/collection')}
             onClick={() => toggleDropdown('collect')}
           />
 
           <Link
             href="/wishlists"
             className={cn(
-              'flex flex-col items-center justify-center gap-1',
+              'flex flex-col items-center justify-center gap-1 py-2',
               pathname.includes('/wishlists')
-                ? 'bg-secondary/30 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold'
+                ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
                 : '',
             )}
             onClick={() => setActiveDropdown(null)}

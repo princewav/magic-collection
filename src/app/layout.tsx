@@ -47,7 +47,7 @@ export default function RootLayout({
           >
             <SettingsProvider>
               <CardModalProvider>
-                <header className="sticky top-0 z-40 w-full border-b border-slate-800">
+                <header className="sticky top-0 z-40 w-full border-b">
                   <Navbar />
                 </header>
 

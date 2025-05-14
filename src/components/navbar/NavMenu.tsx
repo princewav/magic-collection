@@ -14,6 +14,7 @@ import { Session } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '../ui/button';
 
 type AnimatedDropdownProps = {
   trigger: React.ReactNode | ((isOpen: boolean) => React.ReactNode);
@@ -35,16 +36,16 @@ const AnimatedDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isHoveringTriggerArea, setIsHoveringTriggerArea] = useState(false);
-
+  
   const enterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  
   const isOpenRef = useRef(isOpen);
   useEffect(() => {
     isOpenRef.current = isOpen;
   }, [isOpen]);
-
+  
   useEffect(() => {
     if (isOpen) {
       if (hideTimeoutRef.current) {
@@ -165,7 +166,7 @@ const AnimatedDropdown = ({
         {triggerElement}
         <div
           className={cn(
-            'h-fullease-out absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-blue-400 transition-all duration-300',
+            'h-fullease-out bg-primary absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full transition-all duration-300',
             isHoveringTriggerArea || isOpen
               ? 'w-1/2 opacity-100'
               : 'w-0 opacity-0',
@@ -191,7 +192,7 @@ const AnimatedDropdown = ({
       >
         <div
           className={cn(
-            'overflow-hidden rounded-md border border-slate-700 bg-slate-900/95 shadow-lg backdrop-blur-sm',
+            'bg-background/80 overflow-hidden rounded-md border shadow-lg backdrop-blur-lg',
             isOpen
               ? align === 'right'
                 ? 'animate-slide-in-right'
@@ -226,20 +227,20 @@ export function NavMenu({
   session: Session | null;
 }) {
   return (
-    <div className="flex justify-around md:justify-start md:gap-2">
+    <div className="flex justify-around py-1 md:justify-start md:gap-2">
       {session && (
         <>
           <AnimatedDropdown
             trigger={(isOpen) => (
-              <button
+              <Button
+                variant="ghost"
                 className={cn(
-                  'flex h-full items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
-                  pathname.includes('/decks')
-                    ? 'bg-slate-800 hover:bg-slate-700/90'
-                    : 'hover:bg-slate-800/70 focus:bg-slate-800',
+                  'flex h-full items-center gap-2 rounded-md px-4 py-1 text-sm shadow-none transition-colors duration-200 focus:outline-none',
+                  pathname.includes('/decks') &&
+                    'bg-secondary/50 hover:bg-secondary/70',
                 )}
               >
-                <Book className="h-4 w-4" />
+                <Book className="text-accent h-4 w-4" />
                 <span>Decks</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -258,39 +259,45 @@ export function NavMenu({
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
-              </button>
+              </Button>
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b border-slate-700/50 px-3 py-2 text-xs text-slate-400">
-                  Select a deck type
+                <div className="border-b px-3 py-1 text-xs">
+                  Manage your decks
                 </div>
                 <ul className="py-1">
                   <li>
                     <Link
                       href="/decks/paper"
-                      className="flex items-center gap-2 px-4 py-2 transition-colors duration-150 hover:bg-slate-800 focus:bg-slate-800 focus:outline-none"
+                      className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
-                      <span className="text-base">📄</span>
+                      <Image
+                        src="/images/card-accent.png"
+                        alt="Paper Collection"
+                        width={20}
+                        height={20}
+                      />
                       <div>
                         <div className="text-sm font-medium">Paper Decks</div>
-                        <div className="text-xs text-slate-400">
-                          Physical card collections
-                        </div>
+                        <div className="text-xs">Physical card collections</div>
                       </div>
                     </Link>
                   </li>
                   <li>
                     <Link
                       href="/decks/arena"
-                      className="flex items-center gap-2 px-4 py-2 transition-colors duration-150 hover:bg-slate-800 focus:bg-slate-800 focus:outline-none"
+                      className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
-                      <span className="text-base">🎮</span>
+                      <Image
+                        src="/images/arena-accent.png"
+                        alt="Arena Collection"
+                        width={20}
+                        height={20}
+                      />
                       <div>
                         <div className="text-sm font-medium">Arena Decks</div>
-                        <div className="text-xs text-slate-400">
-                          Digital card collections
-                        </div>
+                        <div className="text-xs">Digital card collections</div>
                       </div>
                     </Link>
                   </li>
@@ -304,15 +311,15 @@ export function NavMenu({
 
           <AnimatedDropdown
             trigger={(isOpen) => (
-              <button
+              <Button
+                variant="ghost"
                 className={cn(
-                  'flex h-full items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
-                  pathname.includes('/collection')
-                    ? 'bg-slate-800 hover:bg-slate-700/90'
-                    : 'hover:bg-slate-800/70 focus:bg-slate-800',
+                  'flex h-full items-center gap-2 rounded-md px-4 py-1 text-sm shadow-none transition-colors duration-200 focus:outline-none',
+                  pathname.includes('/collection') &&
+                    'bg-secondary/50 hover:bg-secondary/70',
                 )}
               >
-                <ListChecks className="h-4 w-4 text-amber-500" />
+                <ListChecks className="text-accent h-4 w-4" />
                 <span>Collect</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -331,43 +338,49 @@ export function NavMenu({
                 >
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
-              </button>
+              </Button>
             )}
             content={
               <div className="w-[230px] py-1">
-                <div className="border-b border-slate-700/50 px-3 py-2 text-xs text-slate-400">
+                <div className="border-b px-3 py-2 text-xs">
                   Manage your collection
                 </div>
                 <ul className="py-1">
                   <li>
                     <Link
                       href="/collection/paper"
-                      className="flex items-center gap-2 px-4 py-2 transition-colors duration-150 hover:bg-slate-800 focus:bg-slate-800 focus:outline-none"
+                      className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
-                      <span className="text-base">📄</span>
+                      <Image
+                        src="/images/card-accent.png"
+                        alt="Paper Collection"
+                        width={20}
+                        height={20}
+                      />
                       <div>
                         <div className="text-sm font-medium">
                           Paper Collection
                         </div>
-                        <div className="text-xs text-slate-400">
-                          Physical cards
-                        </div>
+                        <div className="text-xs">Physical cards</div>
                       </div>
                     </Link>
                   </li>
                   <li>
                     <Link
                       href="/collection/arena"
-                      className="flex items-center gap-2 px-4 py-2 transition-colors duration-150 hover:bg-slate-800 focus:bg-slate-800 focus:outline-none"
+                      className="hover:bg-secondary/20 flex items-center gap-2 px-4 py-2 transition-colors duration-150 focus:outline-none"
                     >
-                      <span className="text-base">🎮</span>
+                      <Image
+                        src="/images/arena-accent.png"
+                        alt="Arena Collection"
+                        width={20}
+                        height={20}
+                      />
                       <div>
                         <div className="text-sm font-medium">
                           Arena Collection
                         </div>
-                        <div className="text-xs text-slate-400">
-                          Digital cards
-                        </div>
+                        <div className="text-xs">Digital cards</div>
                       </div>
                     </Link>
                   </li>
@@ -382,15 +395,14 @@ export function NavMenu({
           <Link
             href="/wishlists"
             className={cn(
-              'group relative flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
-              pathname.includes('/wishlists')
-                ? 'bg-slate-800 hover:bg-slate-700/70'
-                : 'hover:bg-slate-800/70 focus:bg-slate-800',
+              'group hover:bg-secondary/50 relative flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors duration-200 focus:outline-none',
+              pathname.includes('/wishlists') &&
+                'bg-secondary/50 hover:bg-secondary/70',
             )}
           >
-            <Heart className="h-4 w-4 text-rose-500" />
+            <Heart className="text-accent h-4 w-4" />
             <span>Wishlists</span>
-            <div className="absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-rose-500 transition-all duration-300 ease-out group-hover:w-1/2" />
+            <div className="bg-accent absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full transition-all duration-300 ease-out group-hover:w-1/2" />
           </Link>
         </>
       )}
