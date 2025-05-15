@@ -61,6 +61,7 @@ export function Filters({
   const urlRarities = searchParams.get('rarities')?.split(',') || [];
   const urlSets = searchParams.get('sets')?.split(',') || [];
   const urlDeduplicate = searchParams.get('dedupe') !== 'false'; // Default to true
+  const urlHideTokens = searchParams.get('hide_tokens') === 'true'; // Default to false
 
   // Parse sort fields from URL
   const urlSortParam = searchParams.get('sort');
@@ -83,6 +84,8 @@ export function Filters({
   const [optimisticSets, setOptimisticSets] = useState<string[]>(urlSets);
   const [optimisticSortFields, setOptimisticSortFields] =
     useState<SortField[]>(urlSortFields);
+  const [optimisticHideTokens, setOptimisticHideTokens] =
+    useState<boolean>(urlHideTokens);
 
   // Sync optimistic states with URL when searchParams change
   useEffect(() => {
@@ -106,12 +109,15 @@ export function Filters({
         })
       : [];
 
+    const newUrlHideTokens = searchParams.get('hide_tokens') === 'true';
+
     // Update optimistic states to match URL values
     setOptimisticColors(newUrlColors);
     setOptimisticCmcRange(newUrlCmcRange);
     setOptimisticRarities(newUrlRarities);
     setOptimisticSets(newUrlSets);
     setOptimisticSortFields(newUrlSortFields);
+    setOptimisticHideTokens(newUrlHideTokens);
   }, [searchParams]);
 
   // Create a debounced function to update URL with new filters
@@ -119,7 +125,10 @@ export function Filters({
     debounce(
       (
         updates: Partial<
-          Omit<FilterOptions, 'exactColorMatch'> & { deduplicate?: boolean }
+          Omit<FilterOptions, 'exactColorMatch'> & {
+            deduplicate?: boolean;
+            hideTokens?: boolean;
+          }
         >,
         preservePage = false,
       ) => {
@@ -171,6 +180,15 @@ export function Filters({
             newParams.set('sort', sortParam);
           } else {
             newParams.delete('sort');
+          }
+        }
+
+        // Handle hideTokens
+        if (updates.hideTokens !== undefined) {
+          if (updates.hideTokens) {
+            newParams.set('hide_tokens', 'true');
+          } else {
+            newParams.delete('hide_tokens');
           }
         }
 
@@ -304,6 +322,12 @@ export function Filters({
 
     // Debounced URL update
     debouncedUpdateUrlFilters({ cmcRange: newRange });
+  };
+
+  const toggleHideTokens = () => {
+    const newValue = !optimisticHideTokens;
+    setOptimisticHideTokens(newValue);
+    debouncedUpdateUrlFilters({ hideTokens: newValue }, true);
   };
 
   const handleDragEnd = (event: any) => {
@@ -540,19 +564,29 @@ export function Filters({
               </div>
             </div>
 
-            {!collectionType && (
-              <div className="flex min-w-fit flex-col gap-2.5">
-                <h3 className="text-xs font-medium md:text-sm">Options</h3>
+            <div className="flex min-w-fit flex-col gap-2.5">
+              <h3 className="text-xs font-medium md:text-sm">Options</h3>
+              <div>
                 <div className="flex items-center space-x-2">
                   <Switch
-                    id="deduplicate"
-                    checked={cardsContext.deduplicate}
-                    onCheckedChange={cardsContext.toggleDeduplicate}
+                    id="hide-tokens"
+                    checked={optimisticHideTokens}
+                    onCheckedChange={toggleHideTokens}
                   />
-                  <Label htmlFor="deduplicate">One card per name</Label>
+                  <Label htmlFor="hide-tokens">Hide Tokens</Label>
                 </div>
+                {!collectionType && (
+                  <div className="mt-2 flex items-center space-x-2">
+                    <Switch
+                      id="deduplicate"
+                      checked={cardsContext.deduplicate}
+                      onCheckedChange={cardsContext.toggleDeduplicate}
+                    />
+                    <Label htmlFor="deduplicate">One card per name</Label>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             <SetFilter
               selectedSets={optimisticSets}

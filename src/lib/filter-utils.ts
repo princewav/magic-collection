@@ -110,6 +110,10 @@ export function parseFiltersFromParams(searchParams: {
   const dedupeParam = getParam('dedupe');
   const deduplicate = dedupeParam !== 'false'; // Default to true unless explicitly set to false
 
+  // Hide tokens option
+  const hideTokensParam = getParam('hide_tokens');
+  filters.hideTokens = hideTokensParam === 'true'; // Defaults to false if param is not 'true' or is missing
+
   return {
     filters: filters as EnhancedFilterOptions,
     deduplicate,

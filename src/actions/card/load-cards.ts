@@ -26,6 +26,7 @@ export interface FilterOptions {
     order: 'asc' | 'desc';
   }>;
   exactColorMatch?: boolean;
+  hideTokens?: boolean;
 }
 
 export async function loadCardsById(ids: string[]): Promise<Card[]> {
@@ -177,6 +178,14 @@ const buildMatchStage = (
 
   if (filters.sets && filters.sets.length > 0) {
     matchConditions[`${lookupPrefix}set`] = { $in: filters.sets };
+  }
+
+  // Add filter for hideTokens
+  if (filters.hideTokens) {
+    // This regex will match if "Token" is a whole word in the type_line, case-insensitive.
+    // It aims to exclude cards that are primarily tokens, e.g., "Token Creature — Spirit"
+    // but not cards that might mention tokens in other ways, if any.
+    matchConditions[`${lookupPrefix}type_line`] = { $not: /\bToken\b/i };
   }
 
   // Add more filters here based on FilterOptions (e.g., name search on cardDetails.name)
