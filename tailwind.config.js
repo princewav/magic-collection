@@ -81,27 +81,46 @@ export default {
       },
       keyframes: {
         'accordion-down': {
-          from: { height: 0 },
+          from: { height: '0' },
           to: { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: 0 },
+          to: { height: '0' },
         },
-        'collapsible-down': {
-          from: { height: 0 },
-          to: { height: 'var(--radix-collapsible-content-height)' },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
         },
-        'collapsible-up': {
-          from: { height: 'var(--radix-collapsible-content-height)' },
-          to: { height: 0 },
+        'slide-in-from-left': {
+          from: { transform: 'translateX(-1.25rem)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'slide-in-from-right': {
+          from: { transform: 'translateX(1.25rem)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'slide-out-to-right': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(1.25rem)' },
+        },
+        'slide-out-to-left': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-1.25rem)' },
         },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        slideDown: 'collapsible-down 0.2s ease-out',
-        slideUp: 'collapsible-up 0.2s ease-out',
+        'fade-in': 'fade-in 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        'slide-in-from-left':
+          'slide-in-from-left 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        'slide-in-from-right':
+          'slide-in-from-right 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        'slide-out-to-right':
+          'slide-out-to-right 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        'slide-out-to-left':
+          'slide-out-to-left 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
       },
     },
   },

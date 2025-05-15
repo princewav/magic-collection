@@ -1,5 +1,5 @@
 import type { Metadata } from 'next/types';
-import { Inter } from 'next/font/google';
+// import { Inter } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import './globals.css';
@@ -12,8 +12,9 @@ import React from 'react';
 import CardModal from '@/components/card-modal/CardModal';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { SettingsProvider } from '@/context/SettingsContext';
+import MobileNavbar from '@/components/navbar/MobileNavbar';
 
-const inter = Inter({ subsets: ['latin'] });
+// const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Magic Collection',
@@ -33,7 +34,7 @@ export default function RootLayout({
     >
       <body
         className={cn(
-          inter.className,
+          // inter.className,
           'bg-background text-foreground mb-20 min-h-screen md:mb-0',
         )}
       >
@@ -46,7 +47,12 @@ export default function RootLayout({
           >
             <SettingsProvider>
               <CardModalProvider>
-                <Navbar />
+                <header className="sticky top-0 z-40 w-full border-b">
+                  <Navbar />
+                </header>
+
+                {/* Mobile Navigation */}
+                <MobileNavbar />
                 {children}
                 <CardModal />
                 <Toaster />
