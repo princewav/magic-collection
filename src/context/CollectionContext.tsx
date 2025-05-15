@@ -7,6 +7,7 @@ import {
   useEffect,
   useCallback,
   ReactNode,
+  useRef,
 } from 'react';
 import { Card } from '@/types/card';
 import { fetchCollectionCards } from '@/actions/load-cards';
@@ -56,6 +57,9 @@ export function CollectionProvider({
     },
   );
 
+  // Reference to the current abort controller
+  const currentAbortController = useRef<AbortController | null>(null);
+
   // Update filters when initialFilters changes
   useEffect(() => {
     if (initialFilters) {
@@ -66,6 +70,15 @@ export function CollectionProvider({
 
   const fetchCollectedCards = useCallback(
     async (pageNum = 1) => {
+      // Cancel any existing request
+      if (currentAbortController.current) {
+        currentAbortController.current.abort();
+      }
+
+      // Create a new AbortController for this request
+      const abortController = new AbortController();
+      currentAbortController.current = abortController;
+
       setIsLoading(true);
       try {
         const { cards, total } = await fetchCollectionCards(
@@ -73,6 +86,9 @@ export function CollectionProvider({
           currentFilters,
           pageNum,
         );
+
+        // If request was aborted, don't update state
+        if (abortController.signal.aborted) return;
 
         if (pageNum === 1) {
           setCollectedCards(cards);
@@ -82,14 +98,23 @@ export function CollectionProvider({
 
         setTotal(total);
       } catch (err) {
-        console.error('[CollectionContext] Error:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-        if (pageNum === 1) {
-          setCollectedCards([]);
-          setTotal(0);
+        // Only log and update state if the error wasn't from aborting
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          console.log('Request was aborted due to new filter changes');
+        } else {
+          console.error('[CollectionContext] Error:', err);
+          setError(err instanceof Error ? err : new Error('Unknown error'));
+          if (pageNum === 1) {
+            setCollectedCards([]);
+            setTotal(0);
+          }
         }
       } finally {
-        setIsLoading(false);
+        // Only update loading state if this is still the current request
+        if (currentAbortController.current === abortController) {
+          setIsLoading(false);
+          currentAbortController.current = null;
+        }
       }
     },
     [currentFilters, collectionType],
@@ -98,6 +123,14 @@ export function CollectionProvider({
   // Fetch cards when filters change
   useEffect(() => {
     fetchCollectedCards(1);
+
+    // Cleanup function for aborting the request when dependencies change
+    return () => {
+      if (currentAbortController.current) {
+        currentAbortController.current.abort();
+        currentAbortController.current = null;
+      }
+    };
   }, [currentFilters, collectionType, fetchCollectedCards]);
 
   const loadNextPage = useCallback(() => {

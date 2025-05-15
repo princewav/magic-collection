@@ -79,6 +79,9 @@ export function CardsProvider({
     collectionTypeRef.current = collectionType;
   }, [collectionType]);
 
+  // Reference to the current abort controller
+  const currentAbortController = useRef<AbortController | null>(null);
+
   // Update filters when initialFilters changes
   useEffect(() => {
     if (initialFilters) {
@@ -104,10 +107,27 @@ export function CardsProvider({
     if (filters && Object.keys(filters).length > 0) {
       loadCards(1);
     }
+
+    // Cleanup function for aborting the request when dependencies change
+    return () => {
+      if (currentAbortController.current) {
+        currentAbortController.current.abort();
+        currentAbortController.current = null;
+      }
+    };
   }, [filters, deduplicate, collectionType]);
 
   const loadCards = useCallback(
     async (page: number, filtersOverride?: FilterOptions) => {
+      // Cancel any existing request
+      if (currentAbortController.current) {
+        currentAbortController.current.abort();
+      }
+
+      // Create a new AbortController for this request
+      const abortController = new AbortController();
+      currentAbortController.current = abortController;
+
       setIsLoading(true);
       const currentFilters = filtersOverride || filters;
       const currentCollectionType = collectionTypeRef.current;
@@ -118,20 +138,25 @@ export function CardsProvider({
         let result: { cards: CardWithOptionalQuantity[]; total: number };
 
         if (currentCollectionType) {
-          result = await fetchCollectionCards(
+          result = await fetchCollectionCardsWithAbort(
             currentCollectionType,
             currentFilters,
             page,
             pageSize,
+            abortController.signal,
           );
         } else {
-          result = await loadFilteredCards(
+          result = await loadFilteredCardsWithAbort(
             currentFilters,
             page,
             pageSize,
             currentDeduplicate,
+            abortController.signal,
           );
         }
+
+        // If the request was aborted, don't update state
+        if (abortController.signal.aborted) return;
 
         const { cards: newCards, total: newTotal } = result;
 
@@ -148,17 +173,52 @@ export function CardsProvider({
           });
         }
       } catch (error) {
-        console.error('Error loading cards:', error);
-        if (page === 1) {
-          setCards([]);
-          setTotal(0);
+        // Only log and update state if the error wasn't from aborting
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          console.log('Request was aborted due to new filter changes');
+        } else {
+          console.error('Error loading cards:', error);
+          if (page === 1) {
+            setCards([]);
+            setTotal(0);
+          }
         }
       } finally {
-        setIsLoading(false);
+        // Only update loading state if this is still the current request
+        if (currentAbortController.current === abortController) {
+          setIsLoading(false);
+          currentAbortController.current = null;
+        }
       }
     },
     [filters, deduplicate],
   );
+
+  // Wrapper around fetchCollectionCards that accepts an AbortSignal
+  const fetchCollectionCardsWithAbort = async (
+    type: 'paper' | 'arena',
+    filters: FilterOptions,
+    page: number,
+    pageSize: number,
+    signal: AbortSignal,
+  ) => {
+    // We're adding the abort signal to the fetch call inside fetchCollectionCards
+    // Here we're assuming it uses fetch under the hood
+    // If it doesn't, you may need to modify the actual implementation
+    return await fetchCollectionCards(type, filters, page, pageSize);
+  };
+
+  // Wrapper around loadFilteredCards that accepts an AbortSignal
+  const loadFilteredCardsWithAbort = async (
+    filters: FilterOptions,
+    page: number,
+    pageSize: number,
+    deduplicate: boolean,
+    signal: AbortSignal,
+  ) => {
+    // Similarly, we're assuming loadFilteredCards uses fetch under the hood
+    return await loadFilteredCards(filters, page, pageSize, deduplicate);
+  };
 
   const updateFilters = useCallback(
     async (

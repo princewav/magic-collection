@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ManaSymbol } from './ManaSymbol';
 import { Slider } from '@/components/ui/slider';
@@ -27,6 +27,19 @@ import { SortOptions, type SortField } from './SortOptions';
 import { getFiltersFromUrl } from '@/lib/url-params';
 import { FilterOptions } from '@/actions/card/load-cards';
 
+// Simple debounce function
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+
+  return function (...args: Parameters<T>) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
 export function Filters({
   className,
   collectionType,
@@ -39,7 +52,7 @@ export function Filters({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Use URL search params as the source of truth
+  // Use URL search params as the initial source of truth
   const urlColors = searchParams.get('colors')?.split(',') || [];
   const urlCmcParam = searchParams.get('cmc')?.split(',') || ['0', '10'];
   const urlCmcRange: [number, number] = [
@@ -63,80 +76,127 @@ export function Filters({
       })
     : [];
 
-  // Create a function to update URL with new filters
-  const updateUrlFilters = useCallback(
-    (
-      updates: Partial<FilterOptions & { deduplicate?: boolean }>,
-      preservePage = false,
-    ) => {
-      const newParams = new URLSearchParams(searchParams.toString());
+  // Optimistic UI states that will be used for rendering
+  const [optimisticColors, setOptimisticColors] = useState<string[]>(urlColors);
+  const [optimisticCmcRange, setOptimisticCmcRange] =
+    useState<[number, number]>(urlCmcRange);
+  const [optimisticRarities, setOptimisticRarities] =
+    useState<string[]>(urlRarities);
+  const [optimisticSets, setOptimisticSets] = useState<string[]>(urlSets);
+  const [optimisticExactColorMatch, setOptimisticExactColorMatch] =
+    useState<boolean>(urlExactColorMatch);
+  const [optimisticSortFields, setOptimisticSortFields] =
+    useState<SortField[]>(urlSortFields);
 
-      // Reset page to 1 when filters change, unless preservePage is true
-      if (!preservePage) {
-        newParams.delete('page');
-      }
+  // Sync optimistic states with URL when searchParams change
+  useEffect(() => {
+    const newUrlColors = searchParams.get('colors')?.split(',') || [];
+    const newUrlCmcParam = searchParams.get('cmc')?.split(',') || ['0', '10'];
+    const newUrlCmcRange: [number, number] = [
+      parseInt(newUrlCmcParam[0], 10),
+      parseInt(newUrlCmcParam[1], 10),
+    ];
+    const newUrlRarities = searchParams.get('rarities')?.split(',') || [];
+    const newUrlSets = searchParams.get('sets')?.split(',') || [];
+    const newUrlExactColorMatch = searchParams.get('exact') === 'true';
 
-      // Handle colors
-      if (updates.colors !== undefined) {
-        if (updates.colors.length > 0) {
-          newParams.set('colors', updates.colors.join(','));
-        } else {
-          newParams.delete('colors');
+    const newUrlSortParam = searchParams.get('sort');
+    const newUrlSortFields: SortField[] = newUrlSortParam
+      ? newUrlSortParam.split(',').map((field) => {
+          const [fieldName, order] = field.split(':');
+          return {
+            field: fieldName,
+            order: order as 'asc' | 'desc',
+          };
+        })
+      : [];
+
+    // Update optimistic states to match URL values
+    setOptimisticColors(newUrlColors);
+    setOptimisticCmcRange(newUrlCmcRange);
+    setOptimisticRarities(newUrlRarities);
+    setOptimisticSets(newUrlSets);
+    setOptimisticExactColorMatch(newUrlExactColorMatch);
+    setOptimisticSortFields(newUrlSortFields);
+  }, [searchParams]);
+
+  // Create a debounced function to update URL with new filters
+  const debouncedUpdateUrlFilters = useCallback(
+    debounce(
+      (
+        updates: Partial<FilterOptions & { deduplicate?: boolean }>,
+        preservePage = false,
+      ) => {
+        const newParams = new URLSearchParams(searchParams.toString());
+
+        // Reset page to 1 when filters change, unless preservePage is true
+        if (!preservePage) {
+          newParams.delete('page');
         }
-      }
 
-      // Handle CMC range
-      if (updates.cmcRange !== undefined) {
-        newParams.set('cmc', `${updates.cmcRange[0]},${updates.cmcRange[1]}`);
-      }
-
-      // Handle rarities
-      if (updates.rarities !== undefined) {
-        if (updates.rarities.length > 0) {
-          newParams.set('rarities', updates.rarities.join(','));
-        } else {
-          newParams.delete('rarities');
+        // Handle colors
+        if (updates.colors !== undefined) {
+          if (updates.colors.length > 0) {
+            newParams.set('colors', updates.colors.join(','));
+          } else {
+            newParams.delete('colors');
+          }
         }
-      }
 
-      // Handle sets
-      if (updates.sets !== undefined) {
-        if (updates.sets.length > 0) {
-          newParams.set('sets', updates.sets.join(','));
-        } else {
-          newParams.delete('sets');
+        // Handle CMC range
+        if (updates.cmcRange !== undefined) {
+          newParams.set('cmc', `${updates.cmcRange[0]},${updates.cmcRange[1]}`);
         }
-      }
 
-      // Handle exact color match
-      if (updates.exactColorMatch !== undefined) {
-        if (updates.exactColorMatch) {
-          newParams.set('exact', 'true');
-        } else {
-          newParams.delete('exact');
+        // Handle rarities
+        if (updates.rarities !== undefined) {
+          if (updates.rarities.length > 0) {
+            newParams.set('rarities', updates.rarities.join(','));
+          } else {
+            newParams.delete('rarities');
+          }
         }
-      }
 
-      // Handle sort fields
-      if (updates.sortFields !== undefined) {
-        if (updates.sortFields.length > 0) {
-          const sortParam = updates.sortFields
-            .map((sf) => `${sf.field}:${sf.order}`)
-            .join(',');
-          newParams.set('sort', sortParam);
-        } else {
-          newParams.delete('sort');
+        // Handle sets
+        if (updates.sets !== undefined) {
+          if (updates.sets.length > 0) {
+            newParams.set('sets', updates.sets.join(','));
+          } else {
+            newParams.delete('sets');
+          }
         }
-      }
 
-      // Handle deduplicate (only in main view, not in collection)
-      if (!collectionType && updates.deduplicate !== undefined) {
-        newParams.set('dedupe', updates.deduplicate.toString());
-      }
+        // Handle exact color match
+        if (updates.exactColorMatch !== undefined) {
+          if (updates.exactColorMatch) {
+            newParams.set('exact', 'true');
+          } else {
+            newParams.delete('exact');
+          }
+        }
 
-      // Update URL without refreshing the page
-      router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
-    },
+        // Handle sort fields
+        if (updates.sortFields !== undefined) {
+          if (updates.sortFields.length > 0) {
+            const sortParam = updates.sortFields
+              .map((sf) => `${sf.field}:${sf.order}`)
+              .join(',');
+            newParams.set('sort', sortParam);
+          } else {
+            newParams.delete('sort');
+          }
+        }
+
+        // Handle deduplicate (only in main view, not in collection)
+        if (!collectionType && updates.deduplicate !== undefined) {
+          newParams.set('dedupe', updates.deduplicate.toString());
+        }
+
+        // Update URL without refreshing the page
+        router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
+      },
+      300,
+    ), // 300ms debounce delay
     [searchParams, router, pathname, collectionType],
   );
 
@@ -147,81 +207,129 @@ export function Filters({
   // Track deduplicate state change from context and update URL if needed
   useEffect(() => {
     if (!collectionType && cardsContext.deduplicate !== urlDeduplicate) {
-      updateUrlFilters({ deduplicate: cardsContext.deduplicate }, true);
+      debouncedUpdateUrlFilters(
+        { deduplicate: cardsContext.deduplicate },
+        true,
+      );
     }
   }, [
     cardsContext.deduplicate,
     urlDeduplicate,
-    updateUrlFilters,
+    debouncedUpdateUrlFilters,
     collectionType,
   ]);
 
-  // Handlers for filter changes
+  // Handlers for filter changes with optimistic updates
   const toggleColor = (symbol: string) => {
-    const newColors = urlColors.includes(symbol)
-      ? urlColors.filter((c) => c !== symbol)
-      : [...urlColors, symbol];
+    // Optimistic UI update
+    const newColors = optimisticColors.includes(symbol)
+      ? optimisticColors.filter((c) => c !== symbol)
+      : [...optimisticColors, symbol];
 
-    updateUrlFilters({ colors: newColors });
+    setOptimisticColors(newColors);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ colors: newColors });
   };
 
   const toggleExactColorMatch = () => {
-    updateUrlFilters({ exactColorMatch: !urlExactColorMatch });
+    // Optimistic UI update
+    const newExactColorMatch = !optimisticExactColorMatch;
+    setOptimisticExactColorMatch(newExactColorMatch);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ exactColorMatch: newExactColorMatch });
   };
 
   const toggleRarity = (value: string) => {
-    const newRarities = urlRarities.includes(value)
-      ? urlRarities.filter((r) => r !== value)
-      : [...urlRarities, value];
+    // Optimistic UI update
+    const newRarities = optimisticRarities.includes(value)
+      ? optimisticRarities.filter((r) => r !== value)
+      : [...optimisticRarities, value];
 
-    updateUrlFilters({ rarities: newRarities });
+    setOptimisticRarities(newRarities);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ rarities: newRarities });
   };
 
   const handleSetChange = (newSets: string[]) => {
-    updateUrlFilters({ sets: newSets });
+    // Optimistic UI update
+    setOptimisticSets(newSets);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ sets: newSets });
   };
 
   const handleSortFieldChange = (field: string) => {
-    const existingField = urlSortFields.find((f) => f.field === field);
+    const existingField = optimisticSortFields.find((f) => f.field === field);
     let newFields: SortField[];
 
     if (existingField) {
-      newFields = urlSortFields.map((f) =>
+      newFields = optimisticSortFields.map((f) =>
         f.field === field
           ? { ...f, order: f.order === 'asc' ? 'desc' : 'asc' }
           : f,
       );
     } else {
-      newFields = [...urlSortFields, { field, order: 'asc' }];
+      newFields = [...optimisticSortFields, { field, order: 'asc' }];
     }
 
-    updateUrlFilters({ sortFields: newFields });
+    // Optimistic UI update
+    setOptimisticSortFields(newFields);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ sortFields: newFields });
   };
 
   const removeSortField = (field: string) => {
-    const newFields = urlSortFields.filter((f) => f.field !== field);
-    updateUrlFilters({ sortFields: newFields });
+    const newFields = optimisticSortFields.filter((f) => f.field !== field);
+
+    // Optimistic UI update
+    setOptimisticSortFields(newFields);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ sortFields: newFields });
   };
 
   const handleCmcRangeChange = (value: number[]) => {
     const newRange: [number, number] = [value[0], value[1]];
-    updateUrlFilters({ cmcRange: newRange });
+
+    // Optimistic UI update
+    setOptimisticCmcRange(newRange);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ cmcRange: newRange });
   };
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
 
     if (active.id !== over.id) {
-      const oldIndex = urlSortFields.findIndex((f) => f.field === active.id);
-      const newIndex = urlSortFields.findIndex((f) => f.field === over.id);
+      const oldIndex = optimisticSortFields.findIndex(
+        (f) => f.field === active.id,
+      );
+      const newIndex = optimisticSortFields.findIndex(
+        (f) => f.field === over.id,
+      );
 
-      const newFields = arrayMove(urlSortFields, oldIndex, newIndex);
-      updateUrlFilters({ sortFields: newFields });
+      const newFields = arrayMove(optimisticSortFields, oldIndex, newIndex);
+
+      // Optimistic UI update
+      setOptimisticSortFields(newFields);
+
+      // Debounced URL update
+      debouncedUpdateUrlFilters({ sortFields: newFields });
     }
   };
 
   const resetColors = () => {
-    updateUrlFilters({ colors: [], exactColorMatch: false });
+    // Optimistic UI update
+    setOptimisticColors([]);
+    setOptimisticExactColorMatch(false);
+
+    // Debounced URL update
+    debouncedUpdateUrlFilters({ colors: [], exactColorMatch: false });
   };
 
   const sensors = useSensors(
@@ -272,7 +380,7 @@ export function Filters({
             <div className="flex min-w-fit flex-col gap-2">
               <div className="flex items-center">
                 <h3 className="text-xs font-medium md:text-sm">Colors</h3>
-                {(urlColors.length > 0 || urlExactColorMatch) && (
+                {(optimisticColors.length > 0 || optimisticExactColorMatch) && (
                   <button
                     onClick={resetColors}
                     className="text-muted-foreground hover:text-foreground ml-2"
@@ -288,7 +396,7 @@ export function Filters({
                     key={filter.symbol}
                     onClick={() => toggleColor(filter.symbol)}
                     className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
-                      urlColors.includes(filter.symbol)
+                      optimisticColors.includes(filter.symbol)
                         ? 'bg-primary/20 ring-primary ring-2'
                         : 'hover:bg-muted'
                     }`}
@@ -309,7 +417,7 @@ export function Filters({
                 <button
                   onClick={toggleExactColorMatch}
                   className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
-                    urlExactColorMatch
+                    optimisticExactColorMatch
                       ? 'bg-primary/20 ring-primary ring-2'
                       : 'hover:bg-muted'
                   }`}
@@ -327,14 +435,14 @@ export function Filters({
 
             <div className="flex min-w-[200px] flex-col gap-5">
               <h3 className="text-xs font-medium md:text-sm">
-                CMC: {urlCmcRange[0]} - {urlCmcRange[1]}
+                CMC: {optimisticCmcRange[0]} - {optimisticCmcRange[1]}
               </h3>
               <Slider
                 defaultValue={[0, 16]}
                 min={0}
                 max={16}
                 step={1}
-                value={[urlCmcRange[0], urlCmcRange[1]]}
+                value={[optimisticCmcRange[0], optimisticCmcRange[1]]}
                 onValueChange={handleCmcRangeChange}
                 className="w-full self-center"
               />
@@ -348,7 +456,7 @@ export function Filters({
                     key={option.symbol}
                     onClick={() => toggleRarity(option.value)}
                     className={`flex size-6 items-center justify-center rounded-full transition-all md:size-7 ${
-                      urlRarities.includes(option.value)
+                      optimisticRarities.includes(option.value)
                         ? 'ring-2 ring-offset-1 ' +
                           (option.symbol === 'C'
                             ? 'ring-gray-400'
@@ -393,10 +501,13 @@ export function Filters({
               </div>
             )}
 
-            <SetFilter selectedSets={urlSets} onSetChange={handleSetChange} />
+            <SetFilter
+              selectedSets={optimisticSets}
+              onSetChange={handleSetChange}
+            />
 
             <SortOptions
-              sortFields={urlSortFields}
+              sortFields={optimisticSortFields}
               onSortFieldChange={handleSortFieldChange}
               onRemoveSortField={removeSortField}
               onDragEnd={handleDragEnd}
