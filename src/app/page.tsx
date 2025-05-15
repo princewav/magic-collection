@@ -4,11 +4,11 @@ import { Filters } from '@/components/Filters';
 import CardModal from '@/components/card-modal/CardModal';
 import { CardContainer } from '@/components/CardContainer';
 import { getFiltersFromSearchParams } from '@/lib/url-params';
-import { Skeleton } from '@/components/ui/skeleton';
 import { CardModalProvider } from '@/context/CardModalContext';
 import { CardsProvider } from '@/context/CardsContext';
 import { CollectionProvider } from '@/context/CollectionContext';
 import { ViewToggleContainer } from '@/components/ViewToggleContainer';
+import { LayoutAwareSkeleton } from '@/components/LayoutAwareSkeleton';
 
 export const metadata: Metadata = {
   title: 'MTG Collection',
@@ -16,18 +16,6 @@ export const metadata: Metadata = {
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
-
-function CardGridSkeleton() {
-  return (
-    <div className="flex flex-wrap justify-center gap-4">
-      {Array.from({ length: 12 }).map((_, index) => (
-        <div key={index} className="w-72 sm:w-[min(100%,275px)]">
-          <Skeleton className="h-[330px] w-full rounded-lg" />
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export default async function Page({ searchParams }: PageProps) {
@@ -48,7 +36,7 @@ export default async function Page({ searchParams }: PageProps) {
               </div>
             </div>
             <Filters className="mb-4" />
-            <Suspense fallback={<CardGridSkeleton />}>
+            <Suspense fallback={<LayoutAwareSkeleton />}>
               <CardContainer
                 filters={filters}
                 page={page}
