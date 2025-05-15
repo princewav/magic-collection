@@ -177,7 +177,6 @@ describe('CardService', () => {
         sortFields: [{ field: 'rarity', order: 'asc' as const }],
         colors: ['R'],
         sets: ['tsr'],
-        exactColorMatch: true,
       };
 
       const { cards } = await cardService.getFilteredCardsWithPagination(
@@ -214,7 +213,6 @@ describe('CardService', () => {
         sortFields: [{ field: 'rarity', order: 'desc' as const }],
         colors: ['R'],
         sets: ['tsr'],
-        exactColorMatch: true,
       };
 
       const { cards } = await cardService.getFilteredCardsWithPagination(
@@ -260,7 +258,6 @@ describe('CardService', () => {
       const filters = {
         sortFields: [{ field: 'colors', order: 'asc' as const }],
         sets: ['tsr'],
-        exactColorMatch: true,
       };
 
       const { cards } = await cardService.getFilteredCardsWithPagination(
@@ -301,7 +298,6 @@ describe('CardService', () => {
       const filters = {
         sortFields: [{ field: 'colors', order: 'desc' as const }],
         sets: ['tsr'],
-        exactColorMatch: true,
       };
 
       const { cards } = await cardService.getFilteredCardsWithPagination(

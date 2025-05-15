@@ -176,22 +176,14 @@ export type CollectionCard = {
 export type CardWithQuantity = Card & { quantity: number };
 export type CardWithOptionalQuantity = Card & { quantity?: number };
 
-export enum Rarity {
-  COMMON = 'common',
-  UNCOMMON = 'uncommon',
-  RARE = 'rare',
-  MYTHIC = 'mythic',
-  BONUS = 'bonus',
-  SPECIAL = 'special',
-}
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'mythic' | 'special';
 
-export const rarityOrder = [
-  Rarity.COMMON,
-  Rarity.UNCOMMON,
-  Rarity.RARE,
-  Rarity.MYTHIC,
-  Rarity.BONUS,
-  Rarity.SPECIAL,
+export const rarityOrder: Rarity[] = [
+  'common',
+  'uncommon',
+  'rare',
+  'mythic',
+  'special',
 ];
 
 export enum Layout {

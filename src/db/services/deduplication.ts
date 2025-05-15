@@ -48,9 +48,8 @@ export class CardDeduplicationService {
     let score = 0;
     const rarity = card.rarity as Rarity;
     const layout = card.layout as Layout;
-
     // Prefer non-special rarities
-    if (![Rarity.BONUS, Rarity.SPECIAL].includes(rarity)) {
+    if (!['bonus', 'special'].includes(rarity)) {
       score += SCORE_CONFIG.RARITY_TYPE.NON_SPECIAL_BONUS;
     }
 

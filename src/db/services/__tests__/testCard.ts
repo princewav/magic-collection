@@ -55,7 +55,7 @@ export const testCard = {
   set_name: 'Time Spiral Timeshifted',
   scryfall_set_uri: 'https://scryfall.com/sets/tsb?utm_source=api',
   collector_number: '20',
-  rarity: 'bonus',
+  rarity: 'special',
   flavor_text:
     'Saffiyah clapped her hands and twenty flying men appeared at her side, each well trained in the art of combat.',
 };

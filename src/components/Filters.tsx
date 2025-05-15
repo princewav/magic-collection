@@ -386,6 +386,7 @@ export function Filters({
     { symbol: 'U', name: 'Uncommon', value: 'uncommon' },
     { symbol: 'R', name: 'Rare', value: 'rare' },
     { symbol: 'M', name: 'Mythic Rare', value: 'mythic' },
+    { symbol: 'S', name: 'Special', value: 'special' },
   ];
 
   // Helper function to get a tooltip for the multicolor button based on state
@@ -570,7 +571,7 @@ export function Filters({
 
             <div className="flex min-w-fit flex-col gap-2">
               <h3 className="text-xs font-medium md:text-sm">Rarity</h3>
-              <div className="flex justify-start gap-3 px-1">
+              <div className="flex flex-wrap justify-start gap-3 px-1">
                 {rarityOptions.map((option) => (
                   <button
                     key={option.symbol}
@@ -584,7 +585,9 @@ export function Filters({
                               ? 'ring-cyan-500'
                               : option.symbol === 'R'
                                 ? 'ring-amber-500'
-                                : 'ring-orange-500')
+                                : option.symbol === 'M'
+                                  ? 'ring-orange-500'
+                                  : 'ring-purple-500')
                         : 'hover:bg-muted'
                     }`}
                     title={option.name}
@@ -597,7 +600,9 @@ export function Filters({
                             ? 'bg-gradient-to-br from-cyan-400 to-cyan-600 text-black'
                             : option.symbol === 'R'
                               ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-black'
-                              : 'bg-gradient-to-br from-orange-400 to-orange-600 text-black'
+                              : option.symbol === 'M'
+                                ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-black'
+                                : 'bg-gradient-to-br from-purple-400 to-purple-600 text-white'
                       }`}
                     >
                       {option.symbol}
