@@ -66,22 +66,35 @@ const buildMatchStage = (
 
   if (filters.colors && filters.colors.length > 0) {
     const includesMulticolor = filters.colors.includes('M');
-    const specificColors = filters.colors.filter((c) => c !== 'M');
+    const specificColors = filters.colors.filter((c) => c !== 'M' && c !== 'C');
     const includesColorless = filters.colors.includes('C');
 
     // Handle colorless cards separately
     if (includesColorless && filters.colors.length === 1) {
       // Only 'C' is selected - match cards with empty color_identity
+      // Use a very simple and direct approach for colorless
+      console.log("Building query for ONLY colorless");
+      
+      // Try different approaches for matching colorless cards
       matchConditions.$or = [
+        // Approach 1: Empty array
+        { [`${lookupPrefix}color_identity`]: [] },
+        // Approach 2: Size 0
         { [`${lookupPrefix}color_identity`]: { $size: 0 } },
-        { [`${lookupPrefix}color_identity`]: { $exists: false } },
+        // Approach 3: Using $expr
+        { $expr: { $eq: [{ $size: `$${lookupPrefix}color_identity` }, 0] } },
+        // Approach 4: Null check
+        { [`${lookupPrefix}color_identity`]: null },
+        // Approach 5: Field doesn't exist
+        { [`${lookupPrefix}color_identity`]: { $exists: false } }
       ];
     } else {
       // Normal color filtering
       if (filters.exactColorMatch) {
         // Exact match: contains exactly the specified colors and no others
+        // Note: this should not include 'C' in the comparison as it's not a real color
         matchConditions[`${lookupPrefix}color_identity`] = {
-          $eq: filters.colors.sort(),
+          $eq: specificColors.sort(),
         };
       } else if (includesMulticolor && specificColors.length > 0) {
         // M + specific colors: Cards must have ALL the specified colors
@@ -366,7 +379,36 @@ export async function loadMoreCollectionCards(
   });
 
   try {
+    // Print the query when colorless filter is used
+    if (filters.colors?.includes('C')) {
+      console.log('Colorless filter query:', JSON.stringify(pipeline, null, 2));
+    }
+
     const results = await collectionCardsRepo.aggregate(pipeline).toArray();
+
+    // If colorless filter and no results, show first 5 cards that should match
+    if (filters.colors?.includes('C') && results.length === 0) {
+      console.log('No results found with colorless filter');
+
+      // Try to find any colorless cards directly
+      const colorlessCheck = await db
+        .collection('cards')
+        .find({ color_identity: { $size: 0 } })
+        .limit(5)
+        .toArray();
+      console.log(
+        'Direct colorless check found:',
+        colorlessCheck.length,
+        'cards',
+      );
+      if (colorlessCheck.length > 0) {
+        console.log(
+          'Sample colorless card:',
+          colorlessCheck[0].name,
+          colorlessCheck[0].set,
+        );
+      }
+    }
 
     // Get total count with the same grouping logic
     const countPipeline = [

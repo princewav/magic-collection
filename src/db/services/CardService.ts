@@ -26,6 +26,56 @@ export class CardService extends BaseService<Card> {
   constructor(filteringService: CardFilteringService) {
     super();
     this.filteringService = filteringService;
+
+    // Debug check for colorless cards
+    this.debugCheckColorless();
+  }
+
+  private async debugCheckColorless() {
+    try {
+      // Check for colorless cards
+      const colorlessCards = await this.repo.collection
+        .find({ color_identity: { $size: 0 } })
+        .limit(3)
+        .toArray();
+      console.log(`DEBUG: Found ${colorlessCards.length} colorless cards`);
+      if (colorlessCards.length > 0) {
+        console.log(
+          'Sample colorless card:',
+          colorlessCards[0].name,
+          JSON.stringify(colorlessCards[0].color_identity),
+        );
+      }
+
+      // Check for null color_identity
+      const nullColorCards = await this.repo.collection
+        .find({ color_identity: null })
+        .limit(3)
+        .toArray();
+      console.log(
+        `DEBUG: Found ${nullColorCards.length} cards with null color_identity`,
+      );
+
+      // Check for undefined color_identity
+      const noColorField = await this.repo.collection
+        .find({ color_identity: { $exists: false } })
+        .limit(3)
+        .toArray();
+      console.log(
+        `DEBUG: Found ${noColorField.length} cards with no color_identity field`,
+      );
+
+      // Check for empty string color_identity (could be a mistake in the data)
+      const emptyStringColor = await this.repo.collection
+        .find({ color_identity: '' })
+        .limit(3)
+        .toArray();
+      console.log(
+        `DEBUG: Found ${emptyStringColor.length} cards with empty string color_identity`,
+      );
+    } catch (error) {
+      console.error('Debug check error:', error);
+    }
   }
 
   async getByNameAndSet(name: string, set: string, setNumber: string = '') {

@@ -13,7 +13,6 @@ interface FilterOptions {
     order: 'asc' | 'desc';
   }>;
   sets?: string[];
-  exactColorMatch?: boolean;
   colorFilter?: ColorFilterInfo; // Added for enhanced filtering
 }
 
@@ -28,17 +27,6 @@ export class CardFilteringService {
     // Handle the enhanced color filter logic if available
     if (filters.colorFilter) {
       this._applyColorFilter(query, filters.colorFilter);
-    }
-    // Fall back to legacy color filtering if colorFilter is not available
-    else if (filters.colors && filters.colors.length > 0) {
-      if (filters.exactColorMatch) {
-        query.$and = [
-          { color_identity: { $all: filters.colors } },
-          { color_identity: { $size: filters.colors.length } },
-        ];
-      } else {
-        query.color_identity = { $in: filters.colors };
-      }
     }
 
     if (filters.cmcRange) {
@@ -63,7 +51,7 @@ export class CardFilteringService {
     query: Record<string, any>,
     colorFilter: ColorFilterInfo,
   ): void {
-    const { mode, specificColors } = colorFilter;
+    const { mode, specificColors, includesMulticolor } = colorFilter;
 
     switch (mode) {
       case MulticolorMode.NONE:
@@ -72,13 +60,16 @@ export class CardFilteringService {
 
       case MulticolorMode.MULTICOLOR_ONLY:
         // Only 'M' filter: show cards with 2+ colors
-        // MongoDB doesn't support $size: { $gt: 1 } directly
-        // Use $expr with $gt operator instead
         query.$expr = { $gt: [{ $size: '$color_identity' }, 1] };
         break;
 
       case MulticolorMode.EXACT_MONO:
         // 'M' + one color: show cards that are exactly mono-colored
+        // If the specific color is 'C', it means we are looking for colorless cards that are also multicolor, which is impossible.
+        // However, the UI might allow this selection. For now, treat 'C' as a normal color for $all.
+        // A card cannot be both colorless (empty color_identity) and have a specific color.
+        // This mode implies a single specific color. If 'C' is that color, this essentially means size 0 AND size 1, which is impossible.
+        // The current logic `color_identity: { $all: specificColors }` and `$size: 1` will correctly yield no results if specificColors = ['C']
         query.$and = [
           { color_identity: { $all: specificColors } },
           { color_identity: { $size: 1 } },
@@ -87,6 +78,10 @@ export class CardFilteringService {
 
       case MulticolorMode.EXACT_MULTI:
         // 'M' + multiple colors: show cards with exactly these colors
+        // 'C' should not logically be part of specificColors here if we mean "exact match for these N colors"
+        // as colorless means "has no colors".
+        // The current logic `color_identity: { $all: specificColors }` and `$size: specificColors.length`
+        // will correctly handle this. If 'C' is in specificColors, it won't match cards.
         query.$and = [
           { color_identity: { $all: specificColors } },
           { color_identity: { $size: specificColors.length } },
@@ -94,8 +89,24 @@ export class CardFilteringService {
         break;
 
       case MulticolorMode.AT_LEAST:
-        // Only specific colors: show cards with at least ONE of these colors (OR logic)
-        query.color_identity = { $in: specificColors };
+        const hasColorless = specificColors.includes('C');
+        const otherColors = specificColors.filter((c) => c !== 'C');
+
+        if (hasColorless && otherColors.length > 0) {
+          // Has 'C' and other colors (e.g., White OR Colorless)
+          query.$or = [
+            { color_identity: { $in: otherColors } },
+            { color_identity: { $size: 0 } },
+          ];
+        } else if (hasColorless && otherColors.length === 0) {
+          // Only 'C' is selected
+          query.color_identity = { $size: 0 };
+        } else if (!hasColorless && otherColors.length > 0) {
+          // Only other colors, no 'C'
+          query.color_identity = { $in: otherColors };
+        }
+        // If specificColors is empty (e.g. only 'M' was selected and then deselected, leading to AT_LEAST with empty specificColors),
+        // no color filter is applied. This case should ideally be handled by mode being NONE.
         break;
     }
   }

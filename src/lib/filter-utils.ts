@@ -24,7 +24,8 @@ export enum MulticolorMode {
 /**
  * Enhanced FilterOptions with detailed color filter information
  */
-export interface EnhancedFilterOptions extends FilterOptions {
+export interface EnhancedFilterOptions
+  extends Omit<FilterOptions, 'exactColorMatch'> {
   colorFilter: ColorFilterInfo;
 }
 
@@ -85,10 +86,6 @@ export function parseFiltersFromParams(searchParams: {
   if (setsParam) {
     filters.sets = setsParam.split(',');
   }
-
-  // Exact color match
-  const exactParam = getParam('exact');
-  filters.exactColorMatch = exactParam === 'true';
 
   // Sort fields
   const sortParam = getParam('sort');

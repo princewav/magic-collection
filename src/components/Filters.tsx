@@ -24,7 +24,6 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
-import { getFiltersFromUrl } from '@/lib/url-params';
 import { FilterOptions } from '@/actions/card/load-cards';
 
 // Simple debounce function
@@ -61,7 +60,6 @@ export function Filters({
   ];
   const urlRarities = searchParams.get('rarities')?.split(',') || [];
   const urlSets = searchParams.get('sets')?.split(',') || [];
-  const urlExactColorMatch = searchParams.get('exact') === 'true';
   const urlDeduplicate = searchParams.get('dedupe') !== 'false'; // Default to true
 
   // Parse sort fields from URL
@@ -83,8 +81,6 @@ export function Filters({
   const [optimisticRarities, setOptimisticRarities] =
     useState<string[]>(urlRarities);
   const [optimisticSets, setOptimisticSets] = useState<string[]>(urlSets);
-  const [optimisticExactColorMatch, setOptimisticExactColorMatch] =
-    useState<boolean>(urlExactColorMatch);
   const [optimisticSortFields, setOptimisticSortFields] =
     useState<SortField[]>(urlSortFields);
 
@@ -98,7 +94,6 @@ export function Filters({
     ];
     const newUrlRarities = searchParams.get('rarities')?.split(',') || [];
     const newUrlSets = searchParams.get('sets')?.split(',') || [];
-    const newUrlExactColorMatch = searchParams.get('exact') === 'true';
 
     const newUrlSortParam = searchParams.get('sort');
     const newUrlSortFields: SortField[] = newUrlSortParam
@@ -116,7 +111,6 @@ export function Filters({
     setOptimisticCmcRange(newUrlCmcRange);
     setOptimisticRarities(newUrlRarities);
     setOptimisticSets(newUrlSets);
-    setOptimisticExactColorMatch(newUrlExactColorMatch);
     setOptimisticSortFields(newUrlSortFields);
   }, [searchParams]);
 
@@ -124,7 +118,9 @@ export function Filters({
   const debouncedUpdateUrlFilters = useCallback(
     debounce(
       (
-        updates: Partial<FilterOptions & { deduplicate?: boolean }>,
+        updates: Partial<
+          Omit<FilterOptions, 'exactColorMatch'> & { deduplicate?: boolean }
+        >,
         preservePage = false,
       ) => {
         const newParams = new URLSearchParams(searchParams.toString());
@@ -166,15 +162,6 @@ export function Filters({
           }
         }
 
-        // Handle exact color match
-        if (updates.exactColorMatch !== undefined) {
-          if (updates.exactColorMatch) {
-            newParams.set('exact', 'true');
-          } else {
-            newParams.delete('exact');
-          }
-        }
-
         // Handle sort fields
         if (updates.sortFields !== undefined) {
           if (updates.sortFields.length > 0) {
@@ -186,6 +173,9 @@ export function Filters({
             newParams.delete('sort');
           }
         }
+
+        // Delete exact param if it exists from old URLs
+        newParams.delete('exact');
 
         // Handle deduplicate (only in main view, not in collection)
         if (!collectionType && updates.deduplicate !== undefined) {
@@ -202,7 +192,7 @@ export function Filters({
 
   // Handle deduplicate toggle from CardsContext
   const cardsContext = useCards();
-  const collectionContext = useCollection();
+  // const collectionContext = useCollection(); // collectionContext is not used
 
   // Track deduplicate state change from context and update URL if needed
   useEffect(() => {
@@ -253,15 +243,6 @@ export function Filters({
 
     // Debounced URL update
     debouncedUpdateUrlFilters({ colors: newColors });
-  };
-
-  const toggleExactColorMatch = () => {
-    // Optimistic UI update
-    const newExactColorMatch = !optimisticExactColorMatch;
-    setOptimisticExactColorMatch(newExactColorMatch);
-
-    // Debounced URL update
-    debouncedUpdateUrlFilters({ exactColorMatch: newExactColorMatch });
   };
 
   const toggleRarity = (value: string) => {
@@ -349,10 +330,9 @@ export function Filters({
   const resetColors = () => {
     // Optimistic UI update
     setOptimisticColors([]);
-    setOptimisticExactColorMatch(false);
 
     // Debounced URL update
-    debouncedUpdateUrlFilters({ colors: [], exactColorMatch: false });
+    debouncedUpdateUrlFilters({ colors: [] });
   };
 
   const sensors = useSensors(
@@ -368,7 +348,7 @@ export function Filters({
     { symbol: 'B', name: 'Black' },
     { symbol: 'R', name: 'Red' },
     { symbol: 'G', name: 'Green' },
-    { symbol: 'C', name: 'Colorless' },
+    { symbol: 'C', name: 'Colorless (no colors)' },
   ];
 
   const rarityOptions = [
@@ -393,18 +373,31 @@ export function Filters({
 
   // Helper function to get a tooltip for the color filtering behavior
   const getColorFilteringTooltip = () => {
+    const specificColors = optimisticColors.filter(
+      (c) => c !== 'M' && c !== 'C',
+    );
+    const includesColorless = optimisticColors.includes('C');
+
     if (optimisticColors.length === 0) {
       return 'Select colors to filter cards';
+    } else if (includesColorless && optimisticColors.length === 1) {
+      return 'Showing only colorless cards (cards with no colors)';
     } else if (isMulticolorSelected) {
-      if (specificColorsCount === 0) {
+      if (specificColors.length === 0 && !includesColorless) {
         return 'Showing cards with two or more colors (any colors)';
-      } else if (specificColorsCount === 1) {
-        return `Showing exactly mono-colored ${optimisticColors.filter((c) => c !== 'M')[0]} cards`;
+      } else if (specificColors.length === 0 && includesColorless) {
+        return 'Showing cards with two or more colors OR colorless cards';
+      } else if (specificColors.length === 1) {
+        return `Showing exactly mono-colored ${specificColors[0]} cards`;
       } else {
         return 'Showing cards with exactly these specific colors (no more, no less)';
       }
     } else {
-      return 'Showing cards with any of the selected colors (OR logic)';
+      let tooltip = 'Showing cards with any of the selected colors';
+      if (includesColorless) {
+        tooltip += ' OR colorless cards';
+      }
+      return tooltip + ' (OR logic)';
     }
   };
 
@@ -433,7 +426,7 @@ export function Filters({
             <div className="flex min-w-fit flex-col gap-2">
               <div className="flex items-center">
                 <h3 className="text-xs font-medium md:text-sm">Colors</h3>
-                {(optimisticColors.length > 0 || optimisticExactColorMatch) && (
+                {optimisticColors.length > 0 && (
                   <button
                     onClick={resetColors}
                     className="text-muted-foreground hover:text-foreground ml-2"
@@ -443,11 +436,7 @@ export function Filters({
                   </button>
                 )}
               </div>
-              {optimisticColors.length > 0 && (
-                <p className="text-muted-foreground mb-1 text-xs">
-                  {getColorFilteringTooltip()}
-                </p>
-              )}
+
               <div className="flex flex-wrap justify-start gap-2 px-1">
                 {colorFilters.map((filter) => (
                   <button
@@ -489,19 +478,12 @@ export function Filters({
                     className="hidden md:block"
                   />
                 </button>
-                {/* Exact color match button */}
-                <button
-                  onClick={toggleExactColorMatch}
-                  className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
-                    optimisticExactColorMatch
-                      ? 'bg-primary/20 ring-primary ring-2'
-                      : 'hover:bg-muted'
-                  }`}
-                  title="Exact color match - Match only cards with exactly these colors"
-                >
-                  <span className="text-xs font-bold md:text-sm">EXACT</span>
-                </button>
               </div>
+              {optimisticColors.length > 0 && (
+                <p className="text-muted-foreground mb-1 text-xs">
+                  {getColorFilteringTooltip()}
+                </p>
+              )}
             </div>
 
             <div className="flex min-w-[200px] flex-col gap-5">
