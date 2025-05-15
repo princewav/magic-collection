@@ -24,52 +24,38 @@ export function CardGrid({
   initialTotal,
 }: CardGridProps) {
   const {
-    cards: generalCards,
-    isLoading: generalLoading,
-    loadNextPage: loadNextGeneralPage,
-    total: generalTotal,
+    cards: generalCardsFromContext,
+    isLoading: generalLoadingFromContext,
+    loadNextPage: loadNextGeneralPageFromContext,
+    total: generalTotalFromContext,
   } = useCards();
   const {
-    collectedCards,
-    isLoading: collectionLoading,
-    loadNextPage: loadNextCollectionPage,
-    total: collectionTotal,
+    collectedCards: collectedCardsFromContext,
+    isLoading: collectionLoadingFromContext,
+    loadNextPage: loadNextCollectionPageFromContext,
+    total: collectionTotalFromContext,
   } = useCollection();
   const { openModal } = useCardModal();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Use initial data if provided (for Suspense support)
-  const [localCards, setLocalCards] = useState<CardWithOptionalQuantity[]>(
-    initialCards || [],
-  );
-  const [localTotal, setLocalTotal] = useState<number>(initialTotal || 0);
-
-  const cards = initialCards
-    ? localCards
-    : collectionType
-      ? collectedCards
-      : generalCards;
-  const isLoading = collectionType ? collectionLoading : generalLoading;
-  const total = initialTotal
-    ? localTotal
-    : collectionType
-      ? collectionTotal
-      : generalTotal;
+  const cards = collectionType
+    ? collectedCardsFromContext
+    : generalCardsFromContext;
+  const isLoading = collectionType
+    ? collectionLoadingFromContext
+    : generalLoadingFromContext;
+  const total = collectionType
+    ? collectionTotalFromContext
+    : generalTotalFromContext;
   const loadNextPage = collectionType
-    ? loadNextCollectionPage
-    : loadNextGeneralPage;
+    ? loadNextCollectionPageFromContext
+    : loadNextGeneralPageFromContext;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  // Update local state if initial props change
-  useEffect(() => {
-    if (initialCards) setLocalCards(initialCards);
-    if (initialTotal) setLocalTotal(initialTotal);
-  }, [initialCards, initialTotal]);
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {

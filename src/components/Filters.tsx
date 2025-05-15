@@ -429,7 +429,7 @@ export function Filters({
                 {optimisticColors.length > 0 && (
                   <button
                     onClick={resetColors}
-                    className="text-muted-foreground hover:text-foreground ml-2"
+                    className="text-muted-foreground hover:text-foreground ml-2 cursor-pointer"
                     title="Clear color filters"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
