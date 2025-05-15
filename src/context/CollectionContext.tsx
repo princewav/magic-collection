@@ -30,11 +30,13 @@ const CollectionContext = createContext<CollectionContextType | undefined>(
 interface CollectionProviderProps {
   children: ReactNode;
   collectionType: 'paper' | 'arena';
+  initialFilters?: FilterOptions;
 }
 
 export function CollectionProvider({
   children,
   collectionType,
+  initialFilters,
 }: CollectionProviderProps) {
   const [collectedCards, setCollectedCards] = useState<
     (Card & { quantity: number })[]
@@ -43,15 +45,24 @@ export function CollectionProvider({
   const [error, setError] = useState<Error | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [currentFilters, setCurrentFilters] = useState<FilterOptions>({
-    colors: [],
-    cmcRange: [0, 16],
-    rarities: [],
-    sortFields: [],
-    sets: [],
-    exactColorMatch: false,
-  });
+  const [currentFilters, setCurrentFilters] = useState<FilterOptions>(
+    initialFilters || {
+      colors: [],
+      cmcRange: [0, 16],
+      rarities: [],
+      sortFields: [],
+      sets: [],
+      exactColorMatch: false,
+    },
+  );
 
+  // Update filters when initialFilters changes
+  useEffect(() => {
+    if (initialFilters) {
+      setCurrentFilters(initialFilters);
+      setPage(1);
+    }
+  }, [initialFilters]);
 
   const fetchCollectedCards = useCallback(
     async (pageNum = 1) => {
@@ -84,10 +95,10 @@ export function CollectionProvider({
     [currentFilters, collectionType],
   );
 
-  // Initial load
+  // Fetch cards when filters change
   useEffect(() => {
     fetchCollectedCards(1);
-  }, [fetchCollectedCards]);
+  }, [currentFilters, collectionType, fetchCollectedCards]);
 
   const loadNextPage = useCallback(() => {
     const nextPage = page + 1;
@@ -98,7 +109,7 @@ export function CollectionProvider({
   const applyFilter = useCallback((filterOptions: FilterOptions) => {
     setCurrentFilters(filterOptions);
     setPage(1);
-    // Filters will be applied on the next fetchCollectedCards call triggered by the useEffect
+    // Filters will be applied by the useEffect when currentFilters changes
   }, []);
 
   return (

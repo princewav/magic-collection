@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ManaSymbol } from './ManaSymbol';
 import { Slider } from '@/components/ui/slider';
 import { SetFilter } from './SetFilter';
@@ -23,7 +24,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
-import { updateUrlWithFilters, getFiltersFromUrl } from '@/lib/url-params';
+import { getFiltersFromUrl } from '@/lib/url-params';
 import { FilterOptions } from '@/actions/card/load-cards';
 
 export function Filters({
@@ -34,94 +35,201 @@ export function Filters({
   collectionType?: 'paper' | 'arena';
 }) {
   const [isOpen, setIsOpen] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  // Use URL search params as the source of truth
+  const urlColors = searchParams.get('colors')?.split(',') || [];
+  const urlCmcParam = searchParams.get('cmc')?.split(',') || ['0', '10'];
+  const urlCmcRange: [number, number] = [
+    parseInt(urlCmcParam[0], 10),
+    parseInt(urlCmcParam[1], 10),
+  ];
+  const urlRarities = searchParams.get('rarities')?.split(',') || [];
+  const urlSets = searchParams.get('sets')?.split(',') || [];
+  const urlExactColorMatch = searchParams.get('exact') === 'true';
+  const urlDeduplicate = searchParams.get('dedupe') !== 'false'; // Default to true
+
+  // Parse sort fields from URL
+  const urlSortParam = searchParams.get('sort');
+  const urlSortFields: SortField[] = urlSortParam
+    ? urlSortParam.split(',').map((field) => {
+        const [fieldName, order] = field.split(':');
+        return {
+          field: fieldName,
+          order: order as 'asc' | 'desc',
+        };
+      })
+    : [];
+
+  // Create a function to update URL with new filters
+  const updateUrlFilters = useCallback(
+    (
+      updates: Partial<FilterOptions & { deduplicate?: boolean }>,
+      preservePage = false,
+    ) => {
+      const newParams = new URLSearchParams(searchParams.toString());
+
+      // Reset page to 1 when filters change, unless preservePage is true
+      if (!preservePage) {
+        newParams.delete('page');
+      }
+
+      // Handle colors
+      if (updates.colors !== undefined) {
+        if (updates.colors.length > 0) {
+          newParams.set('colors', updates.colors.join(','));
+        } else {
+          newParams.delete('colors');
+        }
+      }
+
+      // Handle CMC range
+      if (updates.cmcRange !== undefined) {
+        newParams.set('cmc', `${updates.cmcRange[0]},${updates.cmcRange[1]}`);
+      }
+
+      // Handle rarities
+      if (updates.rarities !== undefined) {
+        if (updates.rarities.length > 0) {
+          newParams.set('rarities', updates.rarities.join(','));
+        } else {
+          newParams.delete('rarities');
+        }
+      }
+
+      // Handle sets
+      if (updates.sets !== undefined) {
+        if (updates.sets.length > 0) {
+          newParams.set('sets', updates.sets.join(','));
+        } else {
+          newParams.delete('sets');
+        }
+      }
+
+      // Handle exact color match
+      if (updates.exactColorMatch !== undefined) {
+        if (updates.exactColorMatch) {
+          newParams.set('exact', 'true');
+        } else {
+          newParams.delete('exact');
+        }
+      }
+
+      // Handle sort fields
+      if (updates.sortFields !== undefined) {
+        if (updates.sortFields.length > 0) {
+          const sortParam = updates.sortFields
+            .map((sf) => `${sf.field}:${sf.order}`)
+            .join(',');
+          newParams.set('sort', sortParam);
+        } else {
+          newParams.delete('sort');
+        }
+      }
+
+      // Handle deduplicate (only in main view, not in collection)
+      if (!collectionType && updates.deduplicate !== undefined) {
+        newParams.set('dedupe', updates.deduplicate.toString());
+      }
+
+      // Update URL without refreshing the page
+      router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
+    },
+    [searchParams, router, pathname, collectionType],
+  );
+
+  // Handle deduplicate toggle from CardsContext
   const cardsContext = useCards();
   const collectionContext = useCollection();
 
-  const contextFilters = collectionType
-    ? collectionContext.currentFilters
-    : cardsContext.filters;
-  const updateContextFilters = collectionType
-    ? collectionContext.applyFilter
-    : cardsContext.updateFilters;
-  const deduplicate = collectionType ? false : cardsContext.deduplicate;
-  const toggleDeduplicate = collectionType
-    ? () => {}
-    : cardsContext.toggleDeduplicate;
-
-  const [selectedColors, setSelectedColors] = useState<string[]>(
-    contextFilters.colors || [],
-  );
-  const [cmcRange, setCmcRange] = useState<[number, number]>(
-    contextFilters.cmcRange || [0, 10],
-  );
-  const [selectedRarities, setSelectedRarities] = useState<string[]>(
-    contextFilters.rarities || [],
-  );
-  const [selectedSets, setSelectedSets] = useState<string[]>(
-    contextFilters.sets || [],
-  );
-  const [sortFields, setSortFields] = useState<SortField[]>(
-    contextFilters.sortFields || [],
-  );
-  const [exactColorMatch, setExactColorMatch] = useState<boolean>(
-    contextFilters.exactColorMatch || false,
-  );
-
-  const prepareFilters = (): FilterOptions => ({
-    colors: selectedColors,
-    cmcRange,
-    rarities: selectedRarities,
-    sets: selectedSets.map((set) => set.toLowerCase()),
-    sortFields,
-    exactColorMatch,
-  });
-
+  // Track deduplicate state change from context and update URL if needed
   useEffect(() => {
-    const { filters: urlFilters, deduplicate: urlDeduplicate } =
-      getFiltersFromUrl();
-
-    if (Object.keys(urlFilters).length > 0) {
-      const newFilters = {
-        ...contextFilters,
-        ...urlFilters,
-      };
-
-      if (urlFilters.colors) setSelectedColors(urlFilters.colors);
-      if (urlFilters.cmcRange) setCmcRange(urlFilters.cmcRange);
-      if (urlFilters.rarities) setSelectedRarities(urlFilters.rarities);
-      if (urlFilters.sets) setSelectedSets(urlFilters.sets);
-      if (urlFilters.sortFields) setSortFields(urlFilters.sortFields);
-      if (urlFilters.exactColorMatch !== undefined)
-        setExactColorMatch(urlFilters.exactColorMatch);
-
-      updateContextFilters(newFilters);
-
-      if (
-        !collectionType &&
-        urlDeduplicate !== undefined &&
-        urlDeduplicate !== deduplicate
-      ) {
-        toggleDeduplicate();
-      }
+    if (!collectionType && cardsContext.deduplicate !== urlDeduplicate) {
+      updateUrlFilters({ deduplicate: cardsContext.deduplicate }, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collectionType]);
-
-  useEffect(() => {
-    const currentFilters = prepareFilters();
-    updateUrlWithFilters(currentFilters, collectionType ? false : deduplicate);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    selectedColors,
-    cmcRange,
-    selectedRarities,
-    selectedSets,
-    sortFields,
-    exactColorMatch,
-    deduplicate,
+    cardsContext.deduplicate,
+    urlDeduplicate,
+    updateUrlFilters,
     collectionType,
   ]);
+
+  // Handlers for filter changes
+  const toggleColor = (symbol: string) => {
+    const newColors = urlColors.includes(symbol)
+      ? urlColors.filter((c) => c !== symbol)
+      : [...urlColors, symbol];
+
+    updateUrlFilters({ colors: newColors });
+  };
+
+  const toggleExactColorMatch = () => {
+    updateUrlFilters({ exactColorMatch: !urlExactColorMatch });
+  };
+
+  const toggleRarity = (value: string) => {
+    const newRarities = urlRarities.includes(value)
+      ? urlRarities.filter((r) => r !== value)
+      : [...urlRarities, value];
+
+    updateUrlFilters({ rarities: newRarities });
+  };
+
+  const handleSetChange = (newSets: string[]) => {
+    updateUrlFilters({ sets: newSets });
+  };
+
+  const handleSortFieldChange = (field: string) => {
+    const existingField = urlSortFields.find((f) => f.field === field);
+    let newFields: SortField[];
+
+    if (existingField) {
+      newFields = urlSortFields.map((f) =>
+        f.field === field
+          ? { ...f, order: f.order === 'asc' ? 'desc' : 'asc' }
+          : f,
+      );
+    } else {
+      newFields = [...urlSortFields, { field, order: 'asc' }];
+    }
+
+    updateUrlFilters({ sortFields: newFields });
+  };
+
+  const removeSortField = (field: string) => {
+    const newFields = urlSortFields.filter((f) => f.field !== field);
+    updateUrlFilters({ sortFields: newFields });
+  };
+
+  const handleCmcRangeChange = (value: number[]) => {
+    const newRange: [number, number] = [value[0], value[1]];
+    updateUrlFilters({ cmcRange: newRange });
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = urlSortFields.findIndex((f) => f.field === active.id);
+      const newIndex = urlSortFields.findIndex((f) => f.field === over.id);
+
+      const newFields = arrayMove(urlSortFields, oldIndex, newIndex);
+      updateUrlFilters({ sortFields: newFields });
+    }
+  };
+
+  const resetColors = () => {
+    updateUrlFilters({ colors: [], exactColorMatch: false });
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const colorFilters = [
     { symbol: 'W', name: 'White' },
@@ -138,103 +246,6 @@ export function Filters({
     { symbol: 'R', name: 'Rare', value: 'rare' },
     { symbol: 'M', name: 'Mythic Rare', value: 'mythic' },
   ];
-
-  const handleFilterUpdate = () => {
-    updateContextFilters(prepareFilters());
-  };
-
-  const toggleColor = (symbol: string) => {
-    const newColors = selectedColors.includes(symbol)
-      ? selectedColors.filter((c) => c !== symbol)
-      : [...selectedColors, symbol];
-    setSelectedColors(newColors);
-    updateContextFilters({ ...prepareFilters(), colors: newColors });
-  };
-
-  const toggleExactColorMatch = () => {
-    const newExactColorMatch = !exactColorMatch;
-    setExactColorMatch(newExactColorMatch);
-    updateContextFilters({
-      ...prepareFilters(),
-      exactColorMatch: newExactColorMatch,
-    });
-  };
-
-  const toggleRarity = (value: string) => {
-    const newRarities = selectedRarities.includes(value)
-      ? selectedRarities.filter((r) => r !== value)
-      : [...selectedRarities, value];
-    setSelectedRarities(newRarities);
-    updateContextFilters({ ...prepareFilters(), rarities: newRarities });
-  };
-
-  const handleSetChange = (newSets: string[]) => {
-    setSelectedSets(newSets);
-    updateContextFilters({
-      ...prepareFilters(),
-      sets: newSets.map((set) => set.toLowerCase()),
-    });
-  };
-
-  const handleSortFieldChange = (field: string) => {
-    const existingField = sortFields.find((f) => f.field === field);
-    let newFields: SortField[];
-
-    if (existingField) {
-      newFields = sortFields.map((f) =>
-        f.field === field
-          ? { ...f, order: f.order === 'asc' ? 'desc' : 'asc' }
-          : f,
-      );
-    } else {
-      newFields = [...sortFields, { field, order: 'asc' }];
-    }
-
-    setSortFields(newFields);
-    updateContextFilters({ ...prepareFilters(), sortFields: newFields });
-  };
-
-  const removeSortField = (field: string) => {
-    const newFields = sortFields.filter((f) => f.field !== field);
-    setSortFields(newFields);
-    updateContextFilters({ ...prepareFilters(), sortFields: newFields });
-  };
-
-  const handleCmcRangeChange = (value: number[]) => {
-    const newRange: [number, number] = [value[0], value[1]];
-    setCmcRange(newRange);
-    updateContextFilters({ ...prepareFilters(), cmcRange: newRange });
-  };
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      const oldIndex = sortFields.findIndex((f) => f.field === active.id);
-      const newIndex = sortFields.findIndex((f) => f.field === over.id);
-
-      const newFields = arrayMove(sortFields, oldIndex, newIndex);
-      setSortFields(newFields);
-      updateContextFilters({ ...prepareFilters(), sortFields: newFields });
-    }
-  };
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const resetColors = () => {
-    setSelectedColors([]);
-    setExactColorMatch(false);
-    updateContextFilters({
-      ...prepareFilters(),
-      colors: [],
-      exactColorMatch: false,
-    });
-  };
 
   return (
     <Collapsible
@@ -261,7 +272,7 @@ export function Filters({
             <div className="flex min-w-fit flex-col gap-2">
               <div className="flex items-center">
                 <h3 className="text-xs font-medium md:text-sm">Colors</h3>
-                {(selectedColors.length > 0 || exactColorMatch) && (
+                {(urlColors.length > 0 || urlExactColorMatch) && (
                   <button
                     onClick={resetColors}
                     className="text-muted-foreground hover:text-foreground ml-2"
@@ -277,7 +288,7 @@ export function Filters({
                     key={filter.symbol}
                     onClick={() => toggleColor(filter.symbol)}
                     className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
-                      selectedColors.includes(filter.symbol)
+                      urlColors.includes(filter.symbol)
                         ? 'bg-primary/20 ring-primary ring-2'
                         : 'hover:bg-muted'
                     }`}
@@ -298,7 +309,7 @@ export function Filters({
                 <button
                   onClick={toggleExactColorMatch}
                   className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
-                    exactColorMatch
+                    urlExactColorMatch
                       ? 'bg-primary/20 ring-primary ring-2'
                       : 'hover:bg-muted'
                   }`}
@@ -316,14 +327,14 @@ export function Filters({
 
             <div className="flex min-w-[200px] flex-col gap-5">
               <h3 className="text-xs font-medium md:text-sm">
-                CMC: {cmcRange[0]} - {cmcRange[1]}
+                CMC: {urlCmcRange[0]} - {urlCmcRange[1]}
               </h3>
               <Slider
                 defaultValue={[0, 16]}
                 min={0}
                 max={16}
                 step={1}
-                value={[cmcRange[0], cmcRange[1]]}
+                value={[urlCmcRange[0], urlCmcRange[1]]}
                 onValueChange={handleCmcRangeChange}
                 className="w-full self-center"
               />
@@ -337,7 +348,7 @@ export function Filters({
                     key={option.symbol}
                     onClick={() => toggleRarity(option.value)}
                     className={`flex size-6 items-center justify-center rounded-full transition-all md:size-7 ${
-                      selectedRarities.includes(option.value)
+                      urlRarities.includes(option.value)
                         ? 'ring-2 ring-offset-1 ' +
                           (option.symbol === 'C'
                             ? 'ring-gray-400'
@@ -374,21 +385,18 @@ export function Filters({
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="deduplicate"
-                    checked={deduplicate}
-                    onCheckedChange={toggleDeduplicate}
+                    checked={cardsContext.deduplicate}
+                    onCheckedChange={cardsContext.toggleDeduplicate}
                   />
                   <Label htmlFor="deduplicate">One card per name</Label>
                 </div>
               </div>
             )}
 
-            <SetFilter
-              selectedSets={selectedSets}
-              onSetChange={handleSetChange}
-            />
+            <SetFilter selectedSets={urlSets} onSetChange={handleSetChange} />
 
             <SortOptions
-              sortFields={sortFields}
+              sortFields={urlSortFields}
               onSortFieldChange={handleSortFieldChange}
               onRemoveSortField={removeSortField}
               onDragEnd={handleDragEnd}

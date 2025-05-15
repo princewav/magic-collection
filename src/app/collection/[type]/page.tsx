@@ -7,7 +7,7 @@ import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
 import { CardsProvider } from '@/context/CardsContext';
 import { CollectionProvider } from '@/context/CollectionContext';
 import { CardContainer } from '@/components/CardContainer';
-import { getFiltersFromSearchParams } from '@/lib/url-params';
+import { FilterOptions } from '@/actions/card/load-cards';
 import { ViewToggleContainer } from '@/components/ViewToggleContainer';
 
 export const metadata: Metadata = {
@@ -16,15 +16,87 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  params: Promise<{ type: 'paper' | 'arena' }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: { type: 'paper' | 'arena' };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+/**
+ * Parse filter parameters from URL search params
+ */
+function parseFiltersFromParams(searchParams: Props['searchParams']): {
+  filters: FilterOptions;
+  page: number;
+  pageSize: number;
+} {
+  // Helper to get a single value from searchParams
+  const getParam = (name: string): string | null => {
+    const value = searchParams[name];
+    if (Array.isArray(value)) return value[0] ?? null;
+    return value ?? null;
+  };
+
+  // Parse filter values with proper defaults
+  const filters: FilterOptions = {};
+
+  // Colors
+  const colorsParam = getParam('colors');
+  if (colorsParam) {
+    filters.colors = colorsParam.split(',');
+  }
+
+  // CMC Range
+  const cmcParam = getParam('cmc');
+  if (cmcParam) {
+    const [min, max] = cmcParam.split(',').map((val) => {
+      const num = parseInt(val, 10);
+      return isNaN(num) ? 0 : num;
+    });
+    filters.cmcRange = [min, max ?? 16];
+  } else {
+    filters.cmcRange = [0, 16]; // Default range
+  }
+
+  // Rarities
+  const raritiesParam = getParam('rarities');
+  if (raritiesParam) {
+    filters.rarities = raritiesParam.split(',');
+  }
+
+  // Sets
+  const setsParam = getParam('sets');
+  if (setsParam) {
+    filters.sets = setsParam.split(',');
+  }
+
+  // Exact color match
+  const exactParam = getParam('exact');
+  filters.exactColorMatch = exactParam === 'true';
+
+  // Sort fields
+  const sortParam = getParam('sort');
+  if (sortParam) {
+    filters.sortFields = sortParam.split(',').map((field) => {
+      const [fieldName, order] = field.split(':');
+      return {
+        field: fieldName,
+        order: (order || 'asc') as 'asc' | 'desc',
+      };
+    });
+  }
+
+  // Pagination
+  const pageParam = getParam('page');
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
+
+  const pageSizeParam = getParam('pageSize');
+  const pageSize = pageSizeParam ? parseInt(pageSizeParam, 10) : 50;
+
+  return { filters, page, pageSize };
 }
 
 export default async function CollectionPage({ params, searchParams }: Props) {
-  const { type } = await params;
-  const { filters /*, page, deduplicate */ } = getFiltersFromSearchParams(
-    await searchParams,
-  );
+  const { type } = params;
+  const { filters, page, pageSize } = parseFiltersFromParams(searchParams);
   const collectionCards = await loadCardsInCollection(type);
 
   const totalQuantity = collectionCards.reduce(
@@ -32,7 +104,6 @@ export default async function CollectionPage({ params, searchParams }: Props) {
     0,
   );
   const totalUnique = collectionCards.length;
-  const pageSize = 50;
 
   const initialCardIds = collectionCards
     .slice(0, pageSize)
@@ -46,11 +117,12 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   }));
 
   return (
-    <CollectionProvider collectionType={type}>
+    <CollectionProvider collectionType={type} initialFilters={filters}>
       <CardsProvider
         initialCards={initialCardsWithQuantity}
         initialTotal={totalUnique}
         initialCollectionType={type}
+        initialFilters={filters}
       >
         <main className="flex flex-col p-4">
           <div className="mb-4 flex items-center justify-between">
@@ -72,7 +144,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
           <CardContainer
             filters={filters}
             collectionType={type}
-            page={1}
+            page={page}
             pageSize={pageSize}
             deduplicate={false}
           />

@@ -12,7 +12,6 @@ import { Card, CardWithOptionalQuantity } from '@/types/card';
 import { loadFilteredCards, FilterOptions } from '@/actions/card/load-cards';
 import { fetchCollectionCards } from '@/actions/load-cards';
 
-
 interface CardsContextType {
   cards: CardWithOptionalQuantity[];
   total: number;
@@ -44,6 +43,8 @@ interface CardsProviderProps {
   initialCards: CardWithOptionalQuantity[];
   initialTotal: number;
   initialCollectionType?: 'paper' | 'arena';
+  initialFilters?: FilterOptions;
+  initialDeduplicate?: boolean;
 }
 
 export function CardsProvider({
@@ -51,20 +52,24 @@ export function CardsProvider({
   initialCards,
   initialTotal,
   initialCollectionType,
+  initialFilters,
+  initialDeduplicate = true,
 }: CardsProviderProps) {
   const [cards, setCards] = useState<CardWithOptionalQuantity[]>(initialCards);
   const [total, setTotal] = useState(initialTotal);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [deduplicate, setDeduplicate] = useState(true);
-  const [filters, setFilters] = useState<FilterOptions>({
-    colors: [],
-    cmcRange: [0, 16],
-    rarities: [],
-    sortFields: [],
-    sets: [],
-    exactColorMatch: false,
-  });
+  const [deduplicate, setDeduplicate] = useState(initialDeduplicate);
+  const [filters, setFilters] = useState<FilterOptions>(
+    initialFilters || {
+      colors: [],
+      cmcRange: [0, 16],
+      rarities: [],
+      sortFields: [],
+      sets: [],
+      exactColorMatch: false,
+    },
+  );
   const [collectionType, setCollectionType] = useState<
     'paper' | 'arena' | undefined
   >(initialCollectionType);
@@ -73,6 +78,33 @@ export function CardsProvider({
   useEffect(() => {
     collectionTypeRef.current = collectionType;
   }, [collectionType]);
+
+  // Update filters when initialFilters changes
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters(initialFilters);
+      setCurrentPage(1);
+    }
+  }, [initialFilters]);
+
+  // Update deduplicate when initialDeduplicate changes
+  useEffect(() => {
+    if (
+      initialDeduplicate !== undefined &&
+      initialDeduplicate !== deduplicate
+    ) {
+      setDeduplicate(initialDeduplicate);
+      setCurrentPage(1);
+    }
+  }, [initialDeduplicate, deduplicate]);
+
+  // Load cards when filters, deduplicate, or collectionType changes
+  useEffect(() => {
+    // Only load cards if we have filters
+    if (filters && Object.keys(filters).length > 0) {
+      loadCards(1);
+    }
+  }, [filters, deduplicate, collectionType]);
 
   const loadCards = useCallback(
     async (page: number, filtersOverride?: FilterOptions) => {
