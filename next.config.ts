@@ -35,6 +35,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/cards/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'errors.scryfall.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 
