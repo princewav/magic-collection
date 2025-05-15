@@ -20,9 +20,11 @@ interface PageProps {
 
 function CardGridSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      {Array.from({ length: 10 }).map((_, index) => (
-        <Skeleton key={index} className="h-[330px] w-[240px] rounded-lg" />
+    <div className="flex flex-wrap justify-center gap-4">
+      {Array.from({ length: 12 }).map((_, index) => (
+        <div key={index} className="w-72 sm:w-[min(100%,275px)]">
+          <Skeleton className="h-[330px] w-full rounded-lg" />
+        </div>
       ))}
     </div>
   );

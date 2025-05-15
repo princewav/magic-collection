@@ -1,8 +1,7 @@
-'use client';
+'use server';
 
-import { useEffect, useRef } from 'react';
-import { CardView } from '@/components/CardView';
-import { useCards } from '@/context/CardsContext';
+import { CardClientView } from '@/components/CardClientView';
+import { fetchCards } from '@/actions/card/fetch-cards';
 
 interface CardContainerProps {
   filters: any;
@@ -12,36 +11,23 @@ interface CardContainerProps {
   collectionType?: 'paper' | 'arena';
 }
 
-function deepEqual(a: any, b: any) {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
-
-export function CardContainer({
+export async function CardContainer({
   filters,
   page,
   pageSize,
   deduplicate,
   collectionType,
 }: CardContainerProps) {
-  const {
-    updateFilters,
-    filters: ctxFilters,
-    collectionType: ctxCollectionType,
-  } = useCards();
-  const prev = useRef<{ filters: any; collectionType?: string }>({
-    filters: ctxFilters,
-    collectionType: ctxCollectionType,
-  });
+  // Server-side data fetching that will work with Suspense
+  const cardsData = await fetchCards(
+    filters,
+    page,
+    pageSize,
+    deduplicate,
+    collectionType,
+  );
 
-  useEffect(() => {
-    const filtersChanged = !deepEqual(filters, prev.current.filters);
-    const collectionTypeChanged =
-      collectionType !== prev.current.collectionType;
-    if (filtersChanged || collectionTypeChanged) {
-      updateFilters(filters, collectionType);
-      prev.current = { filters, collectionType };
-    }
-  }, [filters, collectionType, updateFilters]);
-
-  return <CardView collectionType={collectionType} />;
+  return (
+    <CardClientView cardsData={cardsData} collectionType={collectionType} />
+  );
 }

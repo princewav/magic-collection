@@ -2,18 +2,24 @@
 
 import { useCards } from '@/context/CardsContext';
 import { useCollection } from '@/context/CollectionContext';
-import { CardWithQuantity } from '@/types/card';
+import { CardWithQuantity, CardWithOptionalQuantity } from '@/types/card';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useCardModal } from '@/context/CardModalContext';
 import Image from 'next/image';
 import { ManaSymbol } from './ManaSymbol';
 
+interface CardListProps {
+  collectionType: 'paper' | 'arena' | undefined;
+  initialCards?: CardWithOptionalQuantity[];
+  initialTotal?: number;
+}
+
 export function CardList({
   collectionType,
-}: {
-  collectionType: 'paper' | 'arena' | undefined;
-}) {
+  initialCards,
+  initialTotal,
+}: CardListProps) {
   const {
     cards: generalCards,
     isLoading: generalLoading,
@@ -31,9 +37,23 @@ export function CardList({
   const loadingRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
-  const cards = collectionType ? collectedCards : generalCards;
+  // Use initial data if provided (for Suspense support)
+  const [localCards, setLocalCards] = useState<CardWithOptionalQuantity[]>(
+    initialCards || [],
+  );
+  const [localTotal, setLocalTotal] = useState<number>(initialTotal || 0);
+
+  const cards = initialCards
+    ? localCards
+    : collectionType
+      ? collectedCards
+      : generalCards;
   const isLoading = collectionType ? collectionLoading : generalLoading;
-  const total = collectionType ? collectionTotal : generalTotal;
+  const total = initialTotal
+    ? localTotal
+    : collectionType
+      ? collectionTotal
+      : generalTotal;
   const loadNextPage = collectionType
     ? loadNextCollectionPage
     : loadNextGeneralPage;
@@ -41,6 +61,12 @@ export function CardList({
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Update local state if initial props change
+  useEffect(() => {
+    if (initialCards) setLocalCards(initialCards);
+    if (initialTotal) setLocalTotal(initialTotal);
+  }, [initialCards, initialTotal]);
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
