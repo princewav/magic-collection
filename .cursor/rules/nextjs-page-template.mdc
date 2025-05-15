@@ -1,0 +1,72 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Next.js Page Component Template
+
+When creating a new Next.js page component in the `src/app` directory:
+
+## Basic Page Template
+
+```tsx
+import { PageProps } from '@/types/next';
+
+interface PageParameters {
+  // Define route parameters here
+  // Example: id: string; (for [id] route segment)
+  // Example: type: 'paper' | 'arena'; (for [type] route segment)
+}
+
+export default async function Page({ params, searchParams }: PageProps<PageParameters>) {
+  // Always await params and searchParams
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  
+  // Use params
+  // const { id } = resolvedParams;
+  
+  // Process search params if needed
+  // const { filters, page } = parseFiltersFromParams(resolvedSearchParams);
+  
+  return (
+    <main className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Page Title</h1>
+      {/* Page content */}
+    </main>
+  );
+}
+```
+
+## Template with Metadata
+
+```tsx
+import { Metadata } from 'next';
+import { PageProps } from '@/types/next';
+
+interface PageParameters {
+  // Define route parameters here
+}
+
+export const metadata: Metadata = {
+  title: 'Page Title',
+  description: 'Page description',
+};
+
+export default async function Page({ params, searchParams }: PageProps<PageParameters>) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+  
+  // Component logic
+  
+  return (
+    // JSX
+  );
+}
+```
+
+## TypeScript Reference
+
+For details on proper typing patterns, see:
+- [src/types/next.d.ts](mdc:src/types/next.d.ts)
+- [docs/TYPESCRIPT.md](mdc:docs/TYPESCRIPT.md)

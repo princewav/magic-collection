@@ -1,0 +1,61 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Next.js SearchParams Handling Pattern
+
+## SearchParams Best Practices
+
+When working with searchParams in Next.js App Router:
+
+1. Always type searchParams as a Promise in component props
+2. Always await searchParams before using them
+3. Use helper functions to parse the resolved searchParams object
+
+### ✅ Correct Pattern for Helper Functions
+
+```tsx
+// Parse function accepts the resolved (non-Promise) searchParams
+function parseFiltersFromParams(
+  searchParams: { [key: string]: string | string[] | undefined }
+): FilterResult {
+  // Parse logic here
+  const getParam = (name: string): string | null => {
+    const value = searchParams[name];
+    if (Array.isArray(value)) return value[0] ?? null;
+    return value ?? null;
+  };
+  
+  // Parse and return results
+}
+
+// In the page component:
+export default async function Page({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+  const result = parseFiltersFromParams(resolvedSearchParams);
+  // Use result...
+}
+```
+
+### ❌ Incorrect Pattern (Avoid)
+
+```tsx
+// WRONG: Function accepts Promise<searchParams>
+function parseFiltersFromParams(
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+): FilterResult {
+  // This won't work without awaiting searchParams
+}
+
+// WRONG: Not awaiting searchParams
+export default async function Page({ searchParams }: PageProps) {
+  const result = parseFiltersFromParams(searchParams); // Error: searchParams is a Promise
+}
+```
+
+## Reference Examples
+
+See existing implementations in:
+- [src/app/page.tsx](mdc:src/app/page.tsx)
+- [src/app/collection/[type]/page.tsx](mdc:src/app/collection/[type]/page.tsx)

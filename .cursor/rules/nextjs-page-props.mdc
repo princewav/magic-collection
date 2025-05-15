@@ -1,0 +1,57 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Next.js App Router Page Props Typing
+
+## Page Component Props Pattern
+
+When creating page components in the Next.js App Router:
+
+1. Always import the custom PageProps type from [src/types/next.d.ts](mdc:src/types/next.d.ts)
+2. Define params as Promise types
+3. Use async components and await the params/searchParams
+4. Follow the pattern in our [TypeScript guidelines](mdc:docs/TYPESCRIPT.md)
+
+### ✅ Correct Pattern
+
+```tsx
+// Import our custom types
+import { PageProps } from '@/types/next';
+
+// Define specific param types
+interface MyPageParams {
+  type: 'paper' | 'arena';
+}
+
+// Use the PageProps generic
+export default async function MyPage({ params, searchParams }: PageProps<MyPageParams>) {
+  // Always await params and searchParams
+  const { type } = await params;
+  const resolvedSearchParams = await searchParams;
+  
+  // Use the resolved values
+  // ...
+}
+```
+
+### ❌ Incorrect Pattern (Avoid)
+
+```tsx
+// WRONG: Direct object typing instead of Promise
+interface Props {
+  params: { type: 'paper' | 'arena' };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+// Missing await for params
+export default async function MyPage({ params, searchParams }: Props) {
+  const { type } = params; // Error: params is a Promise
+  // ...
+}
+```
+
+## Why This Matters
+
+Next.js App Router internally expects params and searchParams to be Promise types. Typing them as direct objects causes TypeScript errors with the PageProps constraint.

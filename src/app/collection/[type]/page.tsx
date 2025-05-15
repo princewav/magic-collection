@@ -16,14 +16,16 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  params: { type: 'paper' | 'arena' };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ type: 'paper' | 'arena' }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 /**
  * Parse filter parameters from URL search params
  */
-function parseFiltersFromParams(searchParams: Props['searchParams']): {
+function parseFiltersFromParams(searchParams: {
+  [key: string]: string | string[] | undefined;
+}): {
   filters: FilterOptions;
   page: number;
   pageSize: number;
@@ -95,8 +97,10 @@ function parseFiltersFromParams(searchParams: Props['searchParams']): {
 }
 
 export default async function CollectionPage({ params, searchParams }: Props) {
-  const { type } = params;
-  const { filters, page, pageSize } = parseFiltersFromParams(searchParams);
+  const { type } = await params;
+  const resolvedSearchParams = await searchParams;
+  const { filters, page, pageSize } =
+    parseFiltersFromParams(resolvedSearchParams);
   const collectionCards = await loadCardsInCollection(type);
 
   const totalQuantity = collectionCards.reduce(

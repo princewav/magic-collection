@@ -16,13 +16,15 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 /**
  * Parse filter parameters from URL search params with proper type conversion
  */
-function parseFiltersFromParams(searchParams: PageProps['searchParams']): {
+function parseFiltersFromParams(searchParams: {
+  [key: string]: string | string[] | undefined;
+}): {
   filters: FilterOptions;
   deduplicate: boolean;
   page: number;
@@ -98,10 +100,11 @@ function parseFiltersFromParams(searchParams: PageProps['searchParams']): {
   return { filters, deduplicate, page, pageSize };
 }
 
-export default function Page({ searchParams }: PageProps) {
+export default async function Page({ searchParams }: PageProps) {
   // Parse filters from URL search params
+  const resolvedSearchParams = await searchParams;
   const { filters, deduplicate, page, pageSize } =
-    parseFiltersFromParams(searchParams);
+    parseFiltersFromParams(resolvedSearchParams);
 
   return (
     <CardModalProvider>

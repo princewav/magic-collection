@@ -1,0 +1,80 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Next.js TypeScript Troubleshooting
+
+## Common TypeScript Errors
+
+### Error: Type 'Props' does not satisfy the constraint 'PageProps'
+
+This error occurs when your page component's props interface doesn't match Next.js internal PageProps type.
+
+#### Diagnosis
+
+If you see an error like:
+```
+Type 'Props' does not satisfy the constraint 'PageProps'.
+  Types of property 'params' are incompatible.
+    Type '{ type: "paper" | "arena"; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+```
+
+The issue is that your `params` or `searchParams` are not typed as Promises.
+
+#### Fix
+
+1. Update your Props interface:
+
+```tsx
+// BEFORE
+interface Props {
+  params: { type: 'paper' | 'arena' };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+// AFTER
+interface Props {
+  params: Promise<{ type: 'paper' | 'arena' }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+```
+
+2. Update your component to await the params:
+
+```tsx
+// BEFORE
+export default async function MyPage({ params, searchParams }: Props) {
+  const { type } = params; // Error: params is a Promise
+  // ...
+}
+
+// AFTER
+export default async function MyPage({ params, searchParams }: Props) {
+  const { type } = await params; // Correctly awaits Promise
+  const resolvedSearchParams = await searchParams;
+  // ...
+}
+```
+
+3. Better yet, use our custom PageProps type:
+
+```tsx
+import { PageProps } from '@/types/next';
+
+interface MyParams {
+  type: 'paper' | 'arena';
+}
+
+export default async function MyPage({ params, searchParams }: PageProps<MyParams>) {
+  const { type } = await params;
+  const resolvedSearchParams = await searchParams;
+  // ...
+}
+```
+
+## References
+
+- [TypeScript Guidelines](mdc:docs/TYPESCRIPT.md)
+- [Custom Types](mdc:src/types/next.d.ts)
+- [Fixed Example](mdc:src/app/collection/[type]/page.tsx)
