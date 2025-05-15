@@ -67,7 +67,6 @@ export function CardsProvider({
       rarities: [],
       sortFields: [],
       sets: [],
-      exactColorMatch: false,
     },
   );
   const [collectionType, setCollectionType] = useState<

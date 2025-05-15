@@ -37,11 +37,6 @@ export function updateUrlWithFilters(
     searchParams.set('sets', filters.sets.join(','));
   }
 
-  // Add exact color match
-  if (filters.exactColorMatch) {
-    searchParams.set('exact', filters.exactColorMatch.toString());
-  }
-
   // Add sort fields
   if (filters.sortFields && filters.sortFields.length > 0) {
     const sortParam = filters.sortFields
@@ -95,12 +90,6 @@ function parseSearchParams(params: SearchParamsLike): {
   const setsParam = params.get('sets');
   if (setsParam) {
     filters.sets = setsParam.split(',');
-  }
-
-  // Get exact color match
-  const exactParam = params.get('exact');
-  if (exactParam) {
-    filters.exactColorMatch = exactParam === 'true';
   }
 
   // Get sort fields

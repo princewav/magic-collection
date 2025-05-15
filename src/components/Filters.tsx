@@ -12,7 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, Info } from 'lucide-react';
 import { useCards } from '@/context/CardsContext';
 import { useCollection } from '@/context/CollectionContext';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,12 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { SortOptions, type SortField } from './SortOptions';
 import { FilterOptions } from '@/actions/card/load-cards';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 // Simple debounce function
 function debounce<T extends (...args: any[]) => any>(
@@ -441,9 +447,10 @@ export function Filters({
           .join(', ');
         return `Showing cards with any of: ${colorNames} (OR logic)`;
       } else {
-        // This case should ideally not be reached if optimisticColors.length > 0
-        // and none of the above conditions met (e.g. only 'C' was selected which is covered by the first branch in this else block)
-        return 'Showing cards with selected colors';
+        // This case might be reached if only 'C' was selected and it was cleared, but optimisticColors.length check for tooltip display should prevent this.
+        // Or if colors array becomes empty but tooltip is still triggered by old logic.
+        // Given the tooltip is shown only if optimisticColors.length > 0, specific handling for empty wubrgColorsForTooltip here might not be strictly necessary if 'C' is also not present.
+        return 'Current color filter selection logic is active.'; // Fallback, ideally not shown.
       }
     }
   };
@@ -474,13 +481,31 @@ export function Filters({
               <div className="flex items-center">
                 <h3 className="text-xs font-medium md:text-sm">Colors</h3>
                 {optimisticColors.length > 0 && (
-                  <button
-                    onClick={resetColors}
-                    className="text-muted-foreground hover:text-foreground ml-2 cursor-pointer"
-                    title="Clear color filters"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  <>
+                    <TooltipProvider>
+                      <Tooltip delayDuration={150}>
+                        <TooltipTrigger asChild>
+                          <button className="hover:bg-muted focus-visible:ring-ring ml-1.5 rounded-full p-0.5 focus-visible:ring-1 focus-visible:outline-none">
+                            <Info className="text-muted-foreground h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="bottom"
+                          align="start"
+                          className="bg-popover text-popover-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+                        >
+                          <p>{getColorFilteringTooltip()}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <button
+                      onClick={resetColors}
+                      className="text-muted-foreground hover:text-foreground focus-visible:ring-ring ml-1.5 cursor-pointer rounded-full p-0.5 focus-visible:ring-1 focus-visible:outline-none"
+                      title="Clear color filters"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </>
                 )}
               </div>
 
@@ -526,11 +551,6 @@ export function Filters({
                   />
                 </button>
               </div>
-              {optimisticColors.length > 0 && (
-                <p className="text-muted-foreground mb-1 text-xs">
-                  {getColorFilteringTooltip()}
-                </p>
-              )}
             </div>
 
             <div className="flex min-w-[200px] flex-col gap-5">

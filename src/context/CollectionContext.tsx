@@ -53,7 +53,6 @@ export function CollectionProvider({
       rarities: [],
       sortFields: [],
       sets: [],
-      exactColorMatch: false,
     },
   );
 
