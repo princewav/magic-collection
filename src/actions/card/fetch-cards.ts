@@ -1,7 +1,7 @@
 'use server';
 
 import { loadFilteredCards, FilterOptions } from './load-cards';
-import { fetchCollectionCards } from '../load-cards';
+import { fetchCollectionCards } from './load-cards';
 import { CardWithOptionalQuantity } from '@/types/card';
 
 export async function fetchCards(

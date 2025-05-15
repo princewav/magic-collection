@@ -2,7 +2,7 @@ import { Deck } from '@/types/deck';
 import { deckService } from '@/db/services/DeckService';
 import { collectionCardService } from '@/db/services/CollectionCardService';
 import { Card, CollectionCard } from '@/types/card';
-import { loadCardsById } from '@/actions/load-cards';
+import { loadCardsById } from '@/actions/card/load-cards';
 import { DBDeck } from '@/types/deck';
 import { getServerSession } from 'next-auth/next';
 import { authConfig } from '@/auth/auth.config';

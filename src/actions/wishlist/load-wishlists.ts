@@ -1,6 +1,6 @@
 import { Wishlist, DBWishlist } from '@/types/wishlist';
 import { wishlistService } from '@/db/services/WishlistService';
-import { loadCardsById } from '@/actions/load-cards';
+import { loadCardsById } from '@/actions/card/load-cards';
 import { getServerSession } from 'next-auth/next';
 import { authConfig } from '@/auth/auth.config';
 

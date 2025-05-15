@@ -4,7 +4,7 @@ import { cardService } from '@/db/services/CardService';
 import { deckService } from '@/db/services/DeckService';
 import { Deck, DeckCard, ManaColor } from '@/types/deck';
 import { CardWithQuantity } from '@/types/card';
-import { loadCardsById } from '@/actions/load-cards';
+import { loadCardsById } from '@/actions/card/load-cards';
 
 type ImportDeckResult = {
   success: boolean;

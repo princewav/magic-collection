@@ -10,7 +10,7 @@ import {
   useRef,
 } from 'react';
 import { Card } from '@/types/card';
-import { fetchCollectionCards } from '@/actions/load-cards';
+import { fetchCollectionCards } from '@/actions/card/load-cards';
 import { FilterOptions } from '@/actions/card/load-cards';
 
 interface CollectionContextType {

@@ -3,7 +3,10 @@ import { capitalize } from '@/lib/utils';
 import CsvImportButton from '@/components/CsvImportButton';
 import { parseCSVandInsert } from '@/actions/parse-csv';
 import { Filters } from '@/components/Filters';
-import { loadCardsById, loadCardsInCollection } from '@/actions/load-cards';
+import {
+  loadCardsById,
+  loadCardsInCollection,
+} from '@/actions/card/load-cards';
 import { CardsProvider } from '@/context/CardsContext';
 import { CollectionProvider } from '@/context/CollectionContext';
 import { CardContainer } from '@/components/CardContainer';

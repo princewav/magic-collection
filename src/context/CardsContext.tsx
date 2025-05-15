@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import { Card, CardWithOptionalQuantity } from '@/types/card';
 import { loadFilteredCards, FilterOptions } from '@/actions/card/load-cards';
-import { fetchCollectionCards } from '@/actions/load-cards';
+import { fetchCollectionCards } from '@/actions/card/load-cards';
 
 interface CardsContextType {
   cards: CardWithOptionalQuantity[];

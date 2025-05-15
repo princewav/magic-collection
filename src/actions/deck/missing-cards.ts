@@ -3,7 +3,7 @@
 import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
 import { deckService } from '@/db/services/DeckService';
 import { Card, CardWithQuantity, CollectionCard } from '@/types/card';
-import { loadCardDetailsByNames } from '../load-cards';
+import { loadCardDetailsByNames } from '../card/load-cards';
 
 // Aggregates CollectionCards by name to get total owned quantity per name
 function aggregateCollectionCardsByName(
