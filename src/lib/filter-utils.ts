@@ -5,7 +5,7 @@ import { FilterOptions } from '@/actions/card/load-cards';
  */
 export interface ColorFilterInfo {
   colors: string[]; // All color symbols including 'M' if present
-  specificColors: string[]; // Only the specific color symbols (W, U, B, R, G, C)
+  specificColors: string[]; // Only the specific color symbols (W, U, B, R, G, C), and potentially 'M' if not filtered out by caller of processColorFilter
   includesMulticolor: boolean; // Whether 'M' is selected
   mode: MulticolorMode; // The operational mode based on selected colors
 }
@@ -15,10 +15,9 @@ export interface ColorFilterInfo {
  */
 export enum MulticolorMode {
   NONE = 'none', // No color filters
-  MULTICOLOR_ONLY = 'multicolorOnly', // Only 'M' is selected
-  EXACT_MONO = 'exactMono', // 'M' + exactly one color
-  EXACT_MULTI = 'exactMulti', // 'M' + multiple specific colors
-  AT_LEAST = 'atLeast', // Only specific colors (no 'M') - cards with at least one of these colors (OR logic)
+  MULTICOLOR_ONLY = 'multicolorOnly', // M selected, no specific WUBRGC colors. Query: size >= 2
+  MULTICOLOR_INCLUDES_ALL_SPECIFIC = 'multicolorIncludesAllSpecific', // M selected, AND 1+ specific WUBRGC colors. Query: { $all: specificWUBRGColors, size >= 2 }
+  AT_LEAST = 'atLeast', // No M, only specific WUBRGC colors (OR 'C'). Query: { $in: specificWUBRGColors } (with special 'C' handling)
 }
 
 /**
@@ -127,25 +126,37 @@ export function parseFiltersFromParams(searchParams: {
  */
 function processColorFilter(colors: string[]): ColorFilterInfo {
   const includesMulticolor = colors.includes('M');
+  // specificColors here will contain W, U, B, R, G, and C if they were selected alongside/without M.
+  // It explicitly filters out only 'M'.
   const specificColors = colors.filter((c) => c !== 'M');
 
   let mode: MulticolorMode;
 
-  if (colors.length === 0) {
-    mode = MulticolorMode.NONE;
-  } else if (includesMulticolor && specificColors.length === 0) {
-    mode = MulticolorMode.MULTICOLOR_ONLY;
-  } else if (includesMulticolor && specificColors.length === 1) {
-    mode = MulticolorMode.EXACT_MONO;
-  } else if (includesMulticolor && specificColors.length > 1) {
-    mode = MulticolorMode.EXACT_MULTI;
+  if (!includesMulticolor) {
+    // 'M' is NOT selected
+    if (specificColors.length === 0) {
+      // No colors selected at all (neither M nor WUBRGC)
+      mode = MulticolorMode.NONE;
+    } else {
+      // Only specific colors (W,U,B,R,G,C selected), no 'M'
+      mode = MulticolorMode.AT_LEAST;
+    }
   } else {
-    mode = MulticolorMode.AT_LEAST;
+    // 'M' IS selected
+    // Check WUBRGC colors selected alongside M (excluding C for this check as C is not a WUBRG color)
+    const wubrgColorsAlongsideM = specificColors.filter((c) => c !== 'C');
+    if (wubrgColorsAlongsideM.length === 0) {
+      // Only 'M' selected (or M+C, but no WUBRG)
+      mode = MulticolorMode.MULTICOLOR_ONLY;
+    } else {
+      // 'M' selected AND one or more specific WUBRG colors
+      mode = MulticolorMode.MULTICOLOR_INCLUDES_ALL_SPECIFIC;
+    }
   }
 
   return {
-    colors,
-    specificColors,
+    colors, // original full array from params
+    specificColors, // colors from params excluding 'M' (so it contains W,U,B,R,G,C if selected)
     includesMulticolor,
     mode,
   };

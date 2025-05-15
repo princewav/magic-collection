@@ -25,7 +25,6 @@ export interface FilterOptions {
     field: string;
     order: 'asc' | 'desc';
   }>;
-  exactColorMatch?: boolean;
   hideTokens?: boolean;
 }
 
@@ -102,13 +101,7 @@ const buildMatchStage = (
       ];
     } else {
       // Normal color filtering
-      if (filters.exactColorMatch) {
-        // Exact match: contains exactly the specified colors and no others
-        // Note: this should not include 'C' in the comparison as it's not a real color
-        matchConditions[`${lookupPrefix}color_identity`] = {
-          $eq: specificColors.sort(),
-        };
-      } else if (includesMulticolor && specificColors.length > 0) {
+      if (includesMulticolor && specificColors.length > 0) {
         // M + specific colors: Cards must have ALL the specified colors
         matchConditions[`${lookupPrefix}color_identity`] = {
           $all: specificColors,

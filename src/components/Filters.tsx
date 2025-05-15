@@ -397,31 +397,54 @@ export function Filters({
 
   // Helper function to get a tooltip for the color filtering behavior
   const getColorFilteringTooltip = () => {
-    const specificColors = optimisticColors.filter(
+    const wubrgColorsForTooltip = optimisticColors.filter(
       (c) => c !== 'M' && c !== 'C',
     );
     const includesColorless = optimisticColors.includes('C');
 
     if (optimisticColors.length === 0) {
       return 'Select colors to filter cards';
-    } else if (includesColorless && optimisticColors.length === 1) {
-      return 'Showing only colorless cards (cards with no colors)';
-    } else if (isMulticolorSelected) {
-      if (specificColors.length === 0 && !includesColorless) {
-        return 'Showing cards with two or more colors (any colors)';
-      } else if (specificColors.length === 0 && includesColorless) {
-        return 'Showing cards with two or more colors OR colorless cards';
-      } else if (specificColors.length === 1) {
-        return `Showing exactly mono-colored ${specificColors[0]} cards`;
+    }
+
+    if (isMulticolorSelected) {
+      // 'M' is selected
+      if (wubrgColorsForTooltip.length > 0) {
+        const colorNames = wubrgColorsForTooltip
+          .map(
+            (color) =>
+              colorFilters.find((cf) => cf.symbol === color)?.name || color,
+          )
+          .join(', ');
+        return `Showing multicolor cards that include ALL of: ${colorNames}`;
       } else {
-        return 'Showing cards with exactly these specific colors (no more, no less)';
+        // Only 'M' selected, or 'M' and 'C' selected (no WUBRG colors)
+        return 'Showing all cards with two or more colors';
       }
     } else {
-      let tooltip = 'Showing cards with any of the selected colors';
-      if (includesColorless) {
-        tooltip += ' OR colorless cards';
+      // 'M' is NOT selected
+      if (includesColorless && wubrgColorsForTooltip.length === 0) {
+        return 'Showing only colorless cards (cards with no colors)';
+      } else if (includesColorless && wubrgColorsForTooltip.length > 0) {
+        const colorNames = wubrgColorsForTooltip
+          .map(
+            (color) =>
+              colorFilters.find((cf) => cf.symbol === color)?.name || color,
+          )
+          .join(', ');
+        return `Showing cards that are ${colorNames} OR colorless`;
+      } else if (!includesColorless && wubrgColorsForTooltip.length > 0) {
+        const colorNames = wubrgColorsForTooltip
+          .map(
+            (color) =>
+              colorFilters.find((cf) => cf.symbol === color)?.name || color,
+          )
+          .join(', ');
+        return `Showing cards with any of: ${colorNames} (OR logic)`;
+      } else {
+        // This case should ideally not be reached if optimisticColors.length > 0
+        // and none of the above conditions met (e.g. only 'C' was selected which is covered by the first branch in this else block)
+        return 'Showing cards with selected colors';
       }
-      return tooltip + ' (OR logic)';
     }
   };
 
