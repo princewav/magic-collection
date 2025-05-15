@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface UserMenuProps {
   session: Session | null;
@@ -22,10 +22,19 @@ interface UserMenuProps {
 
 export function UserMenu({ session: initialSession }: UserMenuProps) {
   // Use useSession with default behavior
-  const { data: updatedSession } = useSession();
+  const { data: updatedSession, status } = useSession();
 
   // Use the most up-to-date session
   const session = updatedSession || initialSession;
+
+  // Show loading state
+  if (status === 'loading') {
+    return (
+      <div className="flex h-8 w-8 items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   // Fallback for when not authenticated
   if (!session) {

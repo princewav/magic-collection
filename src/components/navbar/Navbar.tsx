@@ -10,7 +10,7 @@ import { NavMenu } from './NavMenu';
 
 const Navbar: React.FC<{}> = () => {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   return (
     <nav

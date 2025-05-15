@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { UserMenu } from './UserMenu';
 import Image from 'next/image';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface NavLinkProps {
   href: string;
@@ -44,7 +45,7 @@ const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
 NavButton.displayName = 'NavButton';
 
 export default function MobileNavbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const [activeDropdown, setActiveDropdown] = React.useState<string | null>(
     null,
@@ -164,8 +165,8 @@ export default function MobileNavbar() {
             dropdownContainerRefs.current[menu.id] = el;
           }}
           className={cn(
-            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 max-h-0 overflow-hidden border-t opacity-0 transition-all duration-300 h-32',
-            activeDropdown === menu.id ? ' max-h-32 opacity-100' : '',
+            'bg-sidebar fixed right-0 bottom-6 left-0 z-40 h-32 max-h-0 overflow-hidden border-t opacity-0 transition-all duration-300',
+            activeDropdown === menu.id ? 'max-h-32 opacity-100' : '',
           )}
         >
           <div className="space-y-1 p-2">
