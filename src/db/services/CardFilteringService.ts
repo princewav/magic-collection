@@ -1,5 +1,6 @@
 import { Document } from 'mongodb';
 import { rarityOrder } from '@/types/card';
+import { MulticolorMode, ColorFilterInfo } from '@/lib/filter-utils';
 
 // Re-define or import FilterOptions if it's not globally available
 // For now, assume FilterOptions structure is known
@@ -13,6 +14,7 @@ interface FilterOptions {
   }>;
   sets?: string[];
   exactColorMatch?: boolean;
+  colorFilter?: ColorFilterInfo; // Added for enhanced filtering
 }
 
 const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
@@ -23,7 +25,12 @@ export class CardFilteringService {
     query: Record<string, any>,
     filters: FilterOptions,
   ): void {
-    if (filters.colors && filters.colors.length > 0) {
+    // Handle the enhanced color filter logic if available
+    if (filters.colorFilter) {
+      this._applyColorFilter(query, filters.colorFilter);
+    }
+    // Fall back to legacy color filtering if colorFilter is not available
+    else if (filters.colors && filters.colors.length > 0) {
       if (filters.exactColorMatch) {
         query.$and = [
           { color_identity: { $all: filters.colors } },
@@ -45,6 +52,51 @@ export class CardFilteringService {
 
     if (filters.sets && filters.sets.length > 0) {
       query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
+    }
+  }
+
+  /**
+   * Applies color filtering based on the enhanced colorFilter object
+   * Implements the multicolor filter logic (M)
+   */
+  private _applyColorFilter(
+    query: Record<string, any>,
+    colorFilter: ColorFilterInfo,
+  ): void {
+    const { mode, specificColors } = colorFilter;
+
+    switch (mode) {
+      case MulticolorMode.NONE:
+        // No color filter
+        break;
+
+      case MulticolorMode.MULTICOLOR_ONLY:
+        // Only 'M' filter: show cards with 2+ colors
+        // MongoDB doesn't support $size: { $gt: 1 } directly
+        // Use $expr with $gt operator instead
+        query.$expr = { $gt: [{ $size: '$color_identity' }, 1] };
+        break;
+
+      case MulticolorMode.EXACT_MONO:
+        // 'M' + one color: show cards that are exactly mono-colored
+        query.$and = [
+          { color_identity: { $all: specificColors } },
+          { color_identity: { $size: 1 } },
+        ];
+        break;
+
+      case MulticolorMode.EXACT_MULTI:
+        // 'M' + multiple colors: show cards with exactly these colors
+        query.$and = [
+          { color_identity: { $all: specificColors } },
+          { color_identity: { $size: specificColors.length } },
+        ];
+        break;
+
+      case MulticolorMode.AT_LEAST:
+        // Only specific colors: show cards with at least ONE of these colors (OR logic)
+        query.color_identity = { $in: specificColors };
+        break;
     }
   }
 
@@ -90,15 +142,22 @@ export class CardFilteringService {
       });
       stages.push({
         $addFields: {
+          _colorIdentitySizeValue: { $size: '$_colorIdentityArray' },
+        },
+      });
+      stages.push({
+        $addFields: {
           _colorCategory: {
             $switch: {
               branches: [
                 {
-                  case: { $eq: [{ $size: '$_colorIdentityArray' }, 0] },
+                  // Case for colorless cards (empty color identity)
+                  case: { $eq: ['$_colorIdentitySizeValue', 0] },
                   then: 'C',
                 },
                 {
-                  case: { $gt: [{ $size: '$_colorIdentityArray' }, 1] },
+                  // Case for multicolor cards (2+ colors)
+                  case: { $gt: ['$_colorIdentitySizeValue', 1] },
                   then: 'M',
                 },
               ],
@@ -225,6 +284,7 @@ export class CardFilteringService {
         projectFields._colorIndex = 0;
         projectFields._colorCategory = 0;
         projectFields._colorIdentityArray = 0;
+        projectFields._colorIdentitySizeValue = 0;
       }
     }
 
@@ -246,48 +306,26 @@ export class CardFilteringService {
     const query: Record<string, any> = {};
     this._applyFilters(query, filters);
 
-    const needsCustomSort = this._needsCustomSorting(filters);
-    const sortSpec = this._buildSortStage(filters); // Get the sort specification
-
-    let countPipeline: Document[] = [];
-
-    countPipeline.push({ $match: query });
+    let pipeline: Document[] = [{ $match: query }];
 
     if (deduplicate) {
-      if (needsCustomSort) {
-        countPipeline.push(...this._buildCustomSortStages(filters));
-      }
-
-      countPipeline.push({
-        $addFields: {
-          _collectorNumberNumeric: {
-            $convert: {
-              input: '$collector_number',
-              to: 'int',
-              onError: 999999,
-              onNull: 999999,
-            },
-          },
-        },
-      });
-
-      // Add the $sort stage correctly
-      countPipeline.push({ $sort: sortSpec });
-      countPipeline.push({
+      pipeline.push({
         $group: {
           _id: '$name',
+          doc: { $first: '$$ROOT' },
         },
       });
     }
 
-    countPipeline.push({ $count: 'total' });
+    pipeline.push({
+      $count: 'total',
+    });
 
-    return countPipeline;
+    return pipeline;
   }
 
   /**
-   * Builds the query object used for counting documents, applying only the filters.
-   * This is separate because countDocuments doesn't use the full pipeline.
+   * Builds a filter query object for MongoDB based on the provided filters.
    */
   public buildFilterQuery(filters: FilterOptions): Record<string, any> {
     const query: Record<string, any> = {};

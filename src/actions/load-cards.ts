@@ -65,26 +65,78 @@ const buildMatchStage = (
   const matchConditions: any = {};
 
   if (filters.colors && filters.colors.length > 0) {
-    if (filters.exactColorMatch) {
-      // Exact match: contains exactly the specified colors and no others
-      matchConditions[`${lookupPrefix}color_identity`] = {
-        $eq: filters.colors.sort(),
-      };
+    const includesMulticolor = filters.colors.includes('M');
+    const specificColors = filters.colors.filter((c) => c !== 'M');
+    const includesColorless = filters.colors.includes('C');
+
+    // Handle colorless cards separately
+    if (includesColorless && filters.colors.length === 1) {
+      // Only 'C' is selected - match cards with empty color_identity
+      matchConditions.$or = [
+        { [`${lookupPrefix}color_identity`]: { $size: 0 } },
+        { [`${lookupPrefix}color_identity`]: { $exists: false } },
+      ];
     } else {
-      // Contains AT LEAST the specified colors
-      matchConditions[`${lookupPrefix}color_identity`] = {
-        $all: filters.colors,
-      };
-    }
-    // Handle colorless explicitly if 'C' is selected
-    if (filters.colors.includes('C')) {
-      matchConditions[`${lookupPrefix}color_identity`] = {
-        $or: [
-          matchConditions[`${lookupPrefix}color_identity`], // Keep existing color condition
-          { [`${lookupPrefix}color_identity`]: { $size: 0 } }, // Match cards with empty color_identity array
-          { [`${lookupPrefix}color_identity`]: { $exists: false } }, // Match cards where color_identity field doesn't exist
-        ],
-      };
+      // Normal color filtering
+      if (filters.exactColorMatch) {
+        // Exact match: contains exactly the specified colors and no others
+        matchConditions[`${lookupPrefix}color_identity`] = {
+          $eq: filters.colors.sort(),
+        };
+      } else if (includesMulticolor && specificColors.length > 0) {
+        // M + specific colors: Cards must have ALL the specified colors
+        matchConditions[`${lookupPrefix}color_identity`] = {
+          $all: specificColors,
+        };
+      } else if (!includesMulticolor && specificColors.length > 0) {
+        // Only specific colors, no M: Cards with ANY of the specified colors (OR logic)
+        let query = { $in: specificColors };
+
+        // If colorless is also selected, create an $or condition to include it
+        if (includesColorless) {
+          matchConditions.$or = [
+            { [`${lookupPrefix}color_identity`]: query },
+            { [`${lookupPrefix}color_identity`]: { $size: 0 } },
+            { [`${lookupPrefix}color_identity`]: { $exists: false } },
+          ];
+        } else {
+          matchConditions[`${lookupPrefix}color_identity`] = query;
+        }
+      } else if (
+        includesMulticolor &&
+        specificColors.length === 0 &&
+        !includesColorless
+      ) {
+        // Only M: Cards with 2+ colors
+        // Use _colorIdentitySizeValue field if available (in pipelines), otherwise use $expr with $size
+        if (lookupPrefix === 'cardDetails.') {
+          matchConditions.$or = [
+            { _colorIdentitySizeValue: { $gt: 1 } },
+            {
+              $expr: { $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1] },
+            },
+          ];
+        } else {
+          matchConditions.$expr = {
+            $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1],
+          };
+        }
+      } else if (
+        includesMulticolor &&
+        specificColors.length === 0 &&
+        includesColorless
+      ) {
+        // M + C: Cards with 2+ colors OR colorless cards
+        matchConditions.$or = [
+          // Use _colorIdentitySizeValue if available
+          ...(lookupPrefix === 'cardDetails.'
+            ? [{ _colorIdentitySizeValue: { $gt: 1 } }]
+            : []),
+          { $expr: { $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1] } },
+          { [`${lookupPrefix}color_identity`]: { $size: 0 } },
+          { [`${lookupPrefix}color_identity`]: { $exists: false } },
+        ];
+      }
     }
   }
 
@@ -130,6 +182,12 @@ const buildColorSortStages = (lookupPrefix = 'cardDetails.') => {
         },
       },
     },
+    // Calculate size of color identity array
+    {
+      $addFields: {
+        _colorIdentitySizeValue: { $size: '$_colorIdentityArray' },
+      },
+    },
     // Add color category (C for colorless, M for multicolor, or first color)
     {
       $addFields: {
@@ -137,11 +195,11 @@ const buildColorSortStages = (lookupPrefix = 'cardDetails.') => {
           $switch: {
             branches: [
               {
-                case: { $eq: [{ $size: '$_colorIdentityArray' }, 0] },
+                case: { $eq: ['$_colorIdentitySizeValue', 0] },
                 then: 'C',
               },
               {
-                case: { $gt: [{ $size: '$_colorIdentityArray' }, 1] },
+                case: { $gt: ['$_colorIdentitySizeValue', 1] },
                 then: 'M',
               },
             ],
@@ -254,7 +312,16 @@ export async function loadMoreCollectionCards(
   const colorStages = buildColorSortStages();
   pipeline.push(...colorStages);
 
-  // Stage 5.1: Add rarity sorting stage if needed
+  // Stage 5.1: Add color identity size calculation for filter conditions
+  if (filters.colors?.includes('M') || filters.colors?.includes('C')) {
+    pipeline.push({
+      $addFields: {
+        _colorIdentitySizeValue: { $size: '$_colorIdentityArray' },
+      },
+    });
+  }
+
+  // Stage 5.2: Add rarity sorting stage if needed
   if (filters.sortFields?.some((f) => f.field === 'rarity')) {
     pipeline.push({
       $addFields: {
@@ -280,43 +347,21 @@ export async function loadMoreCollectionCards(
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: pageSize });
 
-  // Stage 9: Project
+  // Stage 9: Project fields to include
   pipeline.push({
     $project: {
       _id: { $toString: '$_id' },
       cardId: 1,
       quantity: 1,
-      _colorIndex: 1,
-      _colorCategory: 1,
-      _colorIdentityArray: 1,
       _rarityIndex: 1,
-      cardDetails: {
-        id: 1,
-        cardmarket_id: 1,
-        name: 1,
-        released_at: 1,
-        scryfall_uri: 1,
-        layout: 1,
-        image_uris: 1,
-        mana_cost: 1,
-        cmc: 1,
-        type_line: 1,
-        oracle_text: 1,
-        power: 1,
-        toughness: 1,
-        color_identity: 1,
-        keywords: 1,
-        legalities: 1,
-        set: 1,
-        set_name: 1,
-        scryfall_set_uri: 1,
-        collector_number: 1,
-        rarity: 1,
-        flavor_text: 1,
-        cardmarket_uri: 1,
-        card_faces: 1,
-        prices: 1,
-      },
+      cardDetails: 1,
+    },
+  });
+
+  // Stage 10: Remove temporary fields (exclusion-only stage)
+  pipeline.push({
+    $project: {
+      _colorIdentitySizeValue: 0,
     },
   });
 
@@ -343,6 +388,15 @@ export async function loadMoreCollectionCards(
       },
       { $unwind: { path: '$cardDetails', preserveNullAndEmptyArrays: false } },
     ];
+
+    // Add color identity size calculation for filter conditions that use it
+    if (filters.colors?.includes('M') || filters.colors?.includes('C')) {
+      countPipeline.push({
+        $addFields: {
+          _colorIdentitySizeValue: { $size: '$cardDetails.color_identity' },
+        },
+      } as any);
+    }
 
     if (Object.keys(filters).length > 0) {
       const matchStage = buildMatchStage(filters);

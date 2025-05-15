@@ -219,13 +219,36 @@ export function Filters({
     collectionType,
   ]);
 
+  // Check if Multicolor filter is selected
+  const isMulticolorSelected = optimisticColors.includes('M');
+  // Count selected specific colors (excluding 'M')
+  const specificColorsCount = optimisticColors.filter((c) => c !== 'M').length;
+
   // Handlers for filter changes with optimistic updates
   const toggleColor = (symbol: string) => {
-    // Optimistic UI update
-    const newColors = optimisticColors.includes(symbol)
-      ? optimisticColors.filter((c) => c !== symbol)
-      : [...optimisticColors, symbol];
+    let newColors: string[];
 
+    if (symbol === 'M') {
+      // Toggle Multicolor filter (M)
+      if (isMulticolorSelected) {
+        // Remove M if it's already selected
+        newColors = optimisticColors.filter((c) => c !== 'M');
+      } else {
+        // Add M to existing colors
+        newColors = [...optimisticColors, 'M'];
+      }
+    } else {
+      // Toggle specific color filter
+      if (optimisticColors.includes(symbol)) {
+        // Remove the specific color
+        newColors = optimisticColors.filter((c) => c !== symbol);
+      } else {
+        // Add the specific color
+        newColors = [...optimisticColors, symbol];
+      }
+    }
+
+    // Optimistic UI update
     setOptimisticColors(newColors);
 
     // Debounced URL update
@@ -355,6 +378,36 @@ export function Filters({
     { symbol: 'M', name: 'Mythic Rare', value: 'mythic' },
   ];
 
+  // Helper function to get a tooltip for the multicolor button based on state
+  const getMulticolorTooltip = () => {
+    if (!isMulticolorSelected) {
+      return 'Multicolor - Show cards with two or more colors';
+    } else if (specificColorsCount === 0) {
+      return 'Multicolor - Currently showing all cards with two or more colors';
+    } else if (specificColorsCount === 1) {
+      return 'Multicolor + 1 Color - Currently showing cards that are exactly mono-colored';
+    } else {
+      return 'Multicolor + Multiple Colors - Currently showing cards with exactly these colors';
+    }
+  };
+
+  // Helper function to get a tooltip for the color filtering behavior
+  const getColorFilteringTooltip = () => {
+    if (optimisticColors.length === 0) {
+      return 'Select colors to filter cards';
+    } else if (isMulticolorSelected) {
+      if (specificColorsCount === 0) {
+        return 'Showing cards with two or more colors (any colors)';
+      } else if (specificColorsCount === 1) {
+        return `Showing exactly mono-colored ${optimisticColors.filter((c) => c !== 'M')[0]} cards`;
+      } else {
+        return 'Showing cards with exactly these specific colors (no more, no less)';
+      }
+    } else {
+      return 'Showing cards with any of the selected colors (OR logic)';
+    }
+  };
+
   return (
     <Collapsible
       open={isOpen}
@@ -390,6 +443,11 @@ export function Filters({
                   </button>
                 )}
               </div>
+              {optimisticColors.length > 0 && (
+                <p className="text-muted-foreground mb-1 text-xs">
+                  {getColorFilteringTooltip()}
+                </p>
+              )}
               <div className="flex flex-wrap justify-start gap-2 px-1">
                 {colorFilters.map((filter) => (
                   <button
@@ -414,14 +472,15 @@ export function Filters({
                     />
                   </button>
                 ))}
+                {/* Multicolor filter button */}
                 <button
-                  onClick={toggleExactColorMatch}
+                  onClick={() => toggleColor('M')}
                   className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
-                    optimisticExactColorMatch
+                    isMulticolorSelected
                       ? 'bg-primary/20 ring-primary ring-2'
                       : 'hover:bg-muted'
                   }`}
-                  title="Exact color match"
+                  title={getMulticolorTooltip()}
                 >
                   <ManaSymbol symbol="M" size={20} className="md:hidden" />
                   <ManaSymbol
@@ -429,6 +488,18 @@ export function Filters({
                     size={27}
                     className="hidden md:block"
                   />
+                </button>
+                {/* Exact color match button */}
+                <button
+                  onClick={toggleExactColorMatch}
+                  className={`flex size-6 items-center justify-center rounded-full p-1 transition-all md:size-7 ${
+                    optimisticExactColorMatch
+                      ? 'bg-primary/20 ring-primary ring-2'
+                      : 'hover:bg-muted'
+                  }`}
+                  title="Exact color match - Match only cards with exactly these colors"
+                >
+                  <span className="text-xs font-bold md:text-sm">EXACT</span>
                 </button>
               </div>
             </div>
