@@ -11,7 +11,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useCards } from '@/context/CardsContext';
 import { useCollection } from '@/context/CollectionContext';
 import { cn } from '@/lib/utils';
@@ -226,6 +226,16 @@ export function Filters({
     }),
   );
 
+  const resetColors = () => {
+    setSelectedColors([]);
+    setExactColorMatch(false);
+    updateContextFilters({
+      ...prepareFilters(),
+      colors: [],
+      exactColorMatch: false,
+    });
+  };
+
   return (
     <Collapsible
       open={isOpen}
@@ -249,7 +259,18 @@ export function Filters({
         <div>
           <div className="flex flex-col flex-wrap items-start justify-between gap-6 sm:flex-row">
             <div className="flex min-w-fit flex-col gap-2">
-              <h3 className="text-xs font-medium md:text-sm">Colors</h3>
+              <div className="flex items-center">
+                <h3 className="text-xs font-medium md:text-sm">Colors</h3>
+                {(selectedColors.length > 0 || exactColorMatch) && (
+                  <button
+                    onClick={resetColors}
+                    className="text-muted-foreground hover:text-foreground ml-2"
+                    title="Clear color filters"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
               <div className="flex flex-wrap justify-start gap-2 px-1">
                 {colorFilters.map((filter) => (
                   <button
