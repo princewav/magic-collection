@@ -99,7 +99,7 @@ export function CollectionProvider({
       } catch (err) {
         // Only log and update state if the error wasn't from aborting
         if (err instanceof DOMException && err.name === 'AbortError') {
-          console.log('Request was aborted due to new filter changes');
+          console.error('Request was aborted due to new filter changes');
         } else {
           console.error('[CollectionContext] Error:', err);
           setError(err instanceof Error ? err : new Error('Unknown error'));

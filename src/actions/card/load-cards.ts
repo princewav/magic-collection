@@ -84,7 +84,6 @@ const buildMatchStage = (
     if (includesColorless && filters.colors.length === 1) {
       // Only 'C' is selected - match cards with empty color_identity
       // Use a very simple and direct approach for colorless
-      console.log('Building query for ONLY colorless');
 
       // Try different approaches for matching colorless cards
       matchConditions.$or = [
@@ -393,15 +392,11 @@ export async function loadMoreCollectionCards(
 
   try {
     // Print the query when colorless filter is used
-    if (filters.colors?.includes('C')) {
-      console.log('Colorless filter query:', JSON.stringify(pipeline, null, 2));
-    }
 
     const results = await collectionCardsRepo.aggregate(pipeline).toArray();
 
     // If colorless filter and no results, show first 5 cards that should match
     if (filters.colors?.includes('C') && results.length === 0) {
-      console.log('No results found with colorless filter');
 
       // Try to find any colorless cards directly
       const colorlessCheck = await db
@@ -409,18 +404,6 @@ export async function loadMoreCollectionCards(
         .find({ color_identity: { $size: 0 } })
         .limit(5)
         .toArray();
-      console.log(
-        'Direct colorless check found:',
-        colorlessCheck.length,
-        'cards',
-      );
-      if (colorlessCheck.length > 0) {
-        console.log(
-          'Sample colorless card:',
-          colorlessCheck[0].name,
-          colorlessCheck[0].set,
-        );
-      }
     }
 
     // Get total count with the same grouping logic

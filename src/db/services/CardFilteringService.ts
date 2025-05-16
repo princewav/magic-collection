@@ -58,6 +58,26 @@ export class CardFilteringService {
     const actualWUBRGColors = specificColors.filter(
       (c) => c !== 'C' && c !== 'M',
     ); // Ensure M is also out, though specificColors from processColorFilter already filters M
+    const hasColorless = specificColors.includes('C');
+
+    // Updated colorless condition: For lands, we want those with empty color_identity OR empty colors array
+    // For non-lands, we want those with empty colors array
+    const colorlessCondition = {
+      $or: [
+        // Non-land colorless cards (artifacts, eldrazi, etc.) - must have empty colors array
+        {
+          $and: [{ type_line: { $not: /land/i } }, { colors: { $size: 0 } }],
+        },
+        // Truly colorless lands - must have empty color_identity OR empty colors array
+        {
+          $and: [
+            { type_line: /land/i },
+            { color_identity: { $size: 0 } },
+            { colors: { $size: 0 } },
+          ],
+        },
+      ],
+    };
 
     switch (mode) {
       case MulticolorMode.NONE:
@@ -66,21 +86,44 @@ export class CardFilteringService {
 
       case MulticolorMode.MULTICOLOR_ONLY:
         // Only 'M' filter (or M+C): show cards with 2+ colors
-        query.$expr = { $gt: [{ $size: '$color_identity' }, 1] };
+        if (hasColorless) {
+          // If 'M' and 'C' are selected together, show multicolor OR colorless
+          query.$or = [
+            { $expr: { $gt: [{ $size: '$color_identity' }, 1] } },
+            colorlessCondition,
+          ];
+        } else {
+          // Just multicolor
+          query.$expr = { $gt: [{ $size: '$color_identity' }, 1] };
+        }
         break;
 
       case MulticolorMode.MULTICOLOR_INCLUDES_ALL_SPECIFIC:
         // 'M' selected AND one or more specific WUBRG colors selected.
         // Goal: Show cards that include ALL actualWUBRGColors AND are multicolor.
         if (actualWUBRGColors.length > 0) {
-          query.$and = [
+          // Base condition for WUBRG colors
+          const conditions = [
             { color_identity: { $all: actualWUBRGColors } },
             { $expr: { $gte: [{ $size: '$color_identity' }, 2] } },
           ];
+
+          // Handle colorless case
+          if (hasColorless) {
+            // Create an OR query to include colorless cards
+            query.$or = [{ $and: conditions }, colorlessCondition];
+          } else {
+            // Just the multicolor condition
+            query.$and = conditions;
+          }
+        } else if (hasColorless) {
+          // Only 'M' and 'C' selected, no other colors
+          query.$or = [
+            { $expr: { $gt: [{ $size: '$color_identity' }, 1] } },
+            colorlessCondition,
+          ];
         } else {
-          // This case occurs if 'M' was selected, but the only other specificColors were 'C' (or none).
-          // e.g., User selected M and C. specificColors = ['C']. actualWUBRGColors = [].
-          // This should behave like MULTICOLOR_ONLY: show all multicolor cards.
+          // Just 'M' selected - show all multicolor cards
           query.$expr = { $gt: [{ $size: '$color_identity' }, 1] };
         }
         break;
@@ -88,7 +131,6 @@ export class CardFilteringService {
       case MulticolorMode.AT_LEAST:
         // This mode implies 'M' was NOT selected.
         // specificColors here can contain W,U,B,R,G, and/or C.
-        const hasColorless = specificColors.includes('C');
         const wubrgOnlyColors = specificColors.filter(
           (c) => c !== 'C' && c !== 'M',
         );
@@ -97,17 +139,15 @@ export class CardFilteringService {
           // Has 'C' and other WUBRG colors (e.g., White OR Colorless)
           query.$or = [
             { color_identity: { $in: wubrgOnlyColors } },
-            { color_identity: { $size: 0 } },
+            colorlessCondition,
           ];
         } else if (hasColorless && wubrgOnlyColors.length === 0) {
-          // Only 'C' is selected
-          query.color_identity = { $size: 0 };
+          // Only 'C' is selected - use JUST the colorless condition
+          Object.assign(query, colorlessCondition);
         } else if (!hasColorless && wubrgOnlyColors.length > 0) {
           // Only WUBRG colors, no 'C'
           query.color_identity = { $in: wubrgOnlyColors };
         }
-        // If specificColors was empty (e.g. after filtering M, C), no color filter applied here.
-        // This state should ideally be MulticolorMode.NONE.
         break;
     }
   }

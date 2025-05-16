@@ -174,7 +174,7 @@ export function CardsProvider({
       } catch (error) {
         // Only log and update state if the error wasn't from aborting
         if (error instanceof DOMException && error.name === 'AbortError') {
-          console.log('Request was aborted due to new filter changes');
+          console.error('Request was aborted due to new filter changes');
         } else {
           console.error('Error loading cards:', error);
           if (page === 1) {
