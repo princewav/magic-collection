@@ -26,6 +26,7 @@ export enum MulticolorMode {
 export interface EnhancedFilterOptions
   extends Omit<FilterOptions, 'exactColorMatch'> {
   colorFilter: ColorFilterInfo;
+  textSearch?: string;
 }
 
 /**
@@ -61,6 +62,12 @@ export function parseFiltersFromParams(searchParams: {
   const colorFilter = processColorFilter(colors);
   filters.colors = colors; // Keep the original colors array for compatibility
   filters.colorFilter = colorFilter;
+
+  // Text search for name and type_line
+  const textSearchParam = getParam('search');
+  if (textSearchParam) {
+    filters.textSearch = textSearchParam.trim();
+  }
 
   // CMC Range
   const cmcParam = getParam('cmc');

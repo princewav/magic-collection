@@ -7,12 +7,20 @@ import { Slider } from '@/components/ui/slider';
 import { SetFilter } from './SetFilter';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, Trash2, Info } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Trash2,
+  Info,
+  Search,
+  Loader2,
+} from 'lucide-react';
 import { useCards } from '@/context/CardsContext';
 import { useCollection } from '@/context/CollectionContext';
 import { cn } from '@/lib/utils';
@@ -68,6 +76,7 @@ export function Filters({
   const urlSets = searchParams.get('sets')?.split(',') || [];
   const urlDeduplicate = searchParams.get('dedupe') !== 'false'; // Default to true
   const urlHideTokens = searchParams.get('hide_tokens') === 'true'; // Default to false
+  const urlSearch = searchParams.get('search') || '';
 
   // Parse sort fields from URL
   const urlSortParam = searchParams.get('sort');
@@ -92,6 +101,11 @@ export function Filters({
     useState<SortField[]>(urlSortFields);
   const [optimisticHideTokens, setOptimisticHideTokens] =
     useState<boolean>(urlHideTokens);
+  const [optimisticSearch, setOptimisticSearch] = useState<string>(urlSearch);
+
+  // Add a state to track if search is pending
+  const [isSearchPending, setIsSearchPending] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync optimistic states with URL when searchParams change
   useEffect(() => {
@@ -103,6 +117,7 @@ export function Filters({
     ];
     const newUrlRarities = searchParams.get('rarities')?.split(',') || [];
     const newUrlSets = searchParams.get('sets')?.split(',') || [];
+    const newUrlSearch = searchParams.get('search') || '';
 
     const newUrlSortParam = searchParams.get('sort');
     const newUrlSortFields: SortField[] = newUrlSortParam
@@ -124,6 +139,7 @@ export function Filters({
     setOptimisticSets(newUrlSets);
     setOptimisticSortFields(newUrlSortFields);
     setOptimisticHideTokens(newUrlHideTokens);
+    setOptimisticSearch(newUrlSearch);
   }, [searchParams]);
 
   // Create a debounced function to update URL with new filters
@@ -134,6 +150,7 @@ export function Filters({
           Omit<FilterOptions, 'exactColorMatch'> & {
             deduplicate?: boolean;
             hideTokens?: boolean;
+            search?: string;
           }
         >,
         preservePage = false,
@@ -198,6 +215,15 @@ export function Filters({
           }
         }
 
+        // Handle search
+        if (updates.search !== undefined) {
+          if (updates.search) {
+            newParams.set('search', updates.search);
+          } else {
+            newParams.delete('search');
+          }
+        }
+
         // Delete exact param if it exists from old URLs
         newParams.delete('exact');
 
@@ -210,8 +236,16 @@ export function Filters({
         router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
       },
       300,
-    ), // 300ms debounce delay
+    ), // 300ms debounce delay for most filters
     [searchParams, router, pathname, collectionType],
+  );
+
+  // Create a separate debounced function specifically for search with longer delay
+  const debouncedUpdateSearch = useCallback(
+    debounce((search: string) => {
+      debouncedUpdateUrlFilters({ search });
+    }, 500), // 500ms debounce delay for search
+    [debouncedUpdateUrlFilters],
   );
 
   // Handle deduplicate toggle from CardsContext
@@ -456,6 +490,38 @@ export function Filters({
     }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearch = e.target.value;
+
+    // Optimistic UI update
+    setOptimisticSearch(newSearch);
+
+    // Show search pending indicator
+    setIsSearchPending(true);
+
+    // Clear previous timeout if exists
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set a timeout to clear the pending state
+    searchTimeoutRef.current = setTimeout(() => {
+      setIsSearchPending(false);
+    }, 900); // Slightly longer than the debounce time
+
+    // Use the search-specific debounced function
+    debouncedUpdateSearch(newSearch);
+  };
+
+  // Clear the timeout when component unmounts
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <Collapsible
       open={isOpen}
@@ -478,6 +544,40 @@ export function Filters({
       <CollapsibleContent className="data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
         <div>
           <div className="flex flex-col flex-wrap items-start justify-between gap-6 sm:flex-row">
+            <div className="flex w-full min-w-[250px] flex-col gap-2">
+              <h3 className="text-xs font-medium md:text-sm">
+                Search by Name or Type
+              </h3>
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search cards..."
+                  value={optimisticSearch}
+                  onChange={handleSearchChange}
+                  className="pr-8"
+                />
+                <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center">
+                  {optimisticSearch && (
+                    <button
+                      onClick={() => {
+                        setOptimisticSearch('');
+                        debouncedUpdateUrlFilters({ search: '' });
+                      }}
+                      className="mr-1 rounded-full p-0.5 hover:bg-gray-200 focus:outline-none"
+                      aria-label="Clear search"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-gray-400" />
+                    </button>
+                  )}
+                  {isSearchPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  ) : (
+                    <Search className="h-4 w-4 text-gray-400" />
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="flex min-w-fit flex-col gap-2">
               <div className="flex items-center">
                 <h3 className="text-xs font-medium md:text-sm">Colors</h3>

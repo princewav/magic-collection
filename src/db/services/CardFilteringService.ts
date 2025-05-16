@@ -14,6 +14,7 @@ interface FilterOptions {
   }>;
   sets?: string[];
   colorFilter?: ColorFilterInfo; // Added for enhanced filtering
+  textSearch?: string; // Added for searching by name and type line
 }
 
 const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
@@ -40,6 +41,16 @@ export class CardFilteringService {
 
     if (filters.sets && filters.sets.length > 0) {
       query.set = { $in: filters.sets.map((set) => set.toLowerCase()) };
+    }
+
+    // Apply text search filtering on name and type_line
+    if (filters.textSearch && filters.textSearch.trim() !== '') {
+      const searchTerm = filters.textSearch.trim();
+      // Create a case-insensitive regex for partial matching
+      const searchRegex = new RegExp(searchTerm, 'i');
+
+      // Search in both name and type_line using $or
+      query.$or = [{ name: searchRegex }, { type_line: searchRegex }];
     }
   }
 

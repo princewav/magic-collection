@@ -26,6 +26,7 @@ export interface FilterOptions {
     order: 'asc' | 'desc';
   }>;
   hideTokens?: boolean;
+  textSearch?: string;
 }
 
 export async function loadCardsById(ids: string[]): Promise<Card[]> {
@@ -180,7 +181,18 @@ const buildMatchStage = (
     matchConditions[`${lookupPrefix}type_line`] = { $not: /\bToken\b/i };
   }
 
-  // Add more filters here based on FilterOptions (e.g., name search on cardDetails.name)
+  // Add text search for name and type_line
+  if (filters.textSearch && filters.textSearch.trim() !== '') {
+    const searchTerm = filters.textSearch.trim();
+    const searchRegex = new RegExp(searchTerm, 'i');
+
+    // Search in both name and type_line
+    matchConditions.$or = [
+      ...(matchConditions.$or || []),
+      { [`${lookupPrefix}name`]: searchRegex },
+      { [`${lookupPrefix}type_line`]: searchRegex },
+    ];
+  }
 
   return { $match: matchConditions };
 };
@@ -397,7 +409,6 @@ export async function loadMoreCollectionCards(
 
     // If colorless filter and no results, show first 5 cards that should match
     if (filters.colors?.includes('C') && results.length === 0) {
-
       // Try to find any colorless cards directly
       const colorlessCheck = await db
         .collection('cards')
