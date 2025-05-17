@@ -176,10 +176,9 @@ const buildMatchStage = (
 
   // Add filter for hideTokens
   if (filters.hideTokens) {
-    // This regex will match if "Token" is a whole word in the type_line, case-insensitive.
-    // It aims to exclude cards that are primarily tokens, e.g., "Token Creature — Spirit"
-    // but not cards that might mention tokens in other ways, if any.
-    matchConditions[`${lookupPrefix}type_line`] = { $not: /\bToken\b/i };
+    // This regex will match if "Token" or "Card" is a whole word in the type_line, case-insensitive.
+    // It aims to exclude cards that are primarily tokens or cards, e.g., "Token Creature — Spirit" or "Card — Artifact"
+    matchConditions[`${lookupPrefix}type_line`] = { $not: /\b(Token|Card)\b/i };
   }
 
   // Add text search for name and type_line
