@@ -40,7 +40,7 @@ export function UserMenu({ session: initialSession }: UserMenuProps) {
   if (!session) {
     return (
       <Link href="/auth/login">
-        <Button variant="ghost" size="sm">
+        <Button size="sm">
           Sign in
         </Button>
       </Link>

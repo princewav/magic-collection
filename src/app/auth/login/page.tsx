@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { FcGoogle } from 'react-icons/fc';
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -110,7 +112,7 @@ export default function LoginPage() {
             className="w-full"
             onClick={() => signIn('google', { callbackUrl })}
           >
-            <Mail className="mr-2 h-4 w-4" />
+            <FcGoogle className="mr-2 h-4 w-4" />
             Continue with Google
           </Button>
         </div>
