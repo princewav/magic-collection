@@ -14,6 +14,7 @@ import { MdOutlineCollectionsBookmark } from 'react-icons/md';
 import { MdCollectionsBookmark } from 'react-icons/md';
 import { FaHeart } from 'react-icons/fa';
 import { FaRegHeart } from 'react-icons/fa';
+import { GoHome, GoHomeFill } from 'react-icons/go';
 
 interface NavLinkProps {
   href: string;
@@ -190,6 +191,21 @@ export default function MobileNavbar() {
 
       {/* Bottom Navigation Bar */}
       <div className="bg-background fixed right-0 bottom-0 left-0 z-50 flex border-t">
+        <Link
+          href="/"
+          className={cn(
+            'hover:bg-secondary/30 focus:bg-accent/20 flex flex-col items-center justify-center gap-1 p-3',
+            pathname === '/' &&
+              'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300',
+          )}
+        >
+          {pathname === '/' ? (
+            <GoHomeFill className="text-accent h-4 w-4" />
+          ) : (
+            <GoHome className="text-accent h-4 w-4" />
+          )}
+          <span className="text-xs">Home</span>
+        </Link>
         {session && (
           <div className="grid w-full grid-cols-3">
             <NavButton
@@ -224,9 +240,9 @@ export default function MobileNavbar() {
               ref={wishlistLinkRef}
               href="/wishlists"
               className={cn(
-                'flex flex-col items-center justify-center gap-1 py-2',
+                'hover:bg-secondary/30 focus:bg-accent/20 flex flex-col items-center justify-center gap-1 py-2 transition-all duration-300',
                 pathname.includes('/wishlists')
-                  ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
+                  ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold'
                   : '',
               )}
               onClick={() => setActiveDropdown(null)}
@@ -240,9 +256,9 @@ export default function MobileNavbar() {
             </Link>
           </div>
         )}
-        <div className="mx-3 flex items-center ml-auto gap-2 p-3">
+        <div className="mx-3 ml-auto flex items-center gap-2 p-3">
           {status === 'loading' ? (
-              <LoadingSpinner />
+            <LoadingSpinner />
           ) : (
             <UserMenu session={session} />
           )}
