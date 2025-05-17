@@ -255,7 +255,12 @@ export class CardFilteringService {
           },
         },
       });
-      // _colorIdentitySizeValue is no longer needed here for _colorCategory
+      // Add size of color_identity for sorting multicolor cards by number of colors
+      stages.push({
+        $addFields: {
+          _multicolorIdentitySize: { $size: '$_colorIdentityArray' },
+        },
+      });
 
       stages.push({
         $addFields: {
@@ -264,10 +269,22 @@ export class CardFilteringService {
       });
       stages.push({
         $addFields: {
-          _multicolorSortKey: {
+          _multicolorIdentityString: {
             $cond: {
               if: { $eq: ['$_colorCategory', 'M'] },
-              then: '$_colorIdentityArray',
+              then: {
+                $reduce: {
+                  input: '$_colorIdentityArray',
+                  initialValue: '',
+                  in: {
+                    $concat: [
+                      '$$value',
+                      { $cond: [{ $eq: ['$$value', ''] }, '', ','] }, // Add comma separator if not the first element
+                      '$$this',
+                    ],
+                  },
+                },
+              },
               else: null,
             },
           },
@@ -306,7 +323,8 @@ export class CardFilteringService {
           case 'color_identity':
           case 'colors':
             sortStage._colorIndex = sortDirection;
-            sortStage._multicolorSortKey = sortDirection;
+            sortStage._multicolorIdentitySize = sortDirection; // Sort by number of colors in identity
+            sortStage._multicolorIdentityString = sortDirection; // Then by the identity string
             sortStage._isLandForSort = 1; // Always sort lands last (0 before 1)
             break;
           case 'collector_number':
@@ -406,7 +424,8 @@ export class CardFilteringService {
         projectFields._actualColorsArrayForSort = 0;
         projectFields._actualColorsSizeForSort = 0;
         projectFields._colorIdentityArray = 0;
-        projectFields._multicolorSortKey = 0;
+        projectFields._multicolorIdentitySize = 0;
+        projectFields._multicolorIdentityString = 0;
         projectFields._isLandForSort = 0;
       }
     }
