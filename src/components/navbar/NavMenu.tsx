@@ -8,9 +8,11 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { TbCards, TbCardsFilled } from 'react-icons/tb';
-import { MdCollectionsBookmark, MdOutlineCollectionsBookmark } from 'react-icons/md';
+import {
+  MdCollectionsBookmark,
+  MdOutlineCollectionsBookmark,
+} from 'react-icons/md';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-
 
 type AnimatedDropdownProps = {
   trigger: React.ReactNode | ((isOpen: boolean) => React.ReactNode);

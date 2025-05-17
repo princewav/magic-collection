@@ -190,56 +190,62 @@ export default function MobileNavbar() {
 
       {/* Bottom Navigation Bar */}
       <div className="bg-background fixed right-0 bottom-0 left-0 z-50 flex border-t">
-        <div className="grid w-full grid-cols-3">
-          <NavButton
-            ref={decksButtonRef}
-            label="Decks"
-            icon={
-              pathname.includes('/decks') ? (
-                <TbCardsFilled className="text-accent h-4 w-4" />
-              ) : (
-                <TbCards className="text-accent h-4 w-4" />
-              )
-            }
-            isActive={pathname.includes('/decks')}
-            onClick={() => toggleDropdown('decks')}
-          />
+        {session && (
+          <div className="grid w-full grid-cols-3">
+            <NavButton
+              ref={decksButtonRef}
+              label="Decks"
+              icon={
+                pathname.includes('/decks') ? (
+                  <TbCardsFilled className="text-accent h-4 w-4" />
+                ) : (
+                  <TbCards className="text-accent h-4 w-4" />
+                )
+              }
+              isActive={pathname.includes('/decks')}
+              onClick={() => toggleDropdown('decks')}
+            />
 
-          <NavButton
-            ref={collectButtonRef}
-            label="Collect"
-            icon={
-              pathname.includes('/collection') ? (
-                <MdCollectionsBookmark className="text-accent h-4 w-4" />
-              ) : (
-                <MdOutlineCollectionsBookmark className="text-accent h-4 w-4" />
-              )
-            }
-            isActive={pathname.includes('/collection')}
-            onClick={() => toggleDropdown('collect')}
-          />
+            <NavButton
+              ref={collectButtonRef}
+              label="Collect"
+              icon={
+                pathname.includes('/collection') ? (
+                  <MdCollectionsBookmark className="text-accent h-4 w-4" />
+                ) : (
+                  <MdOutlineCollectionsBookmark className="text-accent h-4 w-4" />
+                )
+              }
+              isActive={pathname.includes('/collection')}
+              onClick={() => toggleDropdown('collect')}
+            />
 
             <Link
               ref={wishlistLinkRef}
-            href="/wishlists"
-            className={cn(
-              'flex flex-col items-center justify-center gap-1 py-2',
-              pathname.includes('/wishlists')
-                ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
-                : '',
-            )}
-            onClick={() => setActiveDropdown(null)}
-          >
-            {pathname.includes('/wishlists') ? (
+              href="/wishlists"
+              className={cn(
+                'flex flex-col items-center justify-center gap-1 py-2',
+                pathname.includes('/wishlists')
+                  ? 'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300'
+                  : '',
+              )}
+              onClick={() => setActiveDropdown(null)}
+            >
+              {pathname.includes('/wishlists') ? (
                 <FaHeart className="text-accent h-4 w-4" />
               ) : (
                 <FaRegHeart className="text-accent h-4 w-4" />
               )}
-            <span className="text-xs">Wishlists</span>
-          </Link>
-        </div>
-        <div className="mx-3 flex items-center gap-2">
-          <UserMenu session={session} />
+              <span className="text-xs">Wishlists</span>
+            </Link>
+          </div>
+        )}
+        <div className="mx-3 flex items-center ml-auto gap-2 p-3">
+          {status === 'loading' ? (
+              <LoadingSpinner />
+          ) : (
+            <UserMenu session={session} />
+          )}
         </div>
       </div>
     </div>
