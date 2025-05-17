@@ -13,7 +13,9 @@ async function getCurrentUserId(): Promise<string> {
   return session.user.id;
 }
 
-async function loadWishlistCards(wishlist: DBWishlist): Promise<Wishlist> {
+export async function loadWishlistCards(
+  wishlist: DBWishlist,
+): Promise<Wishlist> {
   const cardIds = wishlist.cards.map((card) => card.cardId);
   const cards = await loadCardsById(cardIds);
 
@@ -32,7 +34,6 @@ async function loadWishlistCards(wishlist: DBWishlist): Promise<Wishlist> {
 export async function loadWishlistById(id: string): Promise<Wishlist | null> {
   try {
     const userId = await getCurrentUserId();
-    // Pass userId to findById
     const wishlist = await wishlistService.findById(userId, id);
     if (!wishlist) {
       return null;
@@ -45,10 +46,21 @@ export async function loadWishlistById(id: string): Promise<Wishlist | null> {
   }
 }
 
+export async function loadWishlistWithoutCards(
+  id: string,
+): Promise<DBWishlist | null> {
+  try {
+    const userId = await getCurrentUserId();
+    return await wishlistService.findById(userId, id);
+  } catch (e) {
+    console.error(e);
+    throw new Error('Failed to load wishlist');
+  }
+}
+
 export async function loadWishlists(): Promise<Wishlist[]> {
   try {
     const userId = await getCurrentUserId();
-    // Use findByUserId instead of getAll
     const wishlists = await wishlistService.findByUserId(userId);
     return await Promise.all(wishlists.map(loadWishlistCards));
   } catch (e) {
