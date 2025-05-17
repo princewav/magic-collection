@@ -4,6 +4,9 @@ import { useCardModal } from '@/context/CardModalContext';
 import Image from 'next/image';
 import { Card as CardType } from '@/types/card';
 import { cn } from '@/lib/utils';
+import { ChevronDown, Repeat } from 'lucide-react';
+import { useState } from 'react';
+
 interface CardProps {
   card: CardType & { quantity: number };
   collectedQuantity?: number;
@@ -41,6 +44,17 @@ export function Card({
   onClick,
 }: CardProps) {
   const { openModal } = useCardModal();
+  const [faceIndex, setFaceIndex] = useState(0);
+
+  // Check if this is a double-faced card with faces that have images
+  const isReversibleWithFaces =
+    (card.layout === 'reversible_card' ||
+      card.layout === 'modal_dfc' ||
+      card.layout === 'transform') &&
+    !card.image_uris &&
+    card.card_faces &&
+    card.card_faces.length > 0 &&
+    card.card_faces[0].image_uris !== undefined;
 
   const handleClick = () => {
     if (onClick) {
@@ -50,11 +64,16 @@ export function Card({
     }
   };
 
+  const toggleFace = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFaceIndex(faceIndex === 0 ? 1 : 0);
+  };
+
   return (
     <div
       data-role="card-container"
       className={cn(
-        'relative flex h-full w-full transform cursor-pointer flex-col items-center justify-center rounded-mdshadow-md transition-transform',
+        'rounded-mdshadow-md relative flex h-full w-full transform cursor-pointer flex-col items-center justify-center transition-transform',
         className,
       )}
       onClick={handleClick}
@@ -83,7 +102,33 @@ export function Card({
           ))}
         </div>
       )}
-      {card.image_uris?.normal ? (
+
+      {isReversibleWithFaces && card.card_faces ? (
+        <div className="relative">
+          <Image
+            src={
+              card.card_faces[faceIndex].image_uris?.normal ??
+              '/images/placeholder.webp'
+            }
+            alt={`Card ${card.card_faces[faceIndex].name}`}
+            className="h-auto w-full rounded-xl"
+            width={400}
+            height={550}
+            style={{ aspectRatio: '0.72', width: '100%', height: 'auto' }}
+          />
+
+          {/* Flip face button */}
+          {card.card_faces.length > 1 && (
+            <button
+              onClick={toggleFace}
+              className="absolute right-2 bottom-2 rounded-full bg-black/70 p-1 text-white hover:bg-black/90 cursor-pointer"
+              aria-label="Flip card"
+            >
+              <Repeat className="h-5 w-5" />
+            </button>
+          )}
+        </div>
+      ) : card.image_uris?.normal ? (
         <Image
           src={card.image_uris.normal}
           alt={`Card ${card.name}`}

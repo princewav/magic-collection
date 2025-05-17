@@ -9,6 +9,16 @@ export type CardFace = {
   artist: string;
   artist_id: string;
   illustration_id?: string;
+  image_uris?: {
+    small: string;
+    normal: string;
+    large: string;
+    png: string;
+    art_crop: string;
+    border_crop: string;
+  };
+  colors?: string[];
+  cmc?: number;
 };
 
 export type Card = {
@@ -192,4 +202,5 @@ export enum Layout {
   FLIP = 'flip',
   TRANSFORM = 'transform',
   MODAL_DFC = 'modal_dfc',
+  REVERSIBLE_CARD = 'reversible_card',
 }

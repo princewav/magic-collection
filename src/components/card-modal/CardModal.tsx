@@ -24,10 +24,28 @@ export default function CardModal() {
   const [selectedFaceIndex, setSelectedFaceIndex] = useState<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  const currentFace: CardFace | null = card?.card_faces
-    ? card.card_faces[selectedFaceIndex]
-    : (card as CardFace | null);
   const hasMultipleFaces = card?.card_faces && card.card_faces.length > 1;
+  const isDoubleFaced =
+    card?.layout === 'reversible_card' ||
+    card?.layout === 'modal_dfc' ||
+    card?.layout === 'transform';
+
+  const currentFace = hasMultipleFaces
+    ? card?.card_faces?.[selectedFaceIndex] || null
+    : card;
+
+  const getCardImageUrl = () => {
+    if (!card) return '/images/placeholder.webp';
+
+    if (hasMultipleFaces && (!card.image_uris || isDoubleFaced)) {
+      return (
+        card.card_faces?.[selectedFaceIndex]?.image_uris?.normal ||
+        '/images/placeholder.webp'
+      );
+    }
+
+    return card.image_uris?.normal || '/images/placeholder.webp';
+  };
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -145,7 +163,7 @@ export default function CardModal() {
             ) : (
               <div className="relative flex h-[300px] w-[223px] items-center justify-center overflow-hidden rounded-3xl md:h-[500px] md:w-[360px]">
                 <Image
-                  src={card?.image_uris?.normal || '/images/placeholder.webp'}
+                  src={getCardImageUrl()}
                   alt={currentFace?.name || 'Card image'}
                   fill
                   priority
@@ -178,7 +196,7 @@ export default function CardModal() {
                 </div>
               )}
               <div className="flex flex-row justify-between md:flex-col md:space-y-1">
-                <h2 className="p-2 pb-0 text-left text-xl font-bold md:text-2xl normal-case">
+                <h2 className="p-2 pb-0 text-left text-xl font-bold normal-case md:text-2xl">
                   {currentFace?.name}
                 </h2>
                 {currentFace?.mana_cost && (

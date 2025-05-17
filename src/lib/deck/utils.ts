@@ -39,7 +39,20 @@ export function groupCardsByType(
   }
 
   cards.forEach((card) => {
-    const typeLine = card.type_line || '';
+    // Get the type line, considering both regular cards and cards with card_faces
+    let typeLine = '';
+
+    // For regular cards, use the card's type_line
+    if (card.type_line) {
+      typeLine = card.type_line;
+    }
+    // For reversible_card layouts or other multi-faced cards without a main type_line
+    else if (card.card_faces && card.card_faces.length > 0) {
+      // For reversible cards, prioritize the main face (usually the first face)
+      // For adventure cards, the first face is the creature
+      typeLine = card.card_faces[0].type_line || '';
+    }
+
     const primaryType = typeLine.split(' — ')[0]?.trim().toLowerCase() || '';
     let groupAssigned = false;
 

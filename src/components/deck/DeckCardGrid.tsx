@@ -272,7 +272,7 @@ export function DeckCardGrid({
                         <div className="flex h-6 w-6 items-center justify-center rounded-full text-sm font-semibold">
                           {card.quantity}x
                         </div>
-                        {card.image_uris?.art_crop && (
+                        {card.image_uris?.art_crop ? (
                           <Image
                             src={card.image_uris.art_crop}
                             alt=""
@@ -280,17 +280,29 @@ export function DeckCardGrid({
                             height={40}
                             className="size-7 rounded-sm object-cover sm:size-9"
                           />
-                        )}
-                        {/* {collectedCards?.find((c) => c.name === card.name)
-                          ?.quantity ? (
-                          <div className="bg-accent h-2 w-2 rotate-45 transform" />
-                        ) : null} */}
+                        ) : card.card_faces &&
+                          card.card_faces[0].image_uris?.art_crop ? (
+                          <Image
+                            src={card.card_faces[0].image_uris.art_crop}
+                            alt=""
+                            width={40}
+                            height={40}
+                            className="size-7 rounded-sm object-cover sm:size-9"
+                          />
+                        ) : null}
                       </div>
                       {/* Main Content Area */}
                       <div className="ml-2 flex w-full gap-2 truncate sm:flex-col sm:gap-0">
                         {/* Row 1: Name */}
                         <div>
-                          <span className="min-w-0 flex-1">{card.name}</span>
+                          <span className="min-w-0 flex-1">
+                            {(card.layout === 'reversible_card' ||
+                              card.layout === 'modal_dfc' ||
+                              card.layout === 'transform') &&
+                            card.card_faces
+                              ? `${card.card_faces[0].name} // ${card.card_faces[1]?.name || ''}`
+                              : card.name}
+                          </span>
                         </div>
                         {/* Row 2: Set + Mana */}
                         <div className="flex w-full items-center justify-between gap-2 sm:justify-start">
@@ -306,29 +318,64 @@ export function DeckCardGrid({
                               />
                             </p>
                           )}
+                          {!card.mana_cost &&
+                            card.card_faces &&
+                            card.card_faces[0].mana_cost && (
+                              <p className="flex items-center">
+                                <TextWithSymbols
+                                  text={card.card_faces[0].mana_cost}
+                                  symbolSize={16}
+                                  symbolClassName="mx-0.5"
+                                />
+                              </p>
+                            )}
                         </div>
                       </div>
                     </div>
                     {/* Right side: Type Line & P/T */}
                     <div className="ml-4 hidden flex-col items-end text-right sm:flex">
                       <span className="text-muted-foreground min-w-0 truncate text-xs">
-                        {card.type_line?.split(' — ')[0]}
+                        {card.type_line
+                          ? card.type_line.split(' — ')[0]
+                          : card.card_faces && card.card_faces[0].type_line
+                            ? card.card_faces[0].type_line.split(' — ')[0]
+                            : ''}
                       </span>
                       {/* Combined second type line part and P/T */}
                       {(card.type_line?.includes(' — ') ||
-                        (card.power != null && card.toughness != null)) && (
+                        (card.card_faces &&
+                          card.card_faces[0].type_line?.includes(' — ')) ||
+                        (card.power != null && card.toughness != null) ||
+                        (card.card_faces &&
+                          card.card_faces[0].power != null &&
+                          card.card_faces[0].toughness != null)) && (
                         <span className="text-muted-foreground/60 min-w-0 truncate text-xs">
-                          {card.type_line?.includes(' — ') &&
-                            card.type_line?.split(' — ')[1]}
-                          {card.type_line?.includes(' — ') &&
-                            card.power != null &&
-                            card.toughness != null &&
+                          {card.type_line?.includes(' — ')
+                            ? card.type_line?.split(' — ')[1]
+                            : card.card_faces &&
+                                card.card_faces[0].type_line?.includes(' — ')
+                              ? card.card_faces[0].type_line?.split(' — ')[1]
+                              : ''}
+                          {(card.type_line?.includes(' — ') ||
+                            (card.card_faces &&
+                              card.card_faces[0].type_line?.includes(' — '))) &&
+                            ((card.power != null && card.toughness != null) ||
+                              (card.card_faces &&
+                                card.card_faces[0].power != null &&
+                                card.card_faces[0].toughness != null)) &&
                             ' - '}
-                          {card.power != null && card.toughness != null && (
+                          {card.power != null && card.toughness != null ? (
                             <span className="font-semibold">
                               {card.power}/{card.toughness}
                             </span>
-                          )}
+                          ) : card.card_faces &&
+                            card.card_faces[0].power != null &&
+                            card.card_faces[0].toughness != null ? (
+                            <span className="font-semibold">
+                              {card.card_faces[0].power}/
+                              {card.card_faces[0].toughness}
+                            </span>
+                          ) : null}
                         </span>
                       )}
                     </div>
