@@ -191,23 +191,23 @@ export default function MobileNavbar() {
 
       {/* Bottom Navigation Bar */}
       <div className="bg-background fixed right-0 bottom-0 left-0 z-50 flex border-t">
-        <Link
-          href="/"
-          className={cn(
-            'hover:bg-secondary/30 focus:bg-accent/20 flex flex-col items-center justify-center gap-1 p-3',
-            pathname === '/' &&
-              'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300',
-          )}
-        >
-          {pathname === '/' ? (
-            <GoHomeFill className="text-accent h-4 w-4" />
-          ) : (
-            <GoHome className="text-accent h-4 w-4" />
-          )}
-          <span className="text-xs">Home</span>
-        </Link>
-        {session && (
-          <div className="grid w-full grid-cols-3">
+        {session ? (
+          <div className="grid w-full grid-cols-4">
+            <Link
+              href="/"
+              className={cn(
+                'hover:bg-secondary/30 focus:bg-accent/20 flex flex-col items-center justify-center gap-1 p-3',
+                pathname === '/' &&
+                  'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300',
+              )}
+            >
+              {pathname === '/' ? (
+                <GoHomeFill className="text-accent h-4 w-4" />
+              ) : (
+                <GoHome className="text-accent h-4 w-4" />
+              )}
+              <span className="text-xs">Home</span>
+            </Link>
             <NavButton
               ref={decksButtonRef}
               label="Decks"
@@ -255,6 +255,22 @@ export default function MobileNavbar() {
               <span className="text-xs">Wishlists</span>
             </Link>
           </div>
+        ) : (
+          <Link
+            href="/"
+            className={cn(
+              'hover:bg-secondary/30 focus:bg-accent/20 flex w-full flex-col items-center justify-center gap-1 p-3',
+              pathname === '/' &&
+                'bg-secondary/30 hover:bg-secondary/50 dark:bg-primary/10 dark:hover:bg-primary/20 font-semibold transition-all duration-300',
+            )}
+          >
+            {pathname === '/' ? (
+              <GoHomeFill className="text-accent h-4 w-4" />
+            ) : (
+              <GoHome className="text-accent h-4 w-4" />
+            )}
+            <span className="text-xs">Home</span>
+          </Link>
         )}
         <div className="mx-3 ml-auto flex items-center gap-2 p-3">
           {status === 'loading' ? (
