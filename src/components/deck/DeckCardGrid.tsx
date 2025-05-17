@@ -207,30 +207,38 @@ export function DeckCardGrid({
                 )}
                 )
               </h2>
-              <div className="relative justify-center gap-4 sm:grid sm:grid-cols-[repeat(auto-fit,_minmax(200px,250px))] sm:space-y-0">
-                {cardsInGroup.map((card: CardWithQuantity) => (
-                  <div
-                    key={card.id}
-                    className="group relative mb-4 sm:mb-0"
-                    onClick={() => openModal(card, cardsWithQuantity)}
-                  >
+              <div className="w-full">
+                {' '}
+                {/* Or appropriate width context */}
+                {/* This is the container for your cards */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  {cardsInGroup.map((card: CardWithQuantity) => (
+                    // Each card item
+                    // Choose a width that fits your card and is within your original minmax(200px, 250px) range.
+                    // For example, w-56 (224px), w-60 (240px), or w-[250px].
                     <div
-                      className="absolute inset-0 flex items-center justify-center"
-                      onClick={(e) => e.stopPropagation()}
+                      key={card.id}
+                      className="group relative w-[240px]" // Example fixed width for flex items
+                      onClick={() => openModal(card, cardsWithQuantity)}
                     >
-                      <QuantityButton card={card} sign="+" />
-                      <QuantityButton card={card} sign="-" />
+                      <div
+                        className="absolute inset-0 flex items-center justify-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <QuantityButton card={card} sign="+" />
+                        <QuantityButton card={card} sign="-" />
+                      </div>
+                      <Card
+                        card={card}
+                        collectedQuantity={
+                          collectedCards?.find((c) => c.name === card.name)
+                            ?.quantity || 0
+                        }
+                        className="w-full hover:scale-105" // Card component takes full width of its w-[240px] parent
+                      />
                     </div>
-                    <Card
-                      card={card}
-                      collectedQuantity={
-                        collectedCards?.find((c) => c.name === card.name)
-                          ?.quantity || 0
-                      }
-                      className="mx-auto w-full max-w-[320px]"
-                    />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           ))}

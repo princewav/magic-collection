@@ -54,7 +54,7 @@ export function Card({
     <div
       data-role="card-container"
       className={cn(
-        'bg-foreground/10 relative flex h-full w-full transform cursor-pointer flex-col items-center justify-center rounded-md p-2 shadow-md transition-transform',
+        'relative flex h-full w-full transform cursor-pointer flex-col items-center justify-center rounded-mdshadow-md transition-transform',
         className,
       )}
       onClick={handleClick}
