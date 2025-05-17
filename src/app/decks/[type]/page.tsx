@@ -16,15 +16,30 @@ export const metadata: Metadata = {
   description: 'View your decks.',
 };
 
-export default async function DecksPage({ params }: Props) {
-  const { type } = await params;
-  const decks = await loadDecks(type);
+// Async component to load decks with suspense
+async function DecksContent({ type }: { type: 'paper' | 'arena' }) {
+  try {
+    const decks = await loadDecks(type);
 
-  return (
-    <Suspense fallback={<DecksListSkeleton />}>
+    return (
       <DeckSelectionProvider>
         <DecksListContainer decks={decks} type={type} />
       </DeckSelectionProvider>
-    </Suspense>
+    );
+  } catch (error) {
+    console.error('Error loading decks:', error);
+    throw error;
+  }
+}
+
+export default async function DecksPage({ params }: Props) {
+  const { type } = await params;
+
+  return (
+    <main className="container mx-auto p-6">
+      <Suspense fallback={<DecksListSkeleton />}>
+        <DecksContent type={type} />
+      </Suspense>
+    </main>
   );
 }

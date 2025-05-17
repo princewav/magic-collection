@@ -2,13 +2,22 @@
 
 import { Skeleton } from '@/components/ui/skeleton';
 
+export function DecksHeaderSkeleton() {
+  return (
+    <div className="mb-4 flex items-center justify-between">
+      <Skeleton className="h-8 w-32" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-10 w-24" />
+      </div>
+    </div>
+  );
+}
+
 export function DecksListSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-4 flex items-center justify-between">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-10 w-24" />
-      </div>
+      <DecksHeaderSkeleton />
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index} className="rounded-lg border p-4">
