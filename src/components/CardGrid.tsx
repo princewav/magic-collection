@@ -41,12 +41,17 @@ export function CardGrid({
   const loadingRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
+  // Determine if we're using server-loaded data via initialCards
+  const isServerLoaded = Boolean(initialCards && initialCards.length > 0);
+
   const cards = collectionType
     ? collectedCardsFromContext
     : generalCardsFromContext;
-  const isLoading = collectionType
-    ? collectionLoadingFromContext
-    : generalLoadingFromContext;
+  const isLoading = isServerLoaded
+    ? false
+    : collectionType
+      ? collectionLoadingFromContext
+      : generalLoadingFromContext;
   const total = collectionType
     ? collectionTotalFromContext
     : generalTotalFromContext;
@@ -95,7 +100,8 @@ export function CardGrid({
     return null;
   }
 
-  const showEmptyState = cards.length === 0 && !isLoading;
+  // Only show empty state if we're not loading server data
+  const showEmptyState = !isServerLoaded && cards.length === 0 && !isLoading;
 
   return (
     <div className="relative">
@@ -139,7 +145,7 @@ export function CardGrid({
         </div>
       )}
       <div ref={loadingRef} className="h-10 w-full">
-        {isLoading && (
+        {isLoading && !isServerLoaded && (
           <div className="flex justify-center py-4">
             <LoadingSpinner />
           </div>
