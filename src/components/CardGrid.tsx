@@ -40,6 +40,8 @@ export function CardGrid({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isIntersecting, setIsIntersecting] = useState(false);
 
   // Determine if we're using server-loaded data via initialCards
   const isServerLoaded = Boolean(initialCards && initialCards.length > 0);
@@ -61,24 +63,52 @@ export function CardGrid({
 
   useEffect(() => {
     setIsMounted(true);
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+    };
   }, []);
 
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
+      setIsIntersecting(target.isIntersecting);
+
       if (target.isIntersecting && !isLoading && cards.length < total) {
-        loadNextPage();
+        // Use a small delay to prevent multiple triggers
+        if (loadingTimerRef.current) {
+          clearTimeout(loadingTimerRef.current);
+        }
+
+        loadingTimerRef.current = setTimeout(() => {
+          loadNextPage();
+        }, 150);
       }
     },
     [isLoading, loadNextPage, cards.length, total],
   );
+
+  // Re-attempt loading when the loading state changes or cards array changes
+  useEffect(() => {
+    if (isIntersecting && !isLoading && cards.length < total) {
+      // Try loading more after loading state changes
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+
+      loadingTimerRef.current = setTimeout(() => {
+        loadNextPage();
+      }, 150);
+    }
+  }, [isLoading, cards.length, total, isIntersecting, loadNextPage]);
 
   useEffect(() => {
     if (!isMounted) return;
 
     const options = {
       root: null,
-      rootMargin: '20px',
+      rootMargin: '100px', // Increased from 20px to 100px for earlier detection
       threshold: 0,
     };
 
@@ -144,7 +174,7 @@ export function CardGrid({
           ))}
         </div>
       )}
-      <div ref={loadingRef} className="h-10 w-full">
+      <div ref={loadingRef} className="h-20 w-full">
         {isLoading && !isServerLoaded && (
           <div className="flex justify-center py-4">
             <LoadingSpinner />

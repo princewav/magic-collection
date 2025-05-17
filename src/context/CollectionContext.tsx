@@ -13,6 +13,19 @@ import { Card } from '@/types/card';
 import { fetchCollectionCards } from '@/actions/card/load-cards';
 import { FilterOptions } from '@/actions/card/load-cards';
 
+// Simple debounce function
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number,
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+
+  return function (...args: Parameters<T>) {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
+
 interface CollectionContextType {
   collectedCards: (Card & { quantity: number })[];
   isLoading: boolean;
@@ -58,6 +71,8 @@ export function CollectionProvider({
 
   // Reference to the current abort controller
   const currentAbortController = useRef<AbortController | null>(null);
+  // Track if a filter change is pending to avoid duplicate requests
+  const pendingFilterChange = useRef(false);
 
   // Update filters when initialFilters changes
   useEffect(() => {
@@ -113,15 +128,28 @@ export function CollectionProvider({
         if (currentAbortController.current === abortController) {
           setIsLoading(false);
           currentAbortController.current = null;
+          pendingFilterChange.current = false;
         }
       }
     },
     [currentFilters, collectionType],
   );
 
+  // Create a debounced version of the fetchCollectedCards function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedFetchCollectedCards = useCallback(
+    debounce(async (pageNum = 1) => {
+      await fetchCollectedCards(pageNum);
+    }, 300), // 300ms debounce to match the one in Filters.tsx
+    [fetchCollectedCards],
+  );
+
   // Fetch cards when filters change
   useEffect(() => {
-    fetchCollectedCards(1);
+    if (pendingFilterChange.current) return;
+
+    pendingFilterChange.current = true;
+    debouncedFetchCollectedCards(1);
 
     // Cleanup function for aborting the request when dependencies change
     return () => {
@@ -130,13 +158,15 @@ export function CollectionProvider({
         currentAbortController.current = null;
       }
     };
-  }, [currentFilters, collectionType, fetchCollectedCards]);
+  }, [currentFilters, collectionType, debouncedFetchCollectedCards]);
 
   const loadNextPage = useCallback(() => {
+    if (isLoading || pendingFilterChange.current) return;
+
     const nextPage = page + 1;
     setPage(nextPage);
     fetchCollectedCards(nextPage);
-  }, [page, fetchCollectedCards]);
+  }, [page, fetchCollectedCards, isLoading]);
 
   const applyFilter = useCallback((filterOptions: FilterOptions) => {
     setCurrentFilters(filterOptions);

@@ -88,11 +88,14 @@ export default async function CollectionPage({
   );
   const totalUnique = collectionCards.length;
 
+  // For initial server-side rendering, fetch all cards needed for the first page
+  // This prevents flickering and ensures the UI is populated immediately
   const initialCardIds = collectionCards
     .slice(0, pageSize)
     .map((card) => card.cardId);
   const initialCardsData = await loadCardsById(initialCardIds);
 
+  // Combine card data with quantities from collection
   const initialCardsWithQuantity = initialCardsData.map((card) => ({
     ...card,
     quantity:
