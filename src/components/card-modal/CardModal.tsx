@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useCardModal } from '@/context/CardModalContext';
 import { X, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,8 @@ import { TextWithSymbols } from './TextWithSymbols';
 import { CardFace } from '@/types/card';
 
 export default function CardModal() {
+  const pathname = usePathname();
+  const previousPathnameRef = useRef<string | null>(null);
   const {
     isOpen,
     card,
@@ -71,6 +74,20 @@ export default function CardModal() {
     },
     [isOpen, hasNextCard, hasPrevCard, goToNextCard, goToPrevCard, closeModal],
   );
+
+  // Close modal when pathname changes (page navigation)
+  useEffect(() => {
+    // Only check for pathname changes after initial render
+    if (
+      previousPathnameRef.current !== null &&
+      previousPathnameRef.current !== pathname &&
+      isOpen
+    ) {
+      closeModal();
+    }
+
+    previousPathnameRef.current = pathname;
+  }, [pathname, closeModal, isOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
