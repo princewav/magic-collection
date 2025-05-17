@@ -496,7 +496,6 @@ export async function loadFilteredCards(
       pageSize,
       deduplicate,
     );
-    console.log('colors', cards.map((c) => [c.name, c.colors]));
     return { cards, total };
   } catch (error) {
     console.error('Error loading filtered cards:', error);

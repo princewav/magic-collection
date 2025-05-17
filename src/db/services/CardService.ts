@@ -60,14 +60,30 @@ export class CardService extends BaseService<Card> {
       return [];
     }
 
+    const normalizedSet = set.toLowerCase();
+
+    // First try exact match with name, set, and setNumber if provided
+    if (setNumber) {
+      const exactMatchQuery = {
+        name: name,
+        set: normalizedSet,
+        collector_number: setNumber,
+      };
+
+      const exactMatchDocs = await this.repo.findBy(exactMatchQuery);
+      if (exactMatchDocs.length > 0) {
+        return exactMatchDocs;
+      }
+    }
+
+    // If no exact match found with set number or if set number not provided,
+    // try progressive fallback strategies
     const searchStrategies = [
       { name, exact: true, includeSetNumber: true },
       { name, exact: false, includeSetNumber: true },
       { name, exact: true, includeSetNumber: false },
       { name, exact: false, includeSetNumber: false },
     ];
-
-    const normalizedSet = set.toLowerCase();
 
     for (const strategy of searchStrategies) {
       const query = {

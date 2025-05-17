@@ -17,7 +17,11 @@ const importDeckSchema = z.object({
 
 async function convertNameToId(card: ParsedCard): Promise<DeckCard | null> {
   const cardData = await (card.set
-    ? cardService.getByNameAndSet(card.name, card.set)
+    ? cardService.getByNameAndSet(
+        card.name,
+        card.set,
+        card.setNumber?.toString(),
+      )
     : cardService.getByName(card.name));
 
   if (!cardData || cardData.length === 0) {
@@ -25,9 +29,21 @@ async function convertNameToId(card: ParsedCard): Promise<DeckCard | null> {
     return null;
   }
 
-  // If we have multiple versions of the same card, prioritize the one with the lowest non-null EUR price
+  // First check: If set AND collector number are both specified, prioritize exact matches
   let selectedCard = cardData[0];
-  if (cardData.length > 1) {
+  if (card.set && card.setNumber && cardData.length > 1) {
+    const exactMatch = cardData.find(
+      (c) =>
+        c.set.toLowerCase() === card.set.toLowerCase() &&
+        c.collector_number === card.setNumber.toString(),
+    );
+
+    if (exactMatch) {
+      selectedCard = exactMatch;
+    }
+  }
+  // Otherwise, if we have multiple versions, prioritize lowest non-null EUR price
+  else if (cardData.length > 1) {
     // Filter cards with non-null EUR prices
     const cardsWithPrices = cardData.filter((c) => c.prices?.eur !== null);
 
