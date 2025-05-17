@@ -12,7 +12,6 @@ export async function fetchCards(
   collectionType?: 'paper' | 'arena',
 ): Promise<{ cards: CardWithOptionalQuantity[]; total: number }> {
   try {
-    // Use existing server actions but make them work with Suspense
     if (collectionType) {
       return await fetchCollectionCards(
         collectionType,

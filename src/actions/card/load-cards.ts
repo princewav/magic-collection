@@ -27,7 +27,8 @@ export interface FilterOptions {
     order: 'asc' | 'desc';
   }>;
   hideTokens?: boolean;
-  textSearch?: string;
+  textSearch?: string; // Used for searching card names and type lines
+  search?: string; // Alternative name for the same functionality (for compatibility)
 }
 
 export async function loadCardsById(ids: string[]): Promise<Card[]> {
@@ -75,82 +76,54 @@ const buildMatchStage = (
   filters: FilterOptions,
   lookupPrefix = 'cardDetails.',
 ) => {
-  const matchConditions: any = {};
+  const directConditions: any = {};
+  const andClauses: any[] = [];
 
+  // --- Color Filters ---
+  const colorFilterGenerated: any = {};
   if (filters.colors && filters.colors.length > 0) {
     const includesMulticolor = filters.colors.includes('M');
     const specificColors = filters.colors.filter((c) => c !== 'M' && c !== 'C');
     const includesColorless = filters.colors.includes('C');
 
-    // Handle colorless cards separately
     if (includesColorless && filters.colors.length === 1) {
-      // Only 'C' is selected - match cards with empty color_identity
-      // Use a very simple and direct approach for colorless
-
-      // Try different approaches for matching colorless cards
-      matchConditions.$or = [
-        // Approach 1: Empty array
+      colorFilterGenerated.$or = [
         { [`${lookupPrefix}color_identity`]: [] },
-        // Approach 2: Size 0
         { [`${lookupPrefix}color_identity`]: { $size: 0 } },
-        // Approach 3: Using $expr
         { $expr: { $eq: [{ $size: `$${lookupPrefix}color_identity` }, 0] } },
-        // Approach 4: Null check
         { [`${lookupPrefix}color_identity`]: null },
-        // Approach 5: Field doesn't exist
         { [`${lookupPrefix}color_identity`]: { $exists: false } },
       ];
     } else {
-      // Normal color filtering
       if (includesMulticolor && specificColors.length > 0) {
-        // M + specific colors: Cards must have ALL the specified colors
-        matchConditions[`${lookupPrefix}color_identity`] = {
+        colorFilterGenerated[`${lookupPrefix}color_identity`] = {
           $all: specificColors,
         };
       } else if (!includesMulticolor && specificColors.length > 0) {
-        // Only specific colors, no M: Cards with ANY of the specified colors (OR logic)
-        let query = { $in: specificColors };
-
-        // If colorless is also selected, create an $or condition to include it
+        const query = { $in: specificColors };
         if (includesColorless) {
-          matchConditions.$or = [
+          colorFilterGenerated.$or = [
             { [`${lookupPrefix}color_identity`]: query },
             { [`${lookupPrefix}color_identity`]: { $size: 0 } },
             { [`${lookupPrefix}color_identity`]: { $exists: false } },
           ];
         } else {
-          matchConditions[`${lookupPrefix}color_identity`] = query;
+          colorFilterGenerated[`${lookupPrefix}color_identity`] = query;
         }
       } else if (
         includesMulticolor &&
         specificColors.length === 0 &&
         !includesColorless
       ) {
-        // Only M: Cards with 2+ colors
-        // Use _colorIdentitySizeValue field if available (in pipelines), otherwise use $expr with $size
-        if (lookupPrefix === 'cardDetails.') {
-          matchConditions.$or = [
-            { _colorIdentitySizeValue: { $gt: 1 } },
-            {
-              $expr: { $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1] },
-            },
-          ];
-        } else {
-          matchConditions.$expr = {
-            $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1],
-          };
-        }
+        colorFilterGenerated.$or = [
+          { $expr: { $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1] } },
+        ];
       } else if (
         includesMulticolor &&
         specificColors.length === 0 &&
         includesColorless
       ) {
-        // M + C: Cards with 2+ colors OR colorless cards
-        matchConditions.$or = [
-          // Use _colorIdentitySizeValue if available
-          ...(lookupPrefix === 'cardDetails.'
-            ? [{ _colorIdentitySizeValue: { $gt: 1 } }]
-            : []),
+        colorFilterGenerated.$or = [
           { $expr: { $gt: [{ $size: `$${lookupPrefix}color_identity` }, 1] } },
           { [`${lookupPrefix}color_identity`]: { $size: 0 } },
           { [`${lookupPrefix}color_identity`]: { $exists: false } },
@@ -159,56 +132,70 @@ const buildMatchStage = (
     }
   }
 
+  if (colorFilterGenerated.$or) {
+    andClauses.push({ $or: colorFilterGenerated.$or });
+  } else if (Object.keys(colorFilterGenerated).length > 0) {
+    Object.assign(directConditions, colorFilterGenerated);
+  }
+
   if (filters.cmcRange) {
-    matchConditions[`${lookupPrefix}cmc`] = {
+    directConditions[`${lookupPrefix}cmc`] = {
       $gte: filters.cmcRange[0],
       $lte: filters.cmcRange[1],
     };
   }
 
   if (filters.rarities && filters.rarities.length > 0) {
-    matchConditions[`${lookupPrefix}rarity`] = { $in: filters.rarities };
+    directConditions[`${lookupPrefix}rarity`] = { $in: filters.rarities };
   }
 
   if (filters.sets && filters.sets.length > 0) {
-    // Use a case-insensitive query for set matching
-    // MongoDB's $in is case-sensitive, so we need to use a different approach for case-insensitive matching
-    if (filters.sets.length === 1) {
-      // If only one set, we can use a regex for case-insensitive matching
-      const setRegex = new RegExp(`^${filters.sets[0]}$`, 'i');
-      matchConditions[`${lookupPrefix}set`] = setRegex;
-    } else {
-      // For multiple sets, create an $or array of regexes
-      const setRegexes = filters.sets.map((set) => ({
-        [`${lookupPrefix}set`]: new RegExp(`^${set}$`, 'i'),
-      }));
-      matchConditions.$or = [...(matchConditions.$or || []), ...setRegexes];
+    const setOrConditions = filters.sets.map((set) => ({
+      [`${lookupPrefix}set`]: new RegExp(`^${set}$`, 'i'),
+    }));
+    if (setOrConditions.length > 0) {
+      andClauses.push({ $or: setOrConditions });
     }
   }
 
-  // Add filter for hideTokens
   if (filters.hideTokens) {
-    // This regex will match if "Token", "Card", or "Emblem" is a whole word in the type_line, case-insensitive.
-    // It aims to exclude cards that are primarily tokens, cards, or emblems
-    matchConditions[`${lookupPrefix}type_line`] = {
+    directConditions[`${lookupPrefix}type_line`] = {
       $not: /\b(Token|Card|Emblem)\b/i,
     };
   }
 
-  // Add text search for name and type_line
-  if (filters.textSearch && filters.textSearch.trim() !== '') {
-    const searchTerm = filters.textSearch.trim();
+  if (
+    (filters.textSearch && filters.textSearch.trim() !== '') ||
+    (filters.search && filters.search.trim() !== '')
+  ) {
+    const searchTerm = (filters.textSearch || filters.search || '').trim();
     const searchRegex = new RegExp(searchTerm, 'i');
-
-    // Search in both name and type_line
-    matchConditions.$or = [
-      ...(matchConditions.$or || []),
+    const textSearchOrConditions = [
       { [`${lookupPrefix}name`]: searchRegex },
       { [`${lookupPrefix}type_line`]: searchRegex },
     ];
+    andClauses.push({ $or: textSearchOrConditions });
   }
 
-  return { $match: matchConditions };
+  const finalMatchQuery: any = { ...directConditions };
+
+  if (andClauses.length > 0) {
+    if (andClauses.length === 1 && Object.keys(directConditions).length === 0) {
+      Object.assign(finalMatchQuery, andClauses[0]);
+    } else {
+      finalMatchQuery.$and = (finalMatchQuery.$and || []).concat(andClauses);
+      if (
+        finalMatchQuery.$and.length === 1 &&
+        Object.keys(directConditions).length === 0
+      ) {
+        const singleAndOperand = finalMatchQuery.$and[0];
+        delete finalMatchQuery.$and;
+        Object.assign(finalMatchQuery, singleAndOperand);
+      }
+    }
+  }
+
+  return { $match: finalMatchQuery };
 };
 
 const buildColorSortStages = (lookupPrefix = 'cardDetails.') => {
@@ -331,10 +318,8 @@ export async function loadMoreCollectionCards(
 
   const pipeline: any[] = [];
 
-  // Stage 1: Initial Match
   pipeline.push({ $match: { collectionType } });
 
-  // Stage 2: Group by cardId and sum quantities
   pipeline.push({
     $group: {
       _id: '$cardId',
@@ -344,7 +329,6 @@ export async function loadMoreCollectionCards(
     },
   });
 
-  // Stage 3: Lookup Card Details
   pipeline.push({
     $lookup: {
       from: 'cards',
@@ -354,16 +338,13 @@ export async function loadMoreCollectionCards(
     },
   });
 
-  // Stage 4: Unwind
   pipeline.push({
     $unwind: { path: '$cardDetails', preserveNullAndEmptyArrays: false },
   });
 
-  // Stage 5: Add color sorting stages
   const colorStages = buildColorSortStages();
   pipeline.push(...colorStages);
 
-  // Stage 5.1: Add color identity size calculation for filter conditions
   if (filters.colors?.includes('M') || filters.colors?.includes('C')) {
     pipeline.push({
       $addFields: {
@@ -372,7 +353,6 @@ export async function loadMoreCollectionCards(
     });
   }
 
-  // Stage 5.2: Add rarity sorting stage if needed
   if (filters.sortFields?.some((f) => f.field === 'rarity')) {
     pipeline.push({
       $addFields: {
@@ -383,22 +363,18 @@ export async function loadMoreCollectionCards(
     });
   }
 
-  // Stage 6: Post-lookup match (filters)
   if (Object.keys(filters).length > 0) {
     const matchStage = buildMatchStage(filters);
     pipeline.push(matchStage);
   }
 
-  // Stage 7: Sort
   const sortStage = buildSortStage(filters.sortFields);
   pipeline.push(sortStage);
 
-  // Stage 8: Pagination
   const skip = (page - 1) * pageSize;
   pipeline.push({ $skip: skip });
   pipeline.push({ $limit: pageSize });
 
-  // Stage 9: Project fields to include
   pipeline.push({
     $project: {
       _id: { $toString: '$_id' },
@@ -409,7 +385,6 @@ export async function loadMoreCollectionCards(
     },
   });
 
-  // Stage 10: Remove temporary fields (exclusion-only stage)
   pipeline.push({
     $project: {
       _colorIdentitySizeValue: 0,
@@ -417,13 +392,9 @@ export async function loadMoreCollectionCards(
   });
 
   try {
-    // Print the query when colorless filter is used
-
     const results = await collectionCardsRepo.aggregate(pipeline).toArray();
 
-    // If colorless filter and no results, show first 5 cards that should match
     if (filters.colors?.includes('C') && results.length === 0) {
-      // Try to find any colorless cards directly
       const colorlessCheck = await db
         .collection('cards')
         .find({ color_identity: { $size: 0 } })
@@ -431,7 +402,6 @@ export async function loadMoreCollectionCards(
         .toArray();
     }
 
-    // Get total count with the same grouping logic
     const countPipeline = [
       { $match: { collectionType } },
       {
@@ -452,7 +422,6 @@ export async function loadMoreCollectionCards(
       { $unwind: { path: '$cardDetails', preserveNullAndEmptyArrays: false } },
     ];
 
-    // Add color identity size calculation for filter conditions that use it
     if (filters.colors?.includes('M') || filters.colors?.includes('C')) {
       countPipeline.push({
         $addFields: {

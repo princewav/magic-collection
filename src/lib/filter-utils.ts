@@ -27,6 +27,7 @@ export interface EnhancedFilterOptions
   extends Omit<FilterOptions, 'exactColorMatch'> {
   colorFilter: ColorFilterInfo;
   textSearch?: string;
+  search?: string; // Add this for compatibility
 }
 
 /**
@@ -66,7 +67,9 @@ export function parseFiltersFromParams(searchParams: {
   // Text search for name and type_line
   const textSearchParam = getParam('search');
   if (textSearchParam) {
-    filters.textSearch = textSearchParam.trim();
+    const trimmedSearch = textSearchParam.trim();
+    filters.textSearch = trimmedSearch;
+    filters.search = trimmedSearch; // Set both properties for compatibility
   }
 
   // CMC Range

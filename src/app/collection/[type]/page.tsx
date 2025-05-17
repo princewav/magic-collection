@@ -44,7 +44,6 @@ async function CollectionCards({
   initialCardsWithQuantity: any[];
   totalUnique: number;
 }) {
-  // Pre-fetch data to avoid transitions
   const dataPromise = fetchCards(
     filters,
     page,
@@ -53,7 +52,6 @@ async function CollectionCards({
     type as 'paper' | 'arena',
   );
 
-  // Ensure data is ready before rendering
   await dataPromise;
 
   return (
@@ -76,11 +74,9 @@ export default async function CollectionPage({
   const { type } = await params;
   const resolvedSearchParams = await searchParams;
 
-  // Parse filters from URL parameters
   const { filters, page, pageSize } =
     parseFiltersFromParams(resolvedSearchParams);
 
-  // Pre-fetch all data needed before rendering
   const collectionCardsPromise = loadCardsInCollection(type);
   const collectionCards = await collectionCardsPromise;
 
