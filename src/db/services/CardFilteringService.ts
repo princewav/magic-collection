@@ -167,7 +167,10 @@ export class CardFilteringService {
   private _needsCustomSorting(filters: FilterOptions): boolean {
     return (
       filters.sortFields?.some(
-        (f) => f.field === 'color_identity' || f.field === 'rarity',
+        (f) =>
+          f.field === 'colors' ||
+          f.field === 'color_identity' ||
+          f.field === 'rarity',
       ) ?? false
     );
   }
@@ -186,7 +189,55 @@ export class CardFilteringService {
       });
     }
 
-    if (filters.sortFields?.some((f) => f.field === 'color_identity')) {
+    if (
+      filters.sortFields?.some(
+        (f) => f.field === 'color_identity' || f.field === 'colors',
+      )
+    ) {
+      // 1. Prepare fields based on `colors` for primary category determination
+      stages.push({
+        $addFields: {
+          _actualColorsArrayForSort: { $ifNull: ['$colors', []] },
+        },
+      });
+      stages.push({
+        $addFields: {
+          // Ensure _actualColorsArrayForSort is an array
+          _actualColorsArrayForSort: {
+            $cond: {
+              if: { $isArray: '$_actualColorsArrayForSort' },
+              then: '$_actualColorsArrayForSort',
+              else: [],
+            },
+          },
+        },
+      });
+      stages.push({
+        $addFields: {
+          _actualColorsSizeForSort: { $size: '$_actualColorsArrayForSort' },
+        },
+      });
+      stages.push({
+        $addFields: {
+          _colorCategory: {
+            $switch: {
+              branches: [
+                {
+                  case: { $gt: ['$_actualColorsSizeForSort', 1] }, // More than 1 color in `colors` array
+                  then: 'M',
+                },
+                {
+                  case: { $eq: ['$_actualColorsSizeForSort', 1] }, // Exactly 1 color in `colors` array
+                  then: { $arrayElemAt: ['$_actualColorsArrayForSort', 0] },
+                },
+              ],
+              default: 'C', // 0 colors in `colors` array
+            },
+          },
+        },
+      });
+
+      // 2. Prepare _colorIdentityArray for _multicolorSortKey (used when _colorCategory is 'M')
       stages.push({
         $addFields: {
           _colorIdentityArray: { $ifNull: ['$color_identity', []] },
@@ -194,6 +245,7 @@ export class CardFilteringService {
       });
       stages.push({
         $addFields: {
+          // Ensure _colorIdentityArray is an array
           _colorIdentityArray: {
             $cond: {
               if: { $isArray: '$_colorIdentityArray' },
@@ -203,35 +255,35 @@ export class CardFilteringService {
           },
         },
       });
+      // _colorIdentitySizeValue is no longer needed here for _colorCategory
+
       stages.push({
         $addFields: {
-          _colorIdentitySizeValue: { $size: '$_colorIdentityArray' },
+          _colorIndex: { $indexOfArray: [colorOrder, '$_colorCategory'] },
         },
       });
       stages.push({
         $addFields: {
-          _colorCategory: {
-            $switch: {
-              branches: [
-                {
-                  // Case for colorless cards (empty color identity)
-                  case: { $eq: ['$_colorIdentitySizeValue', 0] },
-                  then: 'C',
-                },
-                {
-                  // Case for multicolor cards (2+ colors)
-                  case: { $gt: ['$_colorIdentitySizeValue', 1] },
-                  then: 'M',
-                },
-              ],
-              default: { $arrayElemAt: ['$_colorIdentityArray', 0] },
+          _multicolorSortKey: {
+            $cond: {
+              if: { $eq: ['$_colorCategory', 'M'] },
+              then: '$_colorIdentityArray',
+              else: null,
             },
           },
         },
       });
+
+      // 3. Add _isLandForSort to push lands to the bottom within color groups
       stages.push({
         $addFields: {
-          _colorIndex: { $indexOfArray: [colorOrder, '$_colorCategory'] },
+          _isLandForSort: {
+            $cond: {
+              if: { $regexMatch: { input: '$type_line', regex: /land/i } }, // Case-insensitive match for "land"
+              then: 1, // Lands get 1
+              else: 0, // Non-lands get 0
+            },
+          },
         },
       });
     }
@@ -246,17 +298,18 @@ export class CardFilteringService {
     // Add user-specified sort fields
     if (filters.sortFields) {
       filters.sortFields.forEach(({ field, order }) => {
-        // Handle custom sort fields like rarity and colors
         const sortDirection = order === 'desc' ? -1 : 1;
         switch (field) {
           case 'rarity':
             sortStage._rarityIndex = sortDirection;
             break;
           case 'color_identity':
-          case 'colors': // Support both for backward compatibility
+          case 'colors':
             sortStage._colorIndex = sortDirection;
+            sortStage._multicolorSortKey = sortDirection;
+            sortStage._isLandForSort = 1; // Always sort lands last (0 before 1)
             break;
-          case 'collector_number': // Ensure collector_number uses the numeric field
+          case 'collector_number':
             sortStage._collectorNumberNumeric = sortDirection;
             break;
           case 'cmc':
@@ -343,11 +396,18 @@ export class CardFilteringService {
       if (filters.sortFields?.some((f) => f.field === 'rarity')) {
         projectFields._rarityIndex = 0;
       }
-      if (filters.sortFields?.some((f) => f.field === 'color_identity')) {
+      if (
+        filters.sortFields?.some(
+          (f) => f.field === 'color_identity' || f.field === 'colors',
+        )
+      ) {
         projectFields._colorIndex = 0;
         projectFields._colorCategory = 0;
+        projectFields._actualColorsArrayForSort = 0;
+        projectFields._actualColorsSizeForSort = 0;
         projectFields._colorIdentityArray = 0;
-        projectFields._colorIdentitySizeValue = 0;
+        projectFields._multicolorSortKey = 0;
+        projectFields._isLandForSort = 0;
       }
     }
 

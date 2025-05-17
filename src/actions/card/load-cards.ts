@@ -14,6 +14,7 @@ import { Collection, Db } from 'mongodb';
 import { getServerSession } from 'next-auth/next';
 import { authConfig } from '@/auth/auth.config';
 
+// Order for color sorting: W (white), U (blue), B (black), R (red), G (green), M (multicolor), C (colorless)
 const colorOrder = ['W', 'U', 'B', 'R', 'G', 'M', 'C'];
 
 export interface FilterOptions {
