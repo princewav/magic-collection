@@ -136,44 +136,50 @@ export class CardService extends BaseService<Card> {
       return [];
     }
 
-    // Use aggregation to fetch one document per name, preferring newer printings.
+    // Use aggregation to fetch one document per name, preferring versions with non-null prices
     const pipeline = [
       {
         $match: {
           name: { $in: names },
         },
       },
-      // Add a field to handle null prices for sorting. Assign a large number if price is null.
+      // Add fields to handle null prices for sorting
       {
         $addFields: {
+          // Flag indicating if the EUR price is non-null (1) or null (0)
+          hasPrice: {
+            $cond: [{ $ne: ['$prices.eur', null] }, 1, 0],
+          },
+          // Convert price to number, defaulting to MAX_SAFE_INTEGER if null
           priceValue: {
             $ifNull: [{ $toDouble: '$prices.eur' }, Number.MAX_SAFE_INTEGER],
           },
         },
       },
-      // Sort by name (for grouping consistency) and then by price ascending.
-      // Documents with null prices (now MAX_SAFE_INTEGER) will be sorted last.
+      // Sort by name, then by hasPrice descending (non-null first),
+      // then by priceValue ascending (lowest price first)
       {
         $sort: {
           name: 1,
+          hasPrice: -1,
           priceValue: 1,
         },
       },
-      // Group by card name and take the first document encountered,
-      // which will have the lowest price due to the preceding sort.
+      // Group by card name and take the first document encountered
       {
         $group: {
           _id: '$name',
           firstDoc: { $first: '$$ROOT' },
         },
       },
-      // Promote the selected document to the root.
+      // Promote the selected document to the root
       {
         $replaceRoot: { newRoot: '$firstDoc' },
       },
-      // Remove the temporary sorting field.
+      // Remove the temporary sorting fields
       {
         $project: {
+          hasPrice: 0,
           priceValue: 0,
         },
       },

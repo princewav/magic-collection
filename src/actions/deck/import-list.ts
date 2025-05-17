@@ -24,12 +24,36 @@ async function convertNameToId(card: ParsedCard): Promise<DeckCard | null> {
     console.error(`Card not found: ${card.name} (${card.set})`);
     return null;
   }
+
+  // If we have multiple versions of the same card, prioritize the one with the lowest non-null EUR price
+  let selectedCard = cardData[0];
+  if (cardData.length > 1) {
+    // Filter cards with non-null EUR prices
+    const cardsWithPrices = cardData.filter((c) => c.prices?.eur !== null);
+
+    if (cardsWithPrices.length > 0) {
+      // Sort by EUR price (ascending) and take the first (cheapest)
+      selectedCard = cardsWithPrices.sort((a, b) => {
+        const priceA = parseFloat(a.prices.eur || '0');
+        const priceB = parseFloat(b.prices.eur || '0');
+        return priceA - priceB;
+      })[0];
+    }
+  }
+
+  // Convert setNumber to a number if it's coming from collector_number (which might be a string)
+  const finalSetNumber =
+    card.setNumber ||
+    (selectedCard.collector_number
+      ? parseInt(selectedCard.collector_number, 10)
+      : 0);
+
   return {
-    cardId: cardData[0].cardId,
-    name: cardData[0].name,
-    set: card.set,
+    cardId: selectedCard.cardId,
+    name: selectedCard.name,
+    set: card.set || selectedCard.set,
     quantity: card.quantity,
-    setNumber: card.setNumber,
+    setNumber: finalSetNumber,
   };
 }
 
