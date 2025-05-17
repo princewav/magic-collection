@@ -75,18 +75,14 @@ export default async function CollectionPage({
 }: PageProps<CollectionParams>) {
   const { type } = await params;
   const resolvedSearchParams = await searchParams;
+
+  // Parse filters from URL parameters
   const { filters, page, pageSize } =
     parseFiltersFromParams(resolvedSearchParams);
 
   // Pre-fetch all data needed before rendering
   const collectionCardsPromise = loadCardsInCollection(type);
   const collectionCards = await collectionCardsPromise;
-
-  const totalQuantity = collectionCards.reduce(
-    (acc, card) => acc + card.quantity,
-    0,
-  );
-  const totalUnique = collectionCards.length;
 
   // For initial server-side rendering, fetch all cards needed for the first page
   // This prevents flickering and ensures the UI is populated immediately
@@ -95,11 +91,41 @@ export default async function CollectionPage({
     .map((card) => card.cardId);
   const initialCardsData = await loadCardsById(initialCardIds);
 
+  // Apply set filtering for the initial data display
+  let filteredInitialCards = initialCardsData;
+  let filteredCollectionCards = collectionCards;
+
+  // Apply set filtering if sets filter is present
+  if (filters.sets && filters.sets.length > 0) {
+    // Convert set codes to uppercase for case-insensitive matching
+    const setCodesUppercase = filters.sets.map((set) => set.toUpperCase());
+
+    // Filter initial cards by set (case-insensitive)
+    filteredInitialCards = initialCardsData.filter((card) =>
+      setCodesUppercase.includes(card.set.toUpperCase()),
+    );
+
+    // Get the card IDs that match the set filter
+    const filteredCardIds = filteredInitialCards.map((card) => card.cardId);
+
+    // Filter collection cards to only include those with matching card IDs
+    filteredCollectionCards = collectionCards.filter((card) =>
+      filteredCardIds.includes(card.cardId),
+    );
+  }
+
+  const totalQuantity = filteredCollectionCards.reduce(
+    (acc, card) => acc + card.quantity,
+    0,
+  );
+  const totalUnique = filteredCollectionCards.length;
+
   // Combine card data with quantities from collection
-  const initialCardsWithQuantity = initialCardsData.map((card) => ({
+  const initialCardsWithQuantity = filteredInitialCards.map((card) => ({
     ...card,
     quantity:
-      collectionCards.find((c) => c.cardId === card.cardId)?.quantity || 0,
+      filteredCollectionCards.find((c) => c.cardId === card.cardId)?.quantity ||
+      0,
   }));
 
   return (

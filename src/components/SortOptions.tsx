@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 export interface SortField {
   field: string;
@@ -33,6 +34,22 @@ export const sortOptions: SortOption[] = [
   { value: 'rarity', label: 'Rarity' },
   { value: 'colors', label: 'Color' },
 ];
+
+// Client-side only wrapper to prevent hydration mismatch
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    // Return a simple placeholder during SSR and initial render
+    return <div className="flex flex-wrap gap-2">{/* SSR placeholder */}</div>;
+  }
+
+  return <>{children}</>;
+}
 
 interface SortableSortFieldProps {
   field: SortField;
@@ -129,34 +146,36 @@ export function SortOptions({
     <div className="grid grid-rows-[auto_1fr] gap-2">
       <h3 className="text-sm font-medium">Sort By</h3>
       <div className="grid grid-rows-[auto_auto]">
-        {/* Active sort fields */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={onDragEnd}
-        >
-          <SortableContext
-            items={sortFields.map((f) => f.field)}
-            strategy={horizontalListSortingStrategy}
+        {/* Active sort fields - wrapped in ClientOnly to prevent hydration issues */}
+        <ClientOnly>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onDragEnd}
           >
-            <div
-              className={cn(
-                'flex flex-wrap gap-2',
-                sortFields.length > 0 && 'mb-2',
-              )}
+            <SortableContext
+              items={sortFields.map((f) => f.field)}
+              strategy={horizontalListSortingStrategy}
             >
-              {sortFields.map((field, index) => (
-                <SortableSortField
-                  key={field.field}
-                  field={field}
-                  index={index}
-                  onOrderChange={onSortFieldChange}
-                  onRemove={onRemoveSortField}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+              <div
+                className={cn(
+                  'flex flex-wrap gap-2',
+                  sortFields.length > 0 && 'mb-2',
+                )}
+              >
+                {sortFields.map((field, index) => (
+                  <SortableSortField
+                    key={field.field}
+                    field={field}
+                    index={index}
+                    onOrderChange={onSortFieldChange}
+                    onRemove={onRemoveSortField}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </ClientOnly>
 
         {/* Add sort field */}
         <div className="flex flex-wrap gap-2">

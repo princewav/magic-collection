@@ -171,7 +171,19 @@ const buildMatchStage = (
   }
 
   if (filters.sets && filters.sets.length > 0) {
-    matchConditions[`${lookupPrefix}set`] = { $in: filters.sets };
+    // Use a case-insensitive query for set matching
+    // MongoDB's $in is case-sensitive, so we need to use a different approach for case-insensitive matching
+    if (filters.sets.length === 1) {
+      // If only one set, we can use a regex for case-insensitive matching
+      const setRegex = new RegExp(`^${filters.sets[0]}$`, 'i');
+      matchConditions[`${lookupPrefix}set`] = setRegex;
+    } else {
+      // For multiple sets, create an $or array of regexes
+      const setRegexes = filters.sets.map((set) => ({
+        [`${lookupPrefix}set`]: new RegExp(`^${set}$`, 'i'),
+      }));
+      matchConditions.$or = [...(matchConditions.$or || []), ...setRegexes];
+    }
   }
 
   // Add filter for hideTokens

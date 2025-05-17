@@ -84,10 +84,19 @@ export function CardsProvider({
   // Update filters when initialFilters changes
   useEffect(() => {
     if (initialFilters) {
-      setFilters(initialFilters);
-      setCurrentPage(1);
+      // Check if sets have changed to decide if we need to reload
+      const currentSetsStr = JSON.stringify(filters.sets || []);
+      const initialSetsStr = JSON.stringify(initialFilters.sets || []);
+      const filtersChanged =
+        JSON.stringify(filters) !== JSON.stringify(initialFilters) ||
+        currentSetsStr !== initialSetsStr;
+
+      if (filtersChanged) {
+        setFilters(initialFilters);
+        setCurrentPage(1);
+      }
     }
-  }, [initialFilters]);
+  }, [initialFilters, filters]);
 
   // Update deduplicate when initialDeduplicate changes
   useEffect(() => {

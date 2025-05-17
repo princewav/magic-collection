@@ -316,11 +316,14 @@ export function Filters({
   };
 
   const handleSetChange = (newSets: string[]) => {
+    // Make sure all set codes are uppercase for consistency
+    const normalizedSets = newSets.map((set) => set.toUpperCase());
+
     // Optimistic UI update
-    setOptimisticSets(newSets);
+    setOptimisticSets(normalizedSets);
 
     // Debounced URL update
-    debouncedUpdateUrlFilters({ sets: newSets });
+    debouncedUpdateUrlFilters({ sets: normalizedSets });
   };
 
   const handleSortFieldChange = (field: string) => {
