@@ -12,7 +12,7 @@ import { loadCollectionCardsByName } from '@/actions/deck/load-decks';
 import { MissingCardsModal } from '@/components/deck/MissingCardsModal';
 import { MissingCardsModalProvider } from '@/context/MissingCardsModalContext';
 import { DeckContainer } from '@/components/deck/DeckContainer';
-import { DeckSkeleton } from '@/components/deck/DeckSkeleton';
+import { LayoutAwareSkeleton } from '@/components/LayoutAwareSkeleton';
 import { validateDeck } from '@/lib/deck-validator';
 
 interface Props {
@@ -50,7 +50,7 @@ export default async function DeckDetailPage({ params }: Props) {
 
   return (
     <MissingCardsModalProvider>
-      <Suspense fallback={<DeckSkeleton />}>
+      <Suspense fallback={<LayoutAwareSkeleton />}>
         <DeckContainer
           deck={deck}
           maindeckOwned={maindeckOwned}
