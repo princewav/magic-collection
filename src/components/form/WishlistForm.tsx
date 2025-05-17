@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { wishlistSchema } from '@/app/wishlists/new/validation';
@@ -20,6 +21,14 @@ import { COLOR_OPTIONS } from '@/lib/constants';
 import { z } from 'zod';
 import { Wishlist } from '@/types/wishlist';
 import { Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type WishlistFormData = z.infer<typeof wishlistSchema>;
 
@@ -91,23 +100,108 @@ export const WishlistForm: React.FC<WishlistFormProps> = ({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="imageUrl"
-          render={({ field: { value, ...fieldProps } }) => (
-            <FormItem>
-              <FormLabel>Cover Image URL (optional)</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter image URL"
-                  {...fieldProps}
-                  value={value ?? ''}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <h3 className="mb-2 font-semibold">Wishlist Image</h3>
+        {initialData?.cards && initialData.cards.length > 0 ? (
+          <Tabs defaultValue="url" className="w-full">
+            <TabsList className="mb-2">
+              <TabsTrigger className="cursor-pointer" value="url">
+                URL
+              </TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="card">
+                Select from Wishlist
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="url">
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field: { value, ...fieldProps } }) => (
+                  <FormItem>
+                    <FormLabel>Cover Image URL</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter image URL"
+                        {...fieldProps}
+                        value={value ?? ''}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      URL for the wishlist cover image. Leave empty to use
+                      default.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+            <TabsContent value="card">
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Card</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        const selectedCard = initialData.cards.find(
+                          (card) => card.id === value,
+                        );
+                        field.onChange(
+                          selectedCard?.image_uris?.art_crop || '',
+                        );
+                      }}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a card" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {initialData.cards
+                          .slice()
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((card) => (
+                            <SelectItem key={card.id} value={card.id}>
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={card.image_uris?.art_crop}
+                                  alt={card.name}
+                                  className="h-6 w-6 rounded-sm object-cover"
+                                />
+                                <span>{card.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Choose a card from your wishlist to use its image
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <FormField
+            control={form.control}
+            name="imageUrl"
+            render={({ field: { value, ...fieldProps } }) => (
+              <FormItem>
+                <FormLabel>Cover Image URL (optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter image URL"
+                    {...fieldProps}
+                    value={value ?? ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
