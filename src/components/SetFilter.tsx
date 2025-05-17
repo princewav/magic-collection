@@ -42,7 +42,7 @@ export function SetFilter({ selectedSets, onSetChange }: SetFilterProps) {
           </button>
         )}
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mb-1">
         {selectedSets.map((set) => (
           <div
             key={set}
@@ -64,7 +64,7 @@ export function SetFilter({ selectedSets, onSetChange }: SetFilterProps) {
           onKeyDown={handleKeyDown}
           maxLength={3}
           placeholder="Enter set code (e.g. LTR)"
-          className="focus:ring-primary h-8 rounded-md border px-2 text-sm focus:ring-2 focus:outline-none"
+          className="focus:ring-primary h-8 rounded-md border px-2 text-sm focus:ring-2 focus:outline-none" 
         />
       </div>
     </div>
