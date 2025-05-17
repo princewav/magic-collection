@@ -13,6 +13,7 @@ import { MissingCardsModal } from '@/components/deck/MissingCardsModal';
 import { MissingCardsModalProvider } from '@/context/MissingCardsModalContext';
 import { DeckContainer } from '@/components/deck/DeckContainer';
 import { DeckSkeleton } from '@/components/deck/DeckSkeleton';
+import { validateDeck } from '@/lib/deck-validator';
 
 interface Props {
   params: Promise<{ id: string; type: 'paper' | 'arena' }>;
@@ -42,6 +43,8 @@ export default async function DeckDetailPage({ params }: Props) {
     return notFound();
   }
 
+  const validationErrors = validateDeck(deck as any);
+
   const maindeckOwned = await getCollectedQuantities(deck?.maindeck);
   const sideboardOwned = await getCollectedQuantities(deck?.sideboard);
 
@@ -53,6 +56,7 @@ export default async function DeckDetailPage({ params }: Props) {
           maindeckOwned={maindeckOwned}
           sideboardOwned={sideboardOwned}
           type={type}
+          validationErrors={validationErrors}
         />
       </Suspense>
       <MissingCardsModal />

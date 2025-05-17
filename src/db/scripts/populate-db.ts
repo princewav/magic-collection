@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function fetchCards(): Promise<Card[]> {
-  const dataPath = 'data/Default Cards 2025-04-16.json';
+  const dataPath = 'data/default-cards-20250517091434.json';
   const filePath = path.join(__dirname, '../../..', dataPath);
   console.log(filePath);
   const rawData = fs.readFileSync(filePath, 'utf-8');

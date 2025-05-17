@@ -10,12 +10,15 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, List, Grid2X2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState, useEffect } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface DeckContainerProps {
   deck: any;
   maindeckOwned: any[];
   sideboardOwned: any[];
   type: 'paper' | 'arena';
+  validationErrors: string[];
 }
 
 export function DeckContainer({
@@ -23,6 +26,7 @@ export function DeckContainer({
   maindeckOwned,
   sideboardOwned,
   type,
+  validationErrors,
 }: DeckContainerProps) {
   const [isGridView, setIsGridView] = useState(true);
   const [activeTab, setActiveTab] = useState('maindeck');
@@ -84,6 +88,19 @@ export function DeckContainer({
       </div>
 
       <div data-role="main-content-area" className="container mx-auto">
+        {validationErrors && validationErrors.length > 0 && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Deck Illegality Detected</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc pl-5">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
         <div
           data-role="back-link-mobile-container"
           className="flex justify-start md:hidden"
