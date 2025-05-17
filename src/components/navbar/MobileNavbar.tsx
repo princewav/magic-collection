@@ -9,6 +9,11 @@ import * as React from 'react';
 import { UserMenu } from './UserMenu';
 import Image from 'next/image';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { TbCards, TbCardsFilled } from 'react-icons/tb';
+import { MdOutlineCollectionsBookmark } from 'react-icons/md';
+import { MdCollectionsBookmark } from 'react-icons/md';
+import { FaHeart } from 'react-icons/fa';
+import { FaRegHeart } from 'react-icons/fa';
 
 interface NavLinkProps {
   href: string;
@@ -128,12 +133,12 @@ export default function MobileNavbar() {
       links: [
         {
           href: '/decks/paper',
-          icon: '/images/card-accent.png',
+          icon: '/images/card-w.png',
           label: 'Paper Decks',
         },
         {
           href: '/decks/arena',
-          icon: '/images/arena-accent.png',
+          icon: '/images/arena-w.png',
           label: 'Arena Decks',
         },
       ],
@@ -143,12 +148,12 @@ export default function MobileNavbar() {
       links: [
         {
           href: '/collection/paper',
-          icon: '/images/card-accent.png',
+          icon: '/images/card-w.png',
           label: 'Paper Collection',
         },
         {
           href: '/collection/arena',
-          icon: '/images/arena-accent.png',
+          icon: '/images/arena-w.png',
           label: 'Arena Collection',
         },
       ],
@@ -189,7 +194,13 @@ export default function MobileNavbar() {
           <NavButton
             ref={decksButtonRef}
             label="Decks"
-            icon={<Book className="text-accent h-5 w-5" aria-hidden="true" />}
+            icon={
+              pathname.includes('/decks') ? (
+                <TbCardsFilled className="text-accent h-4 w-4" />
+              ) : (
+                <TbCards className="text-accent h-4 w-4" />
+              )
+            }
             isActive={pathname.includes('/decks')}
             onClick={() => toggleDropdown('decks')}
           />
@@ -198,14 +209,18 @@ export default function MobileNavbar() {
             ref={collectButtonRef}
             label="Collect"
             icon={
-              <ListChecks className="text-accent h-5 w-5" aria-hidden="true" />
+              pathname.includes('/collection') ? (
+                <MdCollectionsBookmark className="text-accent h-4 w-4" />
+              ) : (
+                <MdOutlineCollectionsBookmark className="text-accent h-4 w-4" />
+              )
             }
             isActive={pathname.includes('/collection')}
             onClick={() => toggleDropdown('collect')}
           />
 
-          <Link
-            ref={wishlistLinkRef}
+            <Link
+              ref={wishlistLinkRef}
             href="/wishlists"
             className={cn(
               'flex flex-col items-center justify-center gap-1 py-2',
@@ -215,7 +230,11 @@ export default function MobileNavbar() {
             )}
             onClick={() => setActiveDropdown(null)}
           >
-            <Heart className="text-accent size-5" aria-hidden="true" />
+            {pathname.includes('/wishlists') ? (
+                <FaHeart className="text-accent h-4 w-4" />
+              ) : (
+                <FaRegHeart className="text-accent h-4 w-4" />
+              )}
             <span className="text-xs">Wishlists</span>
           </Link>
         </div>

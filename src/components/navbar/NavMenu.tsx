@@ -7,6 +7,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
+import { TbCards, TbCardsFilled } from 'react-icons/tb';
+import { MdCollectionsBookmark, MdOutlineCollectionsBookmark } from 'react-icons/md';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
+
 
 type AnimatedDropdownProps = {
   trigger: React.ReactNode | ((isOpen: boolean) => React.ReactNode);
@@ -232,7 +236,11 @@ export function NavMenu({
                     'bg-secondary/50 hover:bg-secondary/70',
                 )}
               >
-                <Book className="text-accent h-4 w-4" />
+                {pathname.includes('/decks') ? (
+                  <TbCardsFilled className="text-accent h-6 w-6" />
+                ) : (
+                  <TbCards className="text-accent h-6 w-6" />
+                )}
                 <span>Decks</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -317,7 +325,11 @@ export function NavMenu({
                     'bg-secondary/50 hover:bg-secondary/70',
                 )}
               >
-                <ListChecks className="text-accent h-4 w-4" />
+                {pathname.includes('/collection') ? (
+                  <MdCollectionsBookmark className="text-accent h-6 w-6" />
+                ) : (
+                  <MdOutlineCollectionsBookmark className="text-accent h-6 w-6" />
+                )}
                 <span>Collect</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -404,7 +416,11 @@ export function NavMenu({
                 'bg-secondary/50 hover:bg-secondary/70',
             )}
           >
-            <Heart className="text-accent h-4 w-4" />
+            {pathname.includes('/wishlists') ? (
+              <FaHeart className="text-accent h-4 w-4" />
+            ) : (
+              <FaRegHeart className="text-accent h-4 w-4" />
+            )}
             <span>Wishlists</span>
             <div className="bg-accent absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full transition-all duration-300 ease-out group-hover:w-1/2" />
           </Link>
