@@ -316,9 +316,25 @@ export async function loadMoreCollectionCards(
   const collectionCardsRepo: Collection<CollectionCard> =
     db.collection('collection-cards');
 
+  // Get the current user's session
+  const session = await getServerSession(authConfig);
+  if (!session?.user?.id) {
+    throw new Error('User not authenticated');
+  }
+
   const pipeline: any[] = [];
 
-  pipeline.push({ $match: { collectionType } });
+  // Add userId check to ensure only cards with a valid userId are shown
+  pipeline.push({
+    $match: {
+      collectionType,
+      userId: {
+        $eq: session.user.id,
+        $exists: true,
+        $ne: null,
+      },
+    },
+  });
 
   pipeline.push({
     $group: {
@@ -403,7 +419,16 @@ export async function loadMoreCollectionCards(
     }
 
     const countPipeline = [
-      { $match: { collectionType } },
+      {
+        $match: {
+          collectionType,
+          userId: {
+            $eq: session.user.id,
+            $exists: true,
+            $ne: null,
+          },
+        },
+      },
       {
         $group: {
           _id: '$cardId',

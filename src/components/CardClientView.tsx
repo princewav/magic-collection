@@ -23,14 +23,24 @@ export function CardClientView({
 
   // Small delay to ensure smooth transition from skeleton to content
   useEffect(() => {
-    // Immediate state update when we have data
-    if (cardsData?.cards?.length > 0) {
+    // Set isReady to true if cardsData is available,
+    // indicating that the data fetching process has completed.
+    if (typeof cardsData !== 'undefined') {
       setIsReady(true);
     }
-  }, [cardsData]);
+
+    // Debug logging
+    console.log('CardClientView Debug:', {
+      hasCardsData: Boolean(cardsData),
+      cardsLength: cardsData?.cards?.length,
+      total: cardsData?.total,
+      isReady,
+      collectionType,
+    });
+  }, [cardsData]); // зависимости isReady и collectionType удалены, т.к. не влияют на установку isReady
 
   // Ensure we have data before rendering
-  if (!isReady && !cardsData?.cards?.length) {
+  if (!isReady) {
     return null;
   }
 

@@ -8,7 +8,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { useCardModal } from '@/context/CardModalContext';
 import Image from 'next/image';
 import { ManaSymbol } from './ManaSymbol';
-import { Search } from 'lucide-react';
+import { Search, XCircle } from 'lucide-react';
 
 interface CardListProps {
   collectionType: 'paper' | 'arena' | undefined;
@@ -32,6 +32,7 @@ export function CardList({
     isLoading: collectionLoadingFromContext,
     loadNextPage: loadNextCollectionPageFromContext,
     total: collectionTotalFromContext,
+    currentFilters,
   } = useCollection();
   const { openModal } = useCardModal();
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -40,21 +41,32 @@ export function CardList({
   const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
 
-  // Determine if we're using server-loaded data via initialCards
-  const isServerLoaded = Boolean(initialCards && initialCards.length > 0);
+  const hasInitialServerData = typeof initialCards !== 'undefined';
 
-  const cards = collectionType
-    ? collectedCardsFromContext
-    : generalCardsFromContext;
-  const isLoading = isServerLoaded
-    ? false
-    : collectionType
-      ? collectionLoadingFromContext
-      : generalLoadingFromContext;
-  const total = collectionType
-    ? collectionTotalFromContext
-    : generalTotalFromContext;
-  const loadNextPage = collectionType
+  let localDisplayCards: CardWithOptionalQuantity[];
+  let localDisplayTotal: number;
+  let localDisplayIsLoading: boolean;
+
+  if (hasInitialServerData) {
+    localDisplayCards = initialCards!;
+    localDisplayTotal = initialTotal!;
+    localDisplayIsLoading = false;
+  } else {
+    if (collectionType) {
+      localDisplayCards = collectedCardsFromContext;
+      localDisplayTotal = collectionTotalFromContext;
+      localDisplayIsLoading = collectionLoadingFromContext;
+    } else {
+      localDisplayCards = generalCardsFromContext;
+      localDisplayTotal = generalTotalFromContext;
+      localDisplayIsLoading = generalLoadingFromContext;
+    }
+  }
+
+  const contextIsLoading = collectionType
+    ? collectionLoadingFromContext
+    : generalLoadingFromContext;
+  const contextLoadNextPage = collectionType
     ? loadNextCollectionPageFromContext
     : loadNextGeneralPageFromContext;
 
@@ -72,33 +84,53 @@ export function CardList({
       const target = entries[0];
       setIsIntersecting(target.isIntersecting);
 
-      if (target.isIntersecting && !isLoading && cards.length < total) {
+      if (
+        target.isIntersecting &&
+        !contextIsLoading &&
+        localDisplayCards.length < localDisplayTotal
+      ) {
         // Use a small delay to prevent multiple triggers
         if (loadingTimerRef.current) {
           clearTimeout(loadingTimerRef.current);
         }
 
         loadingTimerRef.current = setTimeout(() => {
-          loadNextPage();
+          contextLoadNextPage();
         }, 150);
       }
     },
-    [isLoading, loadNextPage, cards.length, total],
+    [
+      contextIsLoading,
+      contextLoadNextPage,
+      localDisplayCards.length,
+      localDisplayTotal,
+      setIsIntersecting,
+    ],
   );
 
   // Re-attempt loading when the loading state changes or cards array changes
   useEffect(() => {
-    if (isIntersecting && !isLoading && cards.length < total) {
+    if (
+      isIntersecting &&
+      !contextIsLoading &&
+      localDisplayCards.length < localDisplayTotal
+    ) {
       // Try loading more after loading state changes
       if (loadingTimerRef.current) {
         clearTimeout(loadingTimerRef.current);
       }
 
       loadingTimerRef.current = setTimeout(() => {
-        loadNextPage();
+        contextLoadNextPage();
       }, 150);
     }
-  }, [isLoading, cards.length, total, isIntersecting, loadNextPage]);
+  }, [
+    contextIsLoading,
+    localDisplayCards.length,
+    localDisplayTotal,
+    isIntersecting,
+    contextLoadNextPage,
+  ]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -144,8 +176,30 @@ export function CardList({
     );
   };
 
-  // Add empty state handling similar to CardGrid
-  const showEmptyState = !isServerLoaded && cards.length === 0 && !isLoading;
+  // Determine if we're showing an empty state
+  const showEmptyState =
+    localDisplayCards.length === 0 && !localDisplayIsLoading;
+  // Check if we have any active filters
+  const hasActiveFilters = Object.values(currentFilters).some(
+    (value) => value && (Array.isArray(value) ? value.length > 0 : true),
+  );
+
+  // Debug logging
+  console.log('CardList Debug:', {
+    hasInitialServerData,
+    initialCardsLength: initialCards?.length,
+    initialTotal,
+    cardsLength: localDisplayCards.length,
+    isLoading: localDisplayIsLoading,
+    contextIsLoading,
+    showEmptyState,
+    hasActiveFilters,
+    currentFilters,
+    collectionType,
+    total: localDisplayTotal,
+    collectedCardsFromContext: collectedCardsFromContext.length,
+    generalCardsFromContext: generalCardsFromContext.length,
+  });
 
   return (
     <div className="relative">
@@ -154,11 +208,20 @@ export function CardList({
           <div className="bg-muted mb-6 flex h-20 w-20 items-center justify-center rounded-full">
             <Search className="text-muted-foreground/70 h-10 w-10" />
           </div>
-          <h3 className="mb-2 text-xl font-semibold">No cards found</h3>
+          <h3 className="mb-2 text-xl font-semibold">
+            {hasActiveFilters ? 'No cards found' : 'Your collection is empty'}
+          </h3>
           <p className="text-muted-foreground mb-6 max-w-md">
-            Try adjusting your search filters or removing some constraints to
-            see more results.
+            {hasActiveFilters
+              ? 'Try adjusting your search filters or removing some constraints to see more results.'
+              : 'Start building your collection by adding cards from the search page.'}
           </p>
+          {hasActiveFilters && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <XCircle className="h-4 w-4" />
+              <span>Filters may be too restrictive</span>
+            </div>
+          )}
         </div>
       ) : (
         <div className="w-full overflow-x-auto">
@@ -180,10 +243,10 @@ export function CardList({
               </tr>
             </thead>
             <tbody>
-              {cards.map((card, index) => (
+              {localDisplayCards.map((card, index) => (
                 <tr
                   key={`${card.id}-${index}`}
-                  onClick={() => openModal(card, cards)}
+                  onClick={() => openModal(card, localDisplayCards)}
                   className="hover:bg-secondary/20 cursor-pointer border-b transition-colors"
                 >
                   <td className="flex items-center gap-2 p-2 align-middle">
@@ -221,7 +284,7 @@ export function CardList({
         </div>
       )}
       <div ref={loadingRef} className="h-20 w-full">
-        {isLoading && !isServerLoaded && (
+        {contextIsLoading && (
           <div className="flex justify-center py-4">
             <LoadingSpinner />
           </div>

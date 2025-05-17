@@ -29,6 +29,20 @@ export async function CardContainer({
       ? { cards: initialCardsWithQuantity, total: totalUnique }
       : await fetchCards(filters, page, pageSize, deduplicate, collectionType);
 
+  // Debug logging
+  console.log('CardContainer Debug:', {
+    hasInitialCards: Boolean(initialCardsWithQuantity),
+    initialCardsLength: initialCardsWithQuantity?.length,
+    totalUnique,
+    fetchedCardsLength: cardsData.cards.length,
+    total: cardsData.total,
+    filters,
+    page,
+    pageSize,
+    deduplicate,
+    collectionType,
+  });
+
   return (
     <CardClientView cardsData={cardsData} collectionType={collectionType} />
   );
