@@ -536,7 +536,7 @@ export function Filters({
     >
       {!isOpen && <h2 className="text-xs font-medium md:text-sm">Filters</h2>}
       <CollapsibleTrigger asChild>
-        <div className="absolute top-5 right-3 flex cursor-pointer items-center justify-between">
+        <div className="absolute top-3 right-3 flex cursor-pointer items-center justify-between">
           {isOpen ? (
             <ChevronUp className="h-5 w-5 transition-transform duration-300" />
           ) : (
