@@ -121,7 +121,7 @@ export function Card({
           {card.card_faces.length > 1 && (
             <button
               onClick={toggleFace}
-              className="absolute right-2 bottom-2 rounded-full bg-black/70 p-1 text-white hover:bg-black/90 cursor-pointer"
+              className="absolute right-2 bottom-2 cursor-pointer rounded-full bg-black/70 p-1 text-white hover:bg-black/90"
               aria-label="Flip card"
             >
               <Repeat className="h-5 w-5" />
